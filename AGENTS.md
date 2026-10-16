@@ -116,6 +116,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Never claim browser, GPU, mobile, or production verification that was not actually performed.
 - Update documentation when architecture, commands, boundaries, or operational assumptions change.
 
+## Context Efficiency & Documentation
+
+- Before starting a task, read this `AGENTS.md` and determine the current development phase.
+- Load only documentation files and sections directly relevant to the task; do not read all project documentation by default.
+- Use `docs/ROADMAP.md` to confirm the current phase, its boundaries, and dependencies, but do not reread the full roadmap for every small change.
+- Do not scan the entire repository for a task scoped to one module; begin with the smallest necessary code area and expand only when evidence requires it.
+- Keep handoff reports concise: state what changed, which checks ran, and which problems or limitations remain instead of repeating long architecture descriptions.
+- Reuse existing components, types, and utilities; do not create duplicate functionality.
+- For multi-step work, record durable decisions in the relevant documentation instead of relying only on chat history.
+- Context efficiency never overrides required tests, validation, security checks, or build verification.
+
 ## Git workflow
 
 - Check `git status` before editing and preserve unrelated user changes.
