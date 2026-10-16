@@ -146,24 +146,7 @@ the same maneuver truth; country-specific tests cover legal decisions; no foreig
 
 **Dependencies:** Phase 4 scene contracts and approved Ukrainian educational sources.
 
-### Phase 6 — Admin Dashboard — Planned
-
-**Goal:** provide controlled workflows for managing educational content and platform operations.
-
-**Main tasks:** create `apps/admin`; define roles and permissions; build reviewed publishing workflows
-for lessons, tickets, scenarios, assets, countries, SEO, and integrations; add user, subscription,
-payment, analytics, monitoring, and audit-log views only as backend capabilities become available.
-
-**Result:** authorized staff can manage versioned content safely, with preview, validation, approval,
-and traceable changes.
-
-**Done criteria:** least-privilege access works; drafts and publishing are distinct; destructive actions
-are protected; audit events are recorded; Studio/Composer previews use production contracts.
-
-**Dependencies:** Phases 4–5 and the necessary authenticated APIs from Phase 7. Detailed sequencing
-between Phases 6 and 7 may be refined, but Admin must not invent a temporary production backend.
-
-### Phase 7 — Backend Foundation — Planned
+### Phase 6 — Backend Foundation — Planned
 
 **Goal:** provide a secure NestJS backend for users, content, progress, access, and integrations.
 
@@ -179,8 +162,27 @@ future Mobile clients.
 integration tests cover critical paths; logs exclude secrets and sensitive data; backup recovery is
 demonstrated.
 
-**Dependencies:** Phase 2 service boundaries and Phase 5 domain contracts. It can be prototyped before
-Admin, but Admin integration depends on stable authenticated endpoints.
+**Dependencies:** Phase 2 service boundaries and Phase 5 domain contracts. Backend capabilities are
+delivered incrementally; Phase 7 may begin when its required authenticated contracts are stable,
+without waiting for all server-side business logic to be implemented.
+
+### Phase 7 — Admin Dashboard — Planned
+
+**Goal:** provide controlled workflows for managing educational content and platform operations.
+
+**Main tasks:** create `apps/admin`; define roles and permissions; build reviewed publishing workflows
+for lessons, tickets, scenarios, assets, countries, SEO, and integrations; add user, subscription,
+payment, analytics, monitoring, and audit-log views only as backend capabilities become available.
+
+**Result:** authorized staff can manage versioned content safely, with preview, validation, approval,
+and traceable changes.
+
+**Done criteria:** least-privilege access works; drafts and publishing are distinct; destructive actions
+are protected; audit events are recorded; Studio/Composer previews use production contracts.
+
+**Dependencies:** Phases 4–6 and the authenticated API slices required by each Admin workflow. Admin
+development proceeds incrementally with Phase 6 capabilities and must not invent a temporary
+production backend or wait for unrelated backend business logic.
 
 ### Phase 8 — CI/CD, Testing & Architecture Quality — Planned
 
@@ -225,6 +227,22 @@ Planned learning features include Ukrainian road-rules theory, legally permitted
 materials, 2D and 3D tickets, detailed explanations, progress tracking, practice modes, and mock exams.
 Content provenance, effective dates, review, accessibility, and Ukrainian-language quality are release
 requirements rather than later cleanup.
+
+#### 2D and 3D Content Strategy
+
+- Not every road-rules ticket needs a dedicated 3D scene.
+- Simple questions use text, images, and 2D illustrations.
+- Complex road situations use interactive 3D when spatial context materially improves learning.
+- One 3D location can support dozens or hundreds of different scenario configurations.
+- The Scene Composer assembles 3D scenes from reusable Asset Library components.
+- Examination questions, images, explanations, and 3D configurations are stored separately.
+- A ticket can support 2D, 3D, or both modes without duplicating its authoritative answer logic.
+- Every answer and explanation must match verified Ukrainian road rules and permitted sources.
+- Future country rulesets reuse the common 3D engine rather than requiring it to be rewritten.
+
+For example, one four-way intersection can be reused across many tickets by changing the vehicles,
+road signs, priorities, and directions of travel in its configuration. The location remains the same;
+the educational situation and its verified answer change independently.
 
 ### Users
 
