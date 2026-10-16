@@ -1,35 +1,28 @@
 {
-	"name": "ruh-3d",
-	"version": "1.0.0",
-	"private": true,
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build --webpack",
-		"start": "next start",
-		"lint": "eslint .",
-		"test": "vitest run"
-	},
-	"dependencies": {
-		"@react-three/drei": "^10.7.6",
-		"@react-three/fiber": "^9.4.0",
-		"lucide-react": "^0.548.0",
-		"next": "^16.0.0",
-		"react": "^19.2.0",
-		"react-dom": "^19.2.0",
-		"three": "^0.180.0",
-		"zustand": "^5.0.8"
-	},
-	"devDependencies": {
-		"@react-three/test-renderer": "^9.1.1",
-		"@tailwindcss/postcss": "^4.1.14",
-		"@types/node": "^24.8.1",
-		"@types/react": "^19.2.2",
-		"@types/react-dom": "^19.2.2",
-		"@types/three": "^0.180.0",
-		"eslint": "^9.37.0",
-		"eslint-config-next": "^16.0.0",
-		"tailwindcss": "^4.1.14",
-		"typescript": "^5.9.3",
-		"vitest": "^3.2.4"
-	}
+  "name": "traffic-laws",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=24.12.0 <25",
+    "pnpm": ">=10.34.7 <11"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@traffic-laws/studio",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint . && turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "audit:imports": "node scripts/check-imports.mjs",
+    "check": "pnpm audit:imports && pnpm lint && pnpm test && pnpm typecheck && pnpm build && pnpm format:check"
+  },
+  "devDependencies": {
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.1",
+    "prettier": "3.9.10",
+    "turbo": "2.11.9",
+    "typescript": "5.9.3"
+  }
 }

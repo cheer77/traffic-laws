@@ -1,4 +1,10 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-export default defineConfig([...nextVitals, ...nextTs, globalIgnores([".next/**"])]);
+
+export default defineConfig([
+  globalIgnores(["apps/**", "**/node_modules/**", ".next/**", "out/**", ".turbo/**"]),
+  {
+    files: ["**/*.mjs"],
+    languageOptions: { globals: { console: "readonly", process: "readonly" } },
+    rules: { "no-unused-vars": "error", "no-undef": "error" },
+  },
+]);

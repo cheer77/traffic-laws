@@ -1,0 +1,16 @@
+**/node_modules/
+**/.next/
+**/out/
+**/.turbo/
+**/coverage/
+**/next-env.d.ts
+pnpm-lock.yaml
+.openai/
+# Preserve existing Studio sources byte-for-byte during migration.
+apps/studio/src/
+apps/studio/scripts/
+# Historical reports and generated agent instructions.
+docs/SCENE_STUDIO_UPGRADE.md
+docs/VEHICLE_MODELS.md
+AGENTS.md
+**/AGENTS.md

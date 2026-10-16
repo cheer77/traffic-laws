@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Only these dependencies may execute native installation scripts.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
