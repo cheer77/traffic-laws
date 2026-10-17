@@ -3,6 +3,13 @@
 ```text
 traffic-laws/
 ├── apps/
+│   ├── web/
+│   │   ├── src/app/               # Минимальная пользовательская страница
+│   │   ├── package.json
+│   │   ├── next.config.ts
+│   │   ├── tsconfig.json
+│   │   ├── eslint.config.mjs
+│   │   └── postcss.config.mjs
 │   └── studio/
 │       ├── src/
 │       │   ├── app/                 # Next.js: страница, layout, CSS
@@ -52,4 +59,5 @@ traffic-laws/
 
 Генерируемые `node_modules`, `.next`, `out`, `next-env.d.ts` и кеш TypeScript не входят в Git. `pnpm-lock.yaml` — единственный lockfile репозитория. Старый `package-lock.json` доступен в Git-истории и в резервной папке миграции.
 
-Каталоги `apps/web`, `apps/admin` и `apps/api` не созданы.
+Каталоги `apps/admin`, `apps/api` и `apps/mobile` не созданы. Они остаются планируемыми границами,
+а не реализованными приложениями.

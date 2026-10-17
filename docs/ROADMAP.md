@@ -21,8 +21,10 @@ Status labels in this document have strict meanings:
 - **Phase 1 — Completed.** The audit and monorepo foundation are finished.
 - The existing 3D Studio was moved intact to `apps/studio`.
 - All 54 automated tests passed according to the Phase 1 audit.
-- **Phase 2 — Planned and not started.**
-- Backend, Admin, the user-facing learning platform, and Mobile are not implemented.
+- **Phase 2 — Completed.** Application boundaries and the minimal user-facing Web shell are in place.
+- `apps/web` and `apps/studio` run and build independently; applications may not import each
+  other's internal files.
+- Backend, Admin, product learning features, and Mobile are not implemented.
 - No shared production package exists under `packages` yet.
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
@@ -36,6 +38,7 @@ separate. A package is created only when its boundary and consumers are real.
 
 | Path          | Status           | Responsibility                             |
 | ------------- | ---------------- | ------------------------------------------ |
+| `apps/web`    | Implemented      | Minimal Ukrainian user-platform shell      |
 | `apps/studio` | Implemented      | Existing 3D Asset Library and Scene Studio |
 | `tooling`     | Implemented      | Shared TypeScript and ESLint configuration |
 | `scripts`     | Implemented      | Repository validation utilities            |
@@ -43,12 +46,11 @@ separate. A package is created only when its boundary and consumers are real.
 
 ### Planned applications
 
-| Path          | Status  | Intended responsibility                                              |
-| ------------- | ------- | -------------------------------------------------------------------- |
-| `apps/web`    | Planned | User-facing theory, tickets, exams, progress, and account experience |
-| `apps/admin`  | Planned | Content, users, payments, countries, assets, access, and operations  |
-| `apps/api`    | Planned | NestJS backend and stable application APIs                           |
-| `apps/mobile` | Future  | Expo / React Native applications for iOS and Android                 |
+| Path          | Status  | Intended responsibility                                             |
+| ------------- | ------- | ------------------------------------------------------------------- |
+| `apps/admin`  | Planned | Content, users, payments, countries, assets, access, and operations |
+| `apps/api`    | Planned | NestJS backend and stable application APIs                          |
+| `apps/mobile` | Future  | Expo / React Native applications for iOS and Android                |
 
 ### Planned shared packages
 
@@ -82,7 +84,7 @@ and Studio startup pass; migration and limitations documented.
 
 **Dependencies:** none. This is the foundation for every later phase.
 
-### Phase 2 — Applications Separation — Planned
+### Phase 2 — Applications Separation — Completed
 
 **Goal:** define clear application boundaries before product feature development begins.
 
@@ -90,11 +92,12 @@ and Studio startup pass; migration and limitations documented.
 `api`; define contracts with Studio; establish environment and configuration conventions; decide
 which application is created first based on validated product needs.
 
-**Result:** documented application architecture and, only when explicitly approved, minimal shells
-for the applications in scope without duplicating Studio code.
+**Result:** documented application architecture and an explicitly approved minimal `apps/web` shell,
+without product features or duplicated Studio code. Web runs on port 3000 and Studio on port 3001.
 
-**Done criteria:** ownership and dependency rules are agreed; development/build commands remain
-simple; Studio remains unchanged; no application imports another application's internals.
+**Done criteria:** ownership and dependency rules are documented; development/build commands remain
+simple; Studio remains unchanged; an automated audit confirms that no application imports another
+application's internals.
 
 **Dependencies:** Phase 1 completion and an approved product boundary for each new application.
 

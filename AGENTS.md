@@ -21,7 +21,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Current repository
 
 - This is a pnpm Workspaces + Turborepo monorepo.
-- `apps/studio` is the only implemented application: the existing Next.js 3D Asset Library and Scene Studio.
+- `apps/web` is the minimal user-facing Next.js application; product features are not implemented yet.
+- `apps/studio` is the existing Next.js 3D Asset Library and Scene Studio.
 - `packages` currently contains no implemented shared package; create one only for proven reuse.
 - `tooling` owns shared TypeScript and ESLint configuration.
 - `scripts` contains repository-level validation utilities.
@@ -139,8 +140,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Roadmap discipline
 
 - Phase 1, Audit & Monorepo Foundation, is complete.
-- Phase 2 has not started.
-- New applications, backend, shared engines, and product features remain Planned.
+- Phase 2, Applications Separation, is complete.
+- Phase 3 has not started; backend, Admin, Mobile, shared engines, and product features remain Planned.
 - Before implementation, confirm the active phase in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - If a request crosses phase boundaries, document the conflict and ask for explicit direction.
 - Do not turn roadmap examples into production code without an approved implementation task.

@@ -9,7 +9,11 @@
   },
   "scripts": {
     "dev": "turbo run dev --filter=@traffic-laws/studio",
+    "dev:web": "turbo run dev --filter=@traffic-laws/web",
+    "dev:studio": "turbo run dev --filter=@traffic-laws/studio",
     "build": "turbo run build",
+    "build:web": "turbo run build --filter=@traffic-laws/web",
+    "build:studio": "turbo run build --filter=@traffic-laws/studio",
     "typecheck": "turbo run typecheck",
     "lint": "eslint . && turbo run lint",
     "test": "turbo run test",
