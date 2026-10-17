@@ -66,3 +66,14 @@ traffic-laws/
 
 Каталоги `apps/admin`, `apps/api` и `apps/mobile` не созданы. Они остаются планируемыми границами,
 а не реализованными приложениями.
+
+## Добавления Фазы 4
+
+- `packages/scene-engine/src` — Scene Definition v1, validation/JSON, presets and independent R3F rendering.
+- `apps/studio/src/lib/composer` — immutable instance operations, storage codec, navigation and AABB hints.
+- `apps/studio/src/stores/useComposerStore.ts` — document and editor workflow state.
+- `apps/studio/src/components/composer` — scene list, Inspector, local persistence and transform gizmo.
+- `apps/web/src/app/dev/scene-engine` — gated development-only independent engine consumer.
+
+`packages/scene-composer` is not created: the editor has only one current consumer. See the
+[Phase 4 audit](phase-4-audit.md) for boundaries, usage and verification.

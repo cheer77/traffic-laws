@@ -35,6 +35,9 @@ importers:
       '@traffic-laws/assets-3d':
         specifier: workspace:*
         version: link:../../packages/assets-3d
+      '@traffic-laws/scene-engine':
+        specifier: workspace:*
+        version: link:../../packages/scene-engine
       lucide-react:
         specifier: ^0.548.0
         version: 0.548.0(react@19.3.1)
@@ -102,6 +105,9 @@ importers:
       '@traffic-laws/assets-3d':
         specifier: workspace:*
         version: link:../../packages/assets-3d
+      '@traffic-laws/scene-engine':
+        specifier: workspace:*
+        version: link:../../packages/scene-engine
       next:
         specifier: ^16.0.0
         version: 16.4.1(@babel/core@7.29.7)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -160,6 +166,40 @@ importers:
       three-stdlib:
         specifier: 2.36.1
         version: 2.36.1(three@0.180.0)
+    devDependencies:
+      '@react-three/test-renderer':
+        specifier: ^9.1.1
+        version: 9.1.1(@react-three/fiber@9.8.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(three@0.180.0))(react@19.3.1)(three@0.180.0)
+      '@types/node':
+        specifier: ^24.8.1
+        version: 24.19.2
+      '@types/react':
+        specifier: ^19.2.2
+        version: 19.3.0
+      '@types/three':
+        specifier: ^0.180.0
+        version: 0.180.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.32.0)
+
+  packages/scene-engine:
+    dependencies:
+      '@react-three/fiber':
+        specifier: ^9.4.0
+        version: 9.8.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(three@0.180.0)
+      '@traffic-laws/assets-3d':
+        specifier: workspace:*
+        version: link:../assets-3d
+      react:
+        specifier: ^19.2.0
+        version: 19.3.1
+      three:
+        specifier: ^0.180.0
+        version: 0.180.0
     devDependencies:
       '@react-three/test-renderer':
         specifier: ^9.1.1

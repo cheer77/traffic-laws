@@ -23,7 +23,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - This is a pnpm Workspaces + Turborepo monorepo.
 - `apps/web` is the minimal user-facing Next.js application; product features are not implemented yet.
 - `apps/studio` is the existing Next.js 3D Asset Library and Scene Studio.
-- `packages/assets-3d` owns shared procedural models, resources, and the asset registry; Studio and a development-only Web check consume it. Create other packages only for proven reuse.
+- `packages/assets-3d` owns shared procedural models, resources, and the asset registry.
+- `packages/scene-engine` owns validated versioned scene data, presets and independent rendering; Studio and a development-only Web check consume it.
+- Scene Composer operations, storage and UI stay inside Studio; there is no separate `scene-composer` package. Create other packages only for proven reuse.
 - `tooling` owns shared TypeScript and ESLint configuration.
 - `scripts` contains repository-level validation utilities.
 - Do not imply that planned apps or packages already exist.
@@ -77,7 +79,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Preserve the existing Studio appearance and behavior unless a task explicitly changes them.
 - Do not rewrite models, cameras, lighting, controls, or environment as incidental cleanup.
 - Keep business rules, scene rendering, simulation, and UI state separated.
-- A future scene engine must not contain country-specific legal decisions.
+- The scene engine must not contain country-specific legal decisions.
 - A future country-rules module must not depend on Three.js or React.
 - Reuse geometries, materials, textures, and instancing where appropriate.
 - Dispose dynamically owned GPU resources; document intentionally process-lifetime caches.
@@ -141,7 +143,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Phase 1, Audit & Monorepo Foundation, is complete.
 - Phase 2, Applications Separation, is complete.
-- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4, backend, Admin, Mobile, shared engines, and product features remain Planned.
+- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete; see `docs/phase-4-audit.md` for implementation and verification. Phase 5, backend, Admin, Mobile, simulation, and product learning features remain Planned.
 - Before implementation, confirm the active phase in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - If a request crosses phase boundaries, document the conflict and ask for explicit direction.
 - Do not turn roadmap examples into production code without an approved implementation task.
+
+## Scene authoring boundaries
+
+- Validate untrusted JSON with `@traffic-laws/scene-engine` before rendering or replacing a draft.
+- JSON v1 uses meters, Euler XYZ radians and uniform positive scales; UI converts degrees explicitly.
+- Use stable registry asset IDs and unique instance IDs. Keep questions, answers, physics and legal rules outside scene data.
+- Preserve the urban preset and collection batching. Unknown schema versions require explicit migration, never silent coercion.
+- Root engine exports stay data-only; heavy R3F exports live under `/react`. Never import Studio or editor dependencies into the engine or production Web.
+- localStorage is a temporary per-browser workspace; portable backups use validated JSON. Preserve the current draft on failed loads and report storage errors.
+- Run scene/asset parity tests and comparable browser measurements for renderer changes.

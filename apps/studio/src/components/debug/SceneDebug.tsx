@@ -2,11 +2,13 @@
 import { useLayoutEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { useComposerStore } from "@/stores/useComposerStore";
 import { useStudioStore } from "@/stores/useStudioStore";
 import { inspectObject } from "@/lib/objectInspection";
 import { APPROACHES, laneGeometry, lanePoint, ROAD } from "@/lib/roadGeometry";
 
 export function SceneDebug(){
+ const definition=useComposerStore(s=>s.scene);
  const scene=useThree(s=>s.scene),invalidate=useThree(s=>s.invalidate);
  const selected=useStudioStore(s=>s.selectedId),preview=useStudioStore(s=>s.preview),debug=useStudioStore(s=>s.debug);
  const layers=useStudioStore(s=>s.layers),visible=useStudioStore(s=>s.visible),headlights=useStudioStore(s=>s.headlights),wheels=useStudioStore(s=>s.wheelPreview);
@@ -51,6 +53,6 @@ export function SceneDebug(){
   }
   scene.add(helpers);invalidate();
   return ()=>{restore.forEach(fn=>fn());scene.remove(helpers);disposables.forEach(resource=>resource.dispose())};
- },[scene,invalidate,selected,preview,debug,layers,visible,headlights,wheels,lighting,quality]);
+ },[definition,scene,invalidate,selected,preview,debug,layers,visible,headlights,wheels,lighting,quality]);
  return null;
 }

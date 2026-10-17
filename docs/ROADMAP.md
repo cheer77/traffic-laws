@@ -27,6 +27,7 @@ Status labels in this document have strict meanings:
 - Backend, Admin, product learning features, and Mobile are not implemented.
 - **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
 - Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
+- **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md). Phase 5 remains Planned.
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -37,13 +38,14 @@ separate. A package is created only when its boundary and consumers are real.
 
 ### Implemented now
 
-| Path                 | Status      | Responsibility                                   |
-| -------------------- | ----------- | ------------------------------------------------ |
-| `apps/web`           | Implemented | Minimal Ukrainian user-platform shell            |
-| `apps/studio`        | Implemented | Existing 3D Asset Library and Scene Studio       |
-| `tooling`            | Implemented | Shared TypeScript and ESLint configuration       |
-| `scripts`            | Implemented | Repository validation utilities                  |
-| `packages/assets-3d` | Implemented | Shared procedural models, resources and registry |
+| Path                    | Status      | Responsibility                                          |
+| ----------------------- | ----------- | ------------------------------------------------------- |
+| `apps/web`              | Implemented | Minimal Ukrainian user-platform shell                   |
+| `apps/studio`           | Implemented | Existing 3D Asset Library and Scene Studio              |
+| `tooling`               | Implemented | Shared TypeScript and ESLint configuration              |
+| `scripts`               | Implemented | Repository validation utilities                         |
+| `packages/assets-3d`    | Implemented | Shared procedural models, resources and registry        |
+| `packages/scene-engine` | Implemented | Versioned scene data, validation, presets and rendering |
 
 ### Planned applications
 
@@ -55,15 +57,15 @@ separate. A package is created only when its boundary and consumers are real.
 
 ### Shared packages: implemented and planned
 
-| Path                           | Status      | Intended responsibility                                          |
-| ------------------------------ | ----------- | ---------------------------------------------------------------- |
-| `packages/assets-3d`           | Implemented | Optimized, versioned 3D models and asset metadata                |
-| `packages/scene-engine`        | Planned     | Shared rendering primitives and runtime scene infrastructure     |
-| `packages/scene-composer`      | Planned     | Deterministic assembly of scenes from validated configuration    |
-| `packages/simulation-engine`   | Planned     | Vehicle movement, trajectories, timing, and collision prevention |
-| `packages/country-rules`       | Planned     | Country-specific rulesets behind a common legal contract         |
-| `packages/scenarios`           | Planned     | Educational situations, tickets, answers, and explanations       |
-| `packages/educational-content` | Planned     | Lessons, images, 2D tickets, localization, and translations      |
+| Path                           | Status      | Intended responsibility                                              |
+| ------------------------------ | ----------- | -------------------------------------------------------------------- |
+| `packages/assets-3d`           | Implemented | Optimized, versioned 3D models and asset metadata                    |
+| `packages/scene-engine`        | Implemented | Shared rendering primitives and runtime scene infrastructure         |
+| `packages/scene-composer`      | Deferred    | Composer operations currently live inside Studio; no second consumer |
+| `packages/simulation-engine`   | Planned     | Vehicle movement, trajectories, timing, and collision prevention     |
+| `packages/country-rules`       | Planned     | Country-specific rulesets behind a common legal contract             |
+| `packages/scenarios`           | Planned     | Educational situations, tickets, answers, and explanations           |
+| `packages/educational-content` | Planned     | Lessons, images, 2D tickets, localization, and translations          |
 
 These names describe target boundaries, not permission to create every package at once. Extraction
 must follow a concrete use case, dependency review, and the currently approved phase.
@@ -104,7 +106,7 @@ application's internals.
 
 ### Phase 3 — 3D Asset Library — Architectural foundation completed; expansion ongoing
 
-**Architectural delivery:** 21 real registry entries, measured local bounds, shared resources, typed Studio adapters, searchable Studio index, isolated development-only Web consumer, and automated boundary/geometry checks. Desktop Chrome visual smoke tests and scene counters passed; see [evidence and measurement limits](phase-3-audit.md). This does not authorize Phase 4.
+**Architectural delivery:** 21 real registry entries, measured local bounds, shared resources, typed Studio adapters, searchable Studio index, isolated development-only Web consumer, and automated boundary/geometry checks. Desktop Chrome visual smoke tests and scene counters passed; see [evidence and measurement limits](phase-3-audit.md). Phase 4 was separately authorized and completed; see its audit below.
 
 **Goal:** turn proven Studio assets into a governed, reusable catalog without degrading quality.
 
@@ -120,7 +122,7 @@ pass; no duplicate asset ownership; Studio can inspect every supported asset.
 
 **Dependencies:** Phase 2 boundaries and the preserved Studio asset implementation.
 
-### Phase 4 — Scene Engine & Scene Composer — Planned
+### Phase 4 — Scene Engine & Scene Composer — Completed
 
 **Goal:** render and assemble reusable road scenes from validated, versioned configuration.
 
@@ -133,6 +135,8 @@ embedding educational or country-specific rules in the renderer.
 
 **Done criteria:** schemas validate; reference scenes round-trip; rendering matches Studio baselines;
 invalid configuration fails clearly; CPU/GPU budgets and browser tests pass.
+
+**Verified delivery:** `packages/scene-engine` is consumed by Studio and development-only Web. Studio supports four modes, object editing, versioned JSON import/export and local drafts/snapshots. The original 26-instance city preserves geometry/materials/placement and renderer budgets. All 139 tests and required checks pass; desktop Chrome flows and comparable performance are documented in [the Phase 4 audit](phase-4-audit.md). Only the urban preset exists. Separate `scene-composer` extraction is deferred until a second consumer exists.
 
 **Dependencies:** Phase 3 asset contracts and Phase 2 application boundaries.
 
@@ -222,10 +226,10 @@ license, preview, compatibility, and performance metadata.
 
 ### Scene Composer
 
-The planned composer will build road situations automatically from validated JSON configuration and
-ready-made components. Configuration will describe intent and placement; it will not contain ad hoc
-rendering code. Schemas, version migrations, deterministic output, meaningful validation errors, and
-preview parity are required before it becomes a content-production dependency.
+Phase 4 implements static scene composition from validated JSON and existing assets in Studio.
+It includes one urban preset, object editing, import/export and local storage. Automated scenario
+generation, movement and educational decisions remain future work. New schema versions require
+explicit migrations; only version 1 is supported today. See [the audit](phase-4-audit.md).
 
 ### Learning experience
 

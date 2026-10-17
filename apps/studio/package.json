@@ -19,7 +19,8 @@
     "three": "^0.180.0",
     "zustand": "^5.0.8",
     "three-stdlib": "2.36.1",
-    "@traffic-laws/assets-3d": "workspace:*"
+    "@traffic-laws/assets-3d": "workspace:*",
+    "@traffic-laws/scene-engine": "workspace:*"
   },
   "devDependencies": {
     "@react-three/test-renderer": "^9.1.1",

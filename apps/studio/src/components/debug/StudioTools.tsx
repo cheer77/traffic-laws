@@ -11,7 +11,7 @@ export function StudioTools(){
  const debug=useStudioStore(s=>s.debug),lighting=useStudioStore(s=>s.lighting),shadows=useStudioStore(s=>s.shadows),frameLimit=useStudioStore(s=>s.frameLimit),trafficSignal=useStudioStore(s=>s.trafficSignal);
  const state=useStudioStore.getState(),asset=SCENE_ASSET_BY_ID[selected];
  return <>
-  <details className="tuning-panel"><summary><span><Box size={15}/>Інспектор об’єкта</span><ChevronDown size={14}/></summary>
+  {preview&&<details className="tuning-panel"><summary><span><Box size={15}/>Інспектор об’єкта</span><ChevronDown size={14}/></summary>
    <div className="tuning-content">
     <label className="field-label" htmlFor="inspect-object">Вибрати об’єкт</label>
     <select id="inspect-object" value={selected} onChange={e=>state.selectObject(e.target.value)}>{SCENE_ASSETS.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select>
@@ -30,7 +30,7 @@ export function StudioTools(){
     <label className="layer-row"><span>Каркас моделі</span><input type="checkbox" role="switch" checked={debug.wireframe} onChange={()=>state.toggleDebug("wireframe")}/></label>
     {info&&<details className="material-list"><summary>Матеріали · {info.materials.length}</summary>{info.materials.map(mat=><div key={mat}>{mat}</div>)}</details>}
    </div>
-  </details>
+  </details>}
   <details className="tuning-panel"><summary><span><Wrench size={15}/>Світло та діагностика</span><ChevronDown size={14}/></summary>
    <div className="tuning-content">
     <label className="field-label" htmlFor="lighting-mode">Освітлення</label><select id="lighting-mode" value={lighting} onChange={e=>state.setLighting(e.target.value as typeof lighting)}><option value="day">День</option><option value="evening">Вечір</option></select>

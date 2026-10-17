@@ -131,3 +131,22 @@ input[type="range"]{width:100%;height:3px;accent-color:#819574;cursor:pointer;ma
 @media(max-width:800px){.studio-header{height:58px;padding:0 16px}.local-badge{display:none}.studio-brand{gap:9px}.studio-brand>span:not(.brand-symbol){font-size:13px}.reset-button{padding:7px}.reset-button>span{display:none}.studio-panel{position:absolute;left:0;top:58px;bottom:29px;transform:translateX(-100%);transition:transform .22s ease;width:278px;z-index:50;box-shadow:10px 0 40px #293b3224}.studio-panel.is-open{transform:translateX(0)}.asset-thumbnail{width:66px}.asset-caption>b{font-size:11px}.panel-backdrop{display:block;position:fixed;inset:58px 0 29px;background:#2c3c3140;z-index:40;backdrop-filter:blur(2px)}.mobile-menu,.mobile-close{display:grid}.viewport-toolbar{padding:0 12px}.scene-breadcrumb{gap:8px}.scene-breadcrumb>svg,.scene-breadcrumb>span:first-of-type{display:none}.scene-caption{top:66px;left:18px}.scene-caption h1{font-size:18px}.scene-caption p{font-size:10px;max-width:180px}.performance-panel{top:153px;right:12px;width:135px;padding:12px}.performance-numbers{gap:16px}.performance-numbers b{font-size:22px}.performance-title{font-size:7px}.render-details{display:none}.viewport-bottom{bottom:16px;left:12px;right:12px;align-items:center}.selected-info{padding:8px}.selected-info b{font-size:10px}.selected-info .icon-button{display:none}.camera-toolbar{gap:1px;padding:4px}.camera-toolbar>button{padding:9px}.toolbar-separator{margin:0 1px}.scene-axis{bottom:102px;left:18px}.interaction-hints{display:none!important}.studio-statusbar{padding:0 12px}.scene-version{display:none}}
 @media(max-width:390px){.studio-brand>small{display:none}.viewport-bottom{flex-wrap:wrap;justify-content:center;gap:10px}.selected-info{position:absolute;left:0;bottom:59px;background:transparent;border:0;box-shadow:none;backdrop-filter:none;padding:0}.camera-toolbar{width:100%;justify-content:center}.performance-panel{width:125px}.scene-caption p{max-width:160px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Composer extends the existing Studio palette and panel layout. */
+.studio-brand{background:transparent;padding:0}
+.composer-navigation nav{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:0 8px 15px}
+.composer-navigation nav button{padding:9px 5px;border:1px solid var(--line);border-radius:5px;background:#f3f5ef;font-size:11px}
+.composer-navigation nav button[aria-current="page"],.composer-actions button[aria-pressed="true"]{background:#46583b;color:#f6f8ef}
+.composer-content{padding:0 8px}
+.composer-content input:not([type="checkbox"]),.composer-content select,.tuning-content input[type="search"]{width:100%;padding:8px;border:1px solid #dde2d5;border-radius:5px;background:#f3f5ef;color:var(--ink);font-size:11px;min-width:0}
+.composer-content .composer-file{display:none}
+.composer-actions{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.composer-actions .reset-button{font-size:10px;padding:7px 8px}
+.composer-content h3{font-size:12px;margin-top:20px}.object-editor>small{font-size:10px;overflow-wrap:anywhere;color:#86907f}
+.object-editor fieldset{padding:0;border:0;margin:15px 0}.object-editor legend{font-size:10px;color:#86907f;margin-bottom:8px}
+.vector-inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.vector-inputs label{font-size:10px;color:#86907f}.vector-inputs input{margin-top:4px}
+.composer-error{font-size:11px;line-height:1.6;background:#fae9e2;color:#943f29;padding:9px;border-radius:5px;overflow-wrap:anywhere}
+.composer-message{font-size:11px;color:#486440}.saved-scene,.library-entry{display:flex;align-items:center;gap:5px;margin-top:8px}.saved-scene>.reset-button{flex:1;text-align:left}
+.library-entry .tool-button{margin:0;flex:1;text-align:left;justify-content:flex-start}.library-entry>.reset-button:last-child{font-size:9px;padding:7px;white-space:nowrap}
+.scene-breadcrumb b{max-width:35vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.composer-navigation{position:sticky;top:0;background:var(--panel);z-index:2;padding:4px 0 1px}

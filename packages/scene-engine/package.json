@@ -1,0 +1,31 @@
+{
+  "name": "@traffic-laws/scene-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./react": "./src/SceneRenderer.tsx"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "@react-three/fiber": "^9.4.0",
+    "three": "^0.180.0"
+  },
+  "dependencies": {
+    "@traffic-laws/assets-3d": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/three": "^0.180.0",
+    "@types/node": "^24.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "@react-three/test-renderer": "^9.1.1"
+  }
+}

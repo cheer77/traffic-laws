@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { VEHICLES } from "@/lib/studioConfig";
-import { SCENE_ASSET_BY_ID } from "@/lib/sceneAssets";
 import type { CameraMode, DebugFlag, Inspection, Layer, Quality, RenderMetrics, Signal, TrafficSignal, VehicleKind } from "@/types/studio";
+
+import { useComposerStore } from "./useComposerStore";
+import { sceneAsset } from "@/lib/composer/selection";
 
 const defaultVisible = Object.fromEntries(VEHICLES.map(v=>[v.id,true])) as Record<VehicleKind,boolean>;
 interface StudioState {
@@ -29,7 +31,7 @@ export const useStudioStore=create<StudioState>((set)=>({
  toggleVehicle:id=>set(s=>({visible:{...s.visible,[id]:!s.visible[id]}})),
  select:id=>set(s=>({active:id,selectedId:`vehicle-${id}`,inspection:null,visible:{...s.visible,[id]:true},camera:"focus",cameraRevision:s.cameraRevision+1,signal:"off",beacon:false,wheelPreview:false})),
  selectObject:(id,focus=true)=>set(s=>{
-  const asset=SCENE_ASSET_BY_ID[id];if(!asset)return {};
+  const asset=sceneAsset(useComposerStore.getState().scene,id,s.preview);
   return {selectedId:id,inspection:null,active:asset.vehicle??s.active,visible:asset.vehicle?{...s.visible,[asset.vehicle]:true}:s.visible,
    layers:asset.layer?{...s.layers,[asset.layer]:true}:s.layers,camera:focus?"focus":"free",cameraRevision:focus?s.cameraRevision+1:s.cameraRevision,signal:"off",beacon:false,wheelPreview:false};
  }),
@@ -40,7 +42,7 @@ export const useStudioStore=create<StudioState>((set)=>({
  setTrafficSignal:trafficSignal=>set({trafficSignal}),setInspection:inspection=>set({inspection}),
  toggleLayer:layer=>set(s=>({layers:{...s.layers,[layer]:!s.layers[layer]}})),
  setCamera:camera=>set(s=>{
-  const asset=SCENE_ASSET_BY_ID[s.selectedId];
+  const asset=sceneAsset(useComposerStore.getState().scene,s.selectedId,s.preview);
   return {camera,cameraRevision:s.cameraRevision+1,...(camera==="focus"?{
    visible:asset?.vehicle?{...s.visible,[asset.vehicle]:true}:s.visible,
    layers:asset?.layer?{...s.layers,[asset.layer]:true}:s.layers,
@@ -49,5 +51,5 @@ export const useStudioStore=create<StudioState>((set)=>({
  setQuality:quality=>set({quality}),setSignal:signal=>set({signal}),
  toggle:key=>set(s=>({[key]:!s[key]})),setSun:sun=>set({sun}),
  setMetrics:metrics=>set({metrics}),setRendering:rendering=>set({rendering}),setReady:()=>set({ready:true}),
- reset:()=>set(s=>({...defaults,cameraRevision:s.cameraRevision+1})),
+ reset:()=>{useComposerStore.getState().reset();set(s=>({...defaults,cameraRevision:s.cameraRevision+1}))},
 }));

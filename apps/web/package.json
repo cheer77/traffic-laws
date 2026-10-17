@@ -15,7 +15,8 @@
     "react-dom": "^19.2.0",
     "@traffic-laws/assets-3d": "workspace:*",
     "three": "^0.180.0",
-    "@react-three/fiber": "^9.4.0"
+    "@react-three/fiber": "^9.4.0",
+    "@traffic-laws/scene-engine": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",

@@ -1,10 +1,12 @@
 "use client";
-import { Building2, ChevronDown, Eye, EyeOff, Focus, Footprints, Lamp, Layers3, SlidersHorizontal, TrafficCone, TreePine, X } from "lucide-react";
+import { Building2, Eye, EyeOff, Focus, Footprints, Lamp, Layers3, TrafficCone, TreePine, X } from "lucide-react";
 import { ASSET_BY_ID, VEHICLES } from "@/lib/studioConfig";
 import { useStudioStore } from "@/stores/useStudioStore";
 import type { Layer, Signal } from "@/types/studio";
 import { VehicleThumbnail } from "@/components/ui/VehicleThumbnail";
 import { AssetLibrary } from "./AssetLibrary";
+import { useComposerStore } from "@/stores/useComposerStore";
+import { ComposerPanel, ModeNavigation, MODE_LABELS } from "../composer/ComposerPanel";
 import { StudioTools } from "./StudioTools";
 
 const LAYERS:Array<{id:Layer;name:string;icon:typeof Building2}>=[
@@ -13,10 +15,14 @@ const LAYERS:Array<{id:Layer;name:string;icon:typeof Building2}>=[
 ];
 
 export function StudioPanel(){
+ const mode=useComposerStore(s=>s.mode);
  const visible=useStudioStore(s=>s.visible),selected=useStudioStore(s=>s.selectedId),layers=useStudioStore(s=>s.layers),panelOpen=useStudioStore(s=>s.panelOpen);
  return <aside id="studio-panel" className={`studio-panel ${panelOpen?"is-open":""}`} aria-label="Об'єкти та налаштування сцени">
-  <div className="panel-heading"><div><span className="eyebrow">SCENE EXPLORER</span><h2>Об’єкти сцени</h2></div><button className="icon-button mobile-close" aria-label="Закрити панель" onClick={()=>useStudioStore.getState().toggle("panelOpen")}><X size={18}/></button></div>
+  <div className="panel-heading"><div><span className="eyebrow">SCENE EXPLORER</span><h2>{MODE_LABELS[mode]}</h2></div><button className="icon-button mobile-close" aria-label="Закрити панель" onClick={()=>useStudioStore.getState().toggle("panelOpen")}><X size={18}/></button></div>
   <div className="panel-scroll">
+   <ModeNavigation/>
+   <ComposerPanel/>
+   {mode==="editor"&&<details className="tuning-panel"><summary>Шари та видимість · лише редактор</summary><div className="tuning-content">
    <div className="section-label"><span>ТРАНСПОРТ</span><span>{Object.values(visible).filter(Boolean).length} / 6</span></div>
    <div className="asset-list">{VEHICLES.map(asset=><div key={asset.id} className={`asset-row ${selected===`vehicle-${asset.id}`?"is-selected":""} ${!visible[asset.id]?"is-hidden":""}`}>
     <button className="asset-select" aria-label={`Фокус: ${asset.name}`} aria-pressed={selected===`vehicle-${asset.id}`} onClick={()=>useStudioStore.getState().select(asset.id)}>
@@ -28,9 +34,10 @@ export function StudioPanel(){
    <div className="panel-divider"/>
    <div className="section-label"><span>СЕРЕДОВИЩЕ</span><Layers3 size={13}/></div>
    <div className="layer-list">{LAYERS.map(({id,name,icon:Icon})=><label key={id} className="layer-row"><span><Icon size={16}/>{name}</span><input type="checkbox" role="switch" checked={layers[id]} onChange={()=>useStudioStore.getState().toggleLayer(id)}/></label>)}</div>
-   <details className="tuning-panel" open><summary><span><SlidersHorizontal size={15}/>Налаштування моделі</span><ChevronDown size={14}/></summary><TuningControls/></details>
-   <AssetLibrary/>
-   <StudioTools/>
+   </div></details>}
+   {mode==="editor"&&<details className="tuning-panel"><summary>Анімація моделі · діагностика</summary><TuningControls/></details>}
+   {mode==="library"&&<><AssetLibrary/><details className="tuning-panel"><summary>Налаштування Preview</summary><TuningControls/></details></>}
+   {(mode==="editor"||mode==="library")&&<StudioTools/>}
   </div>
   <div className="panel-footer"><span className="status-dot"/>Локальна сцена<span>01 / 01</span></div>
  </aside>;
