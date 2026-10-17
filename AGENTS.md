@@ -143,7 +143,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Phase 1, Audit & Monorepo Foundation, is complete.
 - Phase 2, Applications Separation, is complete.
-- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete; see `docs/phase-4-audit.md` for implementation and verification. Phase 5, backend, Admin, Mobile, simulation, and product learning features remain Planned.
+- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete. Phase 5 has unverified official-source records, engine-linked study drafts and a bounded deterministic evaluator, but human legal review, broader maneuver truth and protected publication remain open; see `docs/phase-5-audit.md`. Backend, Admin, Mobile, simulation, and product learning features remain Planned.
 - Before implementation, confirm the active phase in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - If a request crosses phase boundaries, document the conflict and ask for explicit direction.
 - Do not turn roadmap examples into production code without an approved implementation task.
@@ -157,3 +157,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Root engine exports stay data-only; heavy R3F exports live under `/react`. Never import Studio or editor dependencies into the engine or production Web.
 - localStorage is a temporary per-browser workspace; portable backups use validated JSON. Preserve the current draft on failed loads and report storage errors.
 - Run scene/asset parity tests and comparable browser measurements for renderer changes.
+
+## Phase 5 content boundary
+
+- `packages/country-rules` contains UA-only normative references and verification metadata, without rendering dependencies. An unverified record is not a verified legal claim.
+- `packages/scenarios` owns versioned questions, answers, explanations and validated optional Scene Definition snapshots. The demo examples are drafts and must never enter a production content feed.
+- A locally recorded review and `publishScenario` enforce structural publication gates, but do not authenticate editors or prove legal correctness. Only separately reviewed, sourced content can advance to publication.
+- Official-text research records under `country-rules/ua-pdr-references` remain `unverified` until competent independent human review. The traffic-situation model describes authored facts and candidates; `country-rules/traffic-rules-engine` computes only the documented narrow cases and keeps technical completeness distinct from normative confirmation. Priority-dependent tickets cannot advance to local verified/published status; production publication additionally needs protected approval tied to immutable revisions.

@@ -1,0 +1,11 @@
+# Scenarios
+
+`@traffic-laws/scenarios` contains Ukrainian educational tickets. Import `validateScenario`, `parseScenarioJSON`, `serializeScenario`, and `publishScenario` from the root. Pass `{ rules: validatedRules }` to every boundary call so unknown rule IDs fail. Use `validateScenarios` when loading a collection to reject duplicate ticket IDs.
+
+JSON v1 requires `schemaVersion: 1`, a positive `revision`, `id`, `country: "UA"`, `language: "uk"`, `category`, `question`, 2–8 `answers`, `correctAnswerId`, `explanation`, `ruleReferences`, `sceneReference`, and `contentStatus`. Unknown fields and unknown versions fail. `sceneReference` is `null` for text or future 2D tickets, or `{ "kind": "snapshot", "scene": <Scene Definition v1> }`. The scene is reconstructed by the Scene Engine validator on input. Store the serialized ticket as a versioned snapshot; edits to the Studio draft cannot change an already saved ticket. A ticket revision must be increased for intentional content changes.
+
+Statuses are `draft`, `in_review`, `verified`, and `published`. Verified and published tickets require a reviewer/date, at least one rule reference, and all referenced rules in verified state. `publishScenario` only accepts a verified ticket and validates it again. This is a local editorial integrity check, **not authentication or a protected publication service**. The application must allow production users to see only explicitly selected published tickets. There are no such tickets yet.
+
+`@traffic-laws/scenarios/demo` provides two draft technical examples from the same urban preset, with different traffic light configurations and questions. They do not state traffic rules and are never eligible for publication without sourced content review.
+
+`@traffic-laws/scenarios/education-demo` provides three Ukrainian `in_review` study drafts linked to official-source research records and validated snapshots of the existing city. They are conditional examples, not reviewed legal advice or official exam tickets. The local Web `/dev/scenarios` route displays them only in development. A competent reviewer must check each question, answer, explanation, scene interpretation and exception before changing status.

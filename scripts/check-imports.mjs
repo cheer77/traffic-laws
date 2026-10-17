@@ -22,6 +22,7 @@ const packageDirectories = fs
   .map((entry) => path.join(packagesRoot, entry.name));
 const workspaceDirectories = [...applicationDirectories, ...packageDirectories];
 const issues = [];
+const workspaceGraph = new Map();
 
 function collectTypeScriptFiles(directory, files) {
   if (!fs.existsSync(directory)) return;
@@ -44,6 +45,7 @@ for (const applicationDirectory of workspaceDirectories) {
       ...manifest.peerDependencies,
     }),
   );
+  workspaceGraph.set(applicationDirectory, new Set());
   const configFile = ts.readConfigFile(
     path.join(applicationDirectory, "tsconfig.json"),
     ts.sys.readFile,
@@ -131,6 +133,7 @@ for (const applicationDirectory of workspaceDirectories) {
             packageName,
         );
         if (workspace) {
+          workspaceGraph.get(applicationDirectory).add(workspace);
           if (applicationDirectories.includes(workspace))
             issues.push(`Forbidden application dependency: ${filename} -> ${specifier}`);
           const targetManifest = JSON.parse(
@@ -180,6 +183,27 @@ for (const applicationDirectory of workspaceDirectories) {
     `${applicationName}: checked ${files.length} TypeScript files; runtime dependencies without a detected use: ${unusedRuntimeDependencies.length ? unusedRuntimeDependencies.join(", ") : "none"}.`,
   );
 }
+
+const visitedWorkspaces = new Set();
+const activeWorkspaces = new Set();
+function walkWorkspace(directory, stack) {
+  if (activeWorkspaces.has(directory)) {
+    issues.push(
+      `Workspace dependency cycle: ${[...stack.slice(stack.indexOf(directory)), directory].map((entry) => path.basename(entry)).join(" -> ")}`,
+    );
+    return;
+  }
+  if (visitedWorkspaces.has(directory)) return;
+  activeWorkspaces.add(directory);
+  for (const dependency of workspaceGraph.get(directory) ?? [])
+    walkWorkspace(dependency, [...stack, directory]);
+  activeWorkspaces.delete(directory);
+  visitedWorkspaces.add(directory);
+}
+for (const directory of workspaceDirectories) walkWorkspace(directory, []);
+const rulePackage = path.join(packagesRoot, "country-rules");
+if ([...(workspaceGraph.get(rulePackage) ?? [])].length)
+  issues.push("country-rules must remain independent from scene, UI, and asset packages.");
 
 if (issues.length) {
   console.error(issues.join("\n"));

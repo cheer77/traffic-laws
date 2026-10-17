@@ -105,6 +105,12 @@ importers:
       '@traffic-laws/assets-3d':
         specifier: workspace:*
         version: link:../../packages/assets-3d
+      '@traffic-laws/country-rules':
+        specifier: workspace:*
+        version: link:../../packages/country-rules
+      '@traffic-laws/scenarios':
+        specifier: workspace:*
+        version: link:../../packages/scenarios
       '@traffic-laws/scene-engine':
         specifier: workspace:*
         version: link:../../packages/scene-engine
@@ -179,6 +185,31 @@ importers:
       '@types/three':
         specifier: ^0.180.0
         version: 0.180.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.32.0)
+
+  packages/country-rules:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.32.0)
+
+  packages/scenarios:
+    dependencies:
+      '@traffic-laws/country-rules':
+        specifier: workspace:*
+        version: link:../country-rules
+      '@traffic-laws/scene-engine':
+        specifier: workspace:*
+        version: link:../scene-engine
+    devDependencies:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

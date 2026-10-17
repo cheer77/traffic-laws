@@ -36,6 +36,9 @@ traffic-laws/
 │   │   ├── src/vehicles/           # Транспорт и процедурная сборка
 │   │   ├── src/environment/        # Здания, озеленение, мебель
 │   │   └── README.md               # Соглашения и инструкция добавления
+│   ├── scene-engine/               # Scene Definition v1 и рендерер
+│   ├── country-rules/              # UA нормативные ссылки
+│   ├── scenarios/                  # Учебный JSON v1 и демо
 │   └── README.md
 ├── tooling/
 │   ├── typescript/base.json        # Общий strict
@@ -77,3 +80,13 @@ traffic-laws/
 
 `packages/scene-composer` is not created: the editor has only one current consumer. See the
 [Phase 4 audit](phase-4-audit.md) for boundaries, usage and verification.
+
+## Добавления Фазы 5
+
+- `packages/country-rules/src` — UA-only нормативные ссылки, статусы проверки и семантическая модель дорожной ситуации.
+- `packages/scenarios/src` — учебный JSON v1, проверка ссылок, жизненный цикл, два технических и три учебных черновика.
+- `apps/web/src/app/dev/scenarios` — изолированный development-only просмотр сценариев.
+
+Studio продолжает редактировать только Scene Definition. Снимок экспортированной сцены можно
+передать в `validateScenario` как `sceneReference.scene`; редактор билетов не создан. См.
+[аудит Фазы 5](phase-5-audit.md).

@@ -1,0 +1,21 @@
+{
+  "name": "@traffic-laws/country-rules",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ua-pdr-references": "./src/ua-pdr-references.ts",
+    "./traffic-situation": "./src/traffic-situation.ts",
+    "./traffic-rules-engine": "./src/traffic-rules-engine.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

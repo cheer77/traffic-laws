@@ -1,0 +1,25 @@
+{
+  "name": "@traffic-laws/scenarios",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./demo": "./src/demo.ts",
+    "./education-demo": "./src/education-demo.ts",
+    "./scene-consistency": "./src/scene-consistency.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@traffic-laws/country-rules": "workspace:*",
+    "@traffic-laws/scene-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

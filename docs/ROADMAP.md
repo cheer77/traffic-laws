@@ -13,6 +13,7 @@ rulesets, localization, and examination content; none of that content is impleme
 Status labels in this document have strict meanings:
 
 - **Completed** — implemented and verified in the repository.
+- **In progress** — part of an approved phase is implemented, but its done criteria remain open.
 - **Planned** — architectural direction only; it must not be treated as existing functionality.
 - **Future** — a product possibility without an approved implementation phase.
 
@@ -27,7 +28,8 @@ Status labels in this document have strict meanings:
 - Backend, Admin, product learning features, and Mobile are not implemented.
 - **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
 - Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
-- **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md). Phase 5 remains Planned.
+- **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md).
+- **Phase 5 — In progress.** UA-only scenarios and rule references, validated situation facts, a bounded deterministic traffic evaluator, geometric/time conflict checks and three engine-linked study drafts are implemented. Pose-level scene checks are automated, but material scene facts remain unconfirmed; eight rule records and all drafts remain unverified. See [`phase-5-audit.md`](phase-5-audit.md).
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -63,8 +65,8 @@ separate. A package is created only when its boundary and consumers are real.
 | `packages/scene-engine`        | Implemented | Shared rendering primitives and runtime scene infrastructure         |
 | `packages/scene-composer`      | Deferred    | Composer operations currently live inside Studio; no second consumer |
 | `packages/simulation-engine`   | Planned     | Vehicle movement, trajectories, timing, and collision prevention     |
-| `packages/country-rules`       | Planned     | Country-specific rulesets behind a common legal contract             |
-| `packages/scenarios`           | Planned     | Educational situations, tickets, answers, and explanations           |
+| `packages/country-rules`       | Implemented | UA source references, semantic contracts and bounded evaluator       |
+| `packages/scenarios`           | Implemented | Versioned tickets, validation, snapshots and review drafts           |
 | `packages/educational-content` | Planned     | Lessons, images, 2D tickets, localization, and translations          |
 
 These names describe target boundaries, not permission to create every package at once. Extraction
@@ -140,7 +142,7 @@ invalid configuration fails clearly; CPU/GPU budgets and browser tests pass.
 
 **Dependencies:** Phase 3 asset contracts and Phase 2 application boundaries.
 
-### Phase 5 — Scenarios & Country Rules Foundation — Planned
+### Phase 5 — Scenarios & Country Rules Foundation — In progress
 
 **Goal:** represent Ukrainian road rules and educational scenarios independently from presentation.
 
@@ -154,7 +156,37 @@ learning experiences while leaving room for future country adapters.
 **Done criteria:** every rule has provenance; scenario schemas and validators pass; UI and 3D consume
 the same maneuver truth; country-specific tests cover legal decisions; no foreign content is mixed in.
 
+**Technical foundation acceptance (clarification, 2026-10-17):** versioned, validated UA scenario and
+situation schemas; official rule links and provenance with honest review status; deterministic outcomes
+for the explicitly supported cases; automated scene/semantic checks where Scene Definition contains
+enough facts; explicit unknown results for absent, conflicting or unsupported conditions; passing
+repository verification. This is a narrower, reviewable engineering milestone, **not a replacement**
+for the done criteria above. The earlier wording combined a domain foundation with production UI/3D
+consumption and legal content validation; those latter outcomes require later capabilities. The
+technical milestone can pass while Phase 5 remains In progress.
+
+**Unchanged completion gates:** the current development gallery is not a shared production 2D/3D
+maneuver consumer. Scene Definition v1 lacks lane-control links, active-participant state and movement
+timing, so the three drafts cannot yet satisfy semantic/3D acceptance. Independent competent review
+of applicable Ukrainian rules, answers, exceptions and scene facts is still outstanding. Keep Phase 5
+In progress until these existing gates are actually evidenced or a separately approved roadmap
+revision changes the scope; technical tests do not constitute legal approval.
+
+**Later release dependencies:** authenticated, revision-bound content approval belongs to the
+Backend/Admin phases; production tickets require that workflow plus independent review. Full PDR
+coverage is a gradual, separately scoped rules-engine expansion, not a precondition for the bounded
+foundation. No publication is authorized by this milestone. See the
+[independent reviewer checklist](phase-5-legal-review-checklist.md).
+
 **Dependencies:** Phase 4 scene contracts and approved Ukrainian educational sources.
+
+**Current implementation:** the current official PDR edition was inspected and eight exact provisions
+were recorded as unverified research notes. Three sourced Ukrainian study drafts contain formal
+situations checked against a bounded deterministic evaluator. The evaluator covers selected signal
+and priority clauses, reports pairwise yield and geometry/time conflicts, and refuses unsupported
+conditions. Competent human legal and scene review, verified examples, a protected publication
+workflow, broader required rule cases, and shared production 2D/3D maneuver truth remain open.
+Technical tests alone do not satisfy these unchanged done criteria. See [the engine design](traffic-rules-engine-design.md).
 
 ### Phase 6 — Backend Foundation — Planned
 
