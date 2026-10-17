@@ -1,8 +1,8 @@
-export type VehicleKind = "sedan" | "suv" | "motorcycle" | "ambulance" | "police" | "fire";
+import type { VehicleKind } from "@traffic-laws/assets-3d/types";
+export type { VehicleKind, Signal } from "@traffic-laws/assets-3d/types";
 export type CameraMode = "free" | "top" | "iso" | "focus";
 export type Quality = "low" | "medium" | "high";
 export type Layer = "characters" | "buildings" | "trees" | "signs" | "lights";
-export type Signal = "off" | "left" | "right" | "hazard";
 export interface VehicleAsset {
  id: VehicleKind;
  name: string;

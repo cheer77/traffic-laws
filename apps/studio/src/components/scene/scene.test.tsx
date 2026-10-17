@@ -46,6 +46,7 @@ describe("assembled R3F scene",()=>{
    await previewVehicles(renderer.scene.instance,"/private/tmp/pdd-devices-preview.png",false,[...SIGNS,LIGHTS[0]]);
    await previewVehicles(renderer.scene.instance,"/private/tmp/pdd-city-preview.png",false,[{id:"city-scene",name:"Міське перехрестя",rotation:0},{id:"city-scene",name:"Міське перехрестя · зворотний ракурс",rotation:Math.PI}]);
   }
+  expect(stats).toEqual({meshes:271,triangles:57930,instanced:12});
   expect(stats.meshes,JSON.stringify(stats)).toBeLessThan(330);expect(stats.triangles,JSON.stringify(stats)).toBeLessThan(65000);expect(stats.instanced).toBeGreaterThanOrEqual(7);
  });
  it("removes and restores real vehicle and environment nodes with panel state",async()=>{

@@ -1,0 +1,338 @@
+{
+  "vehicle.sedan.standard": {
+    "dimensions": [2.55, 1.64, 4.6425],
+    "boundingBox": {
+      "min": [-1.275, 0, -2.3275],
+      "max": [1.275, 1.64, 2.315]
+    },
+    "performanceMetadata": {
+      "meshes": 22,
+      "triangles": 4654,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vehicle.suv.standard": {
+    "dimensions": [2.62, 2.07, 4.8425],
+    "boundingBox": {
+      "min": [-1.31, 0, -2.4275],
+      "max": [1.31, 2.07, 2.415]
+    },
+    "performanceMetadata": {
+      "meshes": 22,
+      "triangles": 4878,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vehicle.motorcycle.standard": {
+    "dimensions": [1.054934, 2.415, 2.53],
+    "boundingBox": {
+      "min": [-0.527467, 0, -1.255],
+      "max": [0.527467, 2.415, 1.275]
+    },
+    "performanceMetadata": {
+      "meshes": 21,
+      "triangles": 4652,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vehicle.ambulance.ua": {
+    "dimensions": [2.67, 2.842, 5.96],
+    "boundingBox": {
+      "min": [-1.335, 0, -2.98],
+      "max": [1.335, 2.842, 2.98]
+    },
+    "performanceMetadata": {
+      "meshes": 27,
+      "triangles": 5192,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vehicle.police.ua": {
+    "dimensions": [2.55, 1.832, 4.6425],
+    "boundingBox": {
+      "min": [-1.275, 0, -2.3275],
+      "max": [1.275, 1.832, 2.315]
+    },
+    "performanceMetadata": {
+      "meshes": 26,
+      "triangles": 5218,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vehicle.fire-truck.ua": {
+    "dimensions": [2.87, 2.802, 7.13],
+    "boundingBox": {
+      "min": [-1.435, 0, -3.565],
+      "max": [1.435, 2.802, 3.565]
+    },
+    "performanceMetadata": {
+      "meshes": 31,
+      "triangles": 6836,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "character.man": {
+    "dimensions": [0.681518, 1.88, 0.44],
+    "boundingBox": {
+      "min": [-0.340759, 0.005, -0.22],
+      "max": [0.340759, 1.885, 0.22]
+    },
+    "performanceMetadata": {
+      "meshes": 6,
+      "triangles": 1820,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "character.woman": {
+    "dimensions": [0.681117, 1.8112, 0.4],
+    "boundingBox": {
+      "min": [-0.340558, 0.0022, -0.19],
+      "max": [0.340558, 1.8134, 0.21]
+    },
+    "performanceMetadata": {
+      "meshes": 6,
+      "triangles": 1928,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "character.senior": {
+    "dimensions": [0.682999, 1.795948, 0.46821],
+    "boundingBox": {
+      "min": [-0.341499, -0.000448, -0.155705],
+      "max": [0.341499, 1.7955, 0.312505]
+    },
+    "performanceMetadata": {
+      "meshes": 7,
+      "triangles": 1884,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "character.youth": {
+    "dimensions": [0.681518, 1.88, 0.515],
+    "boundingBox": {
+      "min": [-0.340759, 0.005, -0.295],
+      "max": [0.340759, 1.885, 0.22]
+    },
+    "performanceMetadata": {
+      "meshes": 7,
+      "triangles": 1992,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "building.home": {
+    "dimensions": [11.3, 9.45, 10.625],
+    "boundingBox": {
+      "min": [-5.65, 0, -5.125],
+      "max": [5.65, 9.45, 5.5]
+    },
+    "performanceMetadata": {
+      "meshes": 8,
+      "triangles": 2904,
+      "instancedMeshes": 1,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "building.office": {
+    "dimensions": [9.3, 12.35, 12.15],
+    "boundingBox": {
+      "min": [-4.65, 0, -5.65],
+      "max": [4.65, 12.35, 6.5]
+    },
+    "performanceMetadata": {
+      "meshes": 7,
+      "triangles": 1848,
+      "instancedMeshes": 1,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "building.shop": {
+    "dimensions": [12.3, 7.35, 10.15],
+    "boundingBox": {
+      "min": [-6.15, 0, -4.65],
+      "max": [6.15, 7.35, 5.5]
+    },
+    "performanceMetadata": {
+      "meshes": 9,
+      "triangles": 1224,
+      "instancedMeshes": 1,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "building.town": {
+    "dimensions": [10.6, 6.32, 12.3],
+    "boundingBox": {
+      "min": [-5.3, 0, -5.8],
+      "max": [5.3, 6.32, 6.5]
+    },
+    "performanceMetadata": {
+      "meshes": 8,
+      "triangles": 596,
+      "instancedMeshes": 1,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "sign.priority.yield.ua": {
+    "dimensions": [1.1, 2.81, 0.19],
+    "boundingBox": {
+      "min": [-0.55, 0.16, -0.095],
+      "max": [0.55, 2.97, 0.095]
+    },
+    "performanceMetadata": {
+      "meshes": 4,
+      "triangles": 78,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "sign.priority.main.ua": {
+    "dimensions": [1.14, 3.06, 0.199],
+    "boundingBox": {
+      "min": [-0.57, 0.16, -0.095],
+      "max": [0.57, 3.22, 0.104]
+    },
+    "performanceMetadata": {
+      "meshes": 4,
+      "triangles": 134,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "sign.priority.stop.ua": {
+    "dimensions": [1.0717, 3.02585, 0.199],
+    "boundingBox": {
+      "min": [-0.53585, 0.16, -0.095],
+      "max": [0.53585, 3.18585, 0.104]
+    },
+    "performanceMetadata": {
+      "meshes": 4,
+      "triangles": 620,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "traffic-light.standard": {
+    "dimensions": [0.56, 4.22, 0.565],
+    "boundingBox": {
+      "min": [-0.28, 0.16, -0.145],
+      "max": [0.28, 4.38, 0.42]
+    },
+    "performanceMetadata": {
+      "meshes": 5,
+      "triangles": 848,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "intersection.city.standard": {
+    "dimensions": [69, 1.06, 69],
+    "boundingBox": {
+      "min": [-34.5, -0.88, -34.5],
+      "max": [34.5, 0.18, 34.5]
+    },
+    "performanceMetadata": {
+      "meshes": 16,
+      "triangles": 3888,
+      "instancedMeshes": 4,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "vegetation.city.collection": {
+    "dimensions": [59.367811, 6.451462, 57.094198],
+    "boundingBox": {
+      "min": [-29.267812, 0.16, -28.027726],
+      "max": [30.099999, 6.611462, 29.066473]
+    },
+    "performanceMetadata": {
+      "meshes": 4,
+      "triangles": 2688,
+      "instancedMeshes": 4,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  },
+  "street-furniture.city.collection": {
+    "dimensions": [34.200001, 5.68, 56.279999],
+    "boundingBox": {
+      "min": [-17.1, 0.16, -28.139999],
+      "max": [17.1, 5.84, 28.139999]
+    },
+    "performanceMetadata": {
+      "meshes": 3,
+      "triangles": 1164,
+      "instancedMeshes": 0,
+      "drawCalls": null,
+      "fps": null,
+      "frameTimeMs": null,
+      "method": "R3F scene graph; all geometry including hidden lamps; no GPU measurement"
+    }
+  }
+}

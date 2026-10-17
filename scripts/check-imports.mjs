@@ -12,6 +12,15 @@ const applicationDirectories = fs
       entry.isDirectory() && fs.existsSync(path.join(appsRoot, entry.name, "package.json")),
   )
   .map((entry) => path.join(appsRoot, entry.name));
+const packagesRoot = path.join(root, "packages");
+const packageDirectories = fs
+  .readdirSync(packagesRoot, { withFileTypes: true })
+  .filter(
+    (entry) =>
+      entry.isDirectory() && fs.existsSync(path.join(packagesRoot, entry.name, "package.json")),
+  )
+  .map((entry) => path.join(packagesRoot, entry.name));
+const workspaceDirectories = [...applicationDirectories, ...packageDirectories];
 const issues = [];
 
 function collectTypeScriptFiles(directory, files) {
@@ -23,12 +32,18 @@ function collectTypeScriptFiles(directory, files) {
   }
 }
 
-for (const applicationDirectory of applicationDirectories) {
+for (const applicationDirectory of workspaceDirectories) {
   const applicationName = path.basename(applicationDirectory);
   const manifest = JSON.parse(
     fs.readFileSync(path.join(applicationDirectory, "package.json"), "utf8"),
   );
-  const declared = new Set(Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }));
+  const declared = new Set(
+    Object.keys({
+      ...manifest.dependencies,
+      ...manifest.devDependencies,
+      ...manifest.peerDependencies,
+    }),
+  );
   const configFile = ts.readConfigFile(
     path.join(applicationDirectory, "tsconfig.json"),
     ts.sys.readFile,
@@ -96,7 +111,7 @@ for (const applicationDirectory of applicationDirectories) {
           );
           continue;
         }
-        const owningApplication = applicationDirectories.find((directory) =>
+        const owningApplication = workspaceDirectories.find((directory) =>
           resolved.resolvedFileName.startsWith(`${directory}${path.sep}`),
         );
         if (owningApplication && owningApplication !== applicationDirectory) {
@@ -110,6 +125,22 @@ for (const applicationDirectory of applicationDirectories) {
           ? specifier.split("/").slice(0, 2).join("/")
           : specifier.split("/")[0];
         used.add(packageName);
+        const workspace = workspaceDirectories.find(
+          (directory) =>
+            JSON.parse(fs.readFileSync(path.join(directory, "package.json"), "utf8")).name ===
+            packageName,
+        );
+        if (workspace) {
+          if (applicationDirectories.includes(workspace))
+            issues.push(`Forbidden application dependency: ${filename} -> ${specifier}`);
+          const targetManifest = JSON.parse(
+            fs.readFileSync(path.join(workspace, "package.json"), "utf8"),
+          );
+          const subpath =
+            specifier === packageName ? "." : "." + specifier.slice(packageName.length);
+          if (!targetManifest.exports?.[subpath])
+            issues.push(`Non-public workspace import: ${filename} -> ${specifier}`);
+        }
         if (!declared.has(packageName)) {
           issues.push(
             `Undeclared dependency: ${packageName} (${applicationName}/${path.relative(applicationDirectory, filename)})`,
@@ -142,7 +173,7 @@ for (const applicationDirectory of applicationDirectories) {
   }
   for (const filename of files) walk(filename);
 
-  const unusedRuntimeDependencies = Object.keys(manifest.dependencies).filter(
+  const unusedRuntimeDependencies = Object.keys(manifest.dependencies ?? {}).filter(
     (name) => !used.has(name) && name !== "react-dom",
   );
   console.log(

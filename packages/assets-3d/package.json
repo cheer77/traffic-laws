@@ -1,0 +1,48 @@
+{
+  "name": "@traffic-laws/assets-3d",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./AssetParts": "./src/AssetParts.tsx",
+    "./Primitives": "./src/Primitives.tsx",
+    "./resources": "./src/resources.ts",
+    "./vehicles/VehicleModel": "./src/vehicles/VehicleModel.tsx",
+    "./vehicles/VehicleLabels": "./src/vehicles/VehicleLabels.tsx",
+    "./vehicles/vehicleAssets": "./src/vehicles/vehicleAssets.ts",
+    "./vehicles/assetBuilder": "./src/vehicles/assetBuilder.ts",
+    "./vehicles/labelLayout": "./src/vehicles/labelLayout.ts",
+    "./signs/signAssets": "./src/signs/signAssets.ts",
+    "./roads/IntersectionRoad": "./src/roads/IntersectionRoad.tsx",
+    "./roads/roadGeometry": "./src/roads/roadGeometry.ts",
+    "./types": "./src/types/assets.ts",
+    "./characters/Characters": "./src/characters/Characters.tsx",
+    "./environment/CityEnvironment": "./src/environment/CityEnvironment.tsx",
+    "./signs/RoadSign": "./src/signs/RoadSign.tsx",
+    "./traffic-lights/TrafficLight": "./src/traffic-lights/TrafficLight.tsx",
+    ".": "./src/index.ts",
+    "./registry": "./src/registry/registry.ts",
+    "./models": "./src/registry/models.tsx"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "@react-three/fiber": "^9.4.0",
+    "three": "^0.180.0"
+  },
+  "dependencies": {
+    "three-stdlib": "2.36.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/three": "^0.180.0",
+    "@types/node": "^24.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "@react-three/test-renderer": "^9.1.1"
+  }
+}

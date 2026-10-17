@@ -16,7 +16,7 @@ traffic-laws/
 │       │   ├── components/
 │       │   │   ├── debug/           # Панели и диагностика
 │       │   │   ├── layout/          # Интерфейс Studio
-│       │   │   ├── scene/           # Все 3D-компоненты
+│       │   │   ├── scene/           # Сцена, камера и адаптеры моделей
 │       │   │   └── ui/              # Элементы интерфейса
 │       │   ├── hooks/
 │       │   ├── lib/                 # Каталоги и расчёты
@@ -31,7 +31,12 @@ traffic-laws/
 │       ├── postcss.config.mjs
 │       └── vitest.config.ts
 ├── packages/
-│   └── README.md                   # Будущие общие модули
+│   ├── assets-3d/                  # Общая библиотека моделей и ресурсов
+│   │   ├── src/registry/           # Реестр, измерения и проверки
+│   │   ├── src/vehicles/           # Транспорт и процедурная сборка
+│   │   ├── src/environment/        # Здания, озеленение, мебель
+│   │   └── README.md               # Соглашения и инструкция добавления
+│   └── README.md
 ├── tooling/
 │   ├── typescript/base.json        # Общий strict
 │   └── eslint/next.mjs              # Профиль Next.js
@@ -55,7 +60,7 @@ traffic-laws/
 └── README.md
 ```
 
-Тесты остаются рядом с проверяемым кодом. Модели и ресурсы не переносились в новые пакеты: приложение перемещено целиком, поэтому относительные импорты сохранились.
+Тесты находятся рядом с кодом. Модели принадлежат `packages/assets-3d`; прежние пути Studio — адаптеры или re-export. В пакете также существуют `characters`, `signs`, `traffic-lights`, `roads` и `types`. Web содержит dev-проверку в `src/app/dev/assets-3d`, исключённую из production.
 
 Генерируемые `node_modules`, `.next`, `out`, `next-env.d.ts` и кеш TypeScript не входят в Git. `pnpm-lock.yaml` — единственный lockfile репозитория. Старый `package-lock.json` доступен в Git-истории и в резервной папке миграции.
 

@@ -25,7 +25,8 @@ Status labels in this document have strict meanings:
 - `apps/web` and `apps/studio` run and build independently; applications may not import each
   other's internal files.
 - Backend, Admin, product learning features, and Mobile are not implemented.
-- No shared production package exists under `packages` yet.
+- **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
+- Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -36,13 +37,13 @@ separate. A package is created only when its boundary and consumers are real.
 
 ### Implemented now
 
-| Path          | Status           | Responsibility                             |
-| ------------- | ---------------- | ------------------------------------------ |
-| `apps/web`    | Implemented      | Minimal Ukrainian user-platform shell      |
-| `apps/studio` | Implemented      | Existing 3D Asset Library and Scene Studio |
-| `tooling`     | Implemented      | Shared TypeScript and ESLint configuration |
-| `scripts`     | Implemented      | Repository validation utilities            |
-| `packages`    | Placeholder only | Reserved for approved shared modules       |
+| Path                 | Status      | Responsibility                                   |
+| -------------------- | ----------- | ------------------------------------------------ |
+| `apps/web`           | Implemented | Minimal Ukrainian user-platform shell            |
+| `apps/studio`        | Implemented | Existing 3D Asset Library and Scene Studio       |
+| `tooling`            | Implemented | Shared TypeScript and ESLint configuration       |
+| `scripts`            | Implemented | Repository validation utilities                  |
+| `packages/assets-3d` | Implemented | Shared procedural models, resources and registry |
 
 ### Planned applications
 
@@ -52,17 +53,17 @@ separate. A package is created only when its boundary and consumers are real.
 | `apps/api`    | Planned | NestJS backend and stable application APIs                          |
 | `apps/mobile` | Future  | Expo / React Native applications for iOS and Android                |
 
-### Planned shared packages
+### Shared packages: implemented and planned
 
-| Path                           | Status  | Intended responsibility                                          |
-| ------------------------------ | ------- | ---------------------------------------------------------------- |
-| `packages/assets-3d`           | Planned | Optimized, versioned 3D models and asset metadata                |
-| `packages/scene-engine`        | Planned | Shared rendering primitives and runtime scene infrastructure     |
-| `packages/scene-composer`      | Planned | Deterministic assembly of scenes from validated configuration    |
-| `packages/simulation-engine`   | Planned | Vehicle movement, trajectories, timing, and collision prevention |
-| `packages/country-rules`       | Planned | Country-specific rulesets behind a common legal contract         |
-| `packages/scenarios`           | Planned | Educational situations, tickets, answers, and explanations       |
-| `packages/educational-content` | Planned | Lessons, images, 2D tickets, localization, and translations      |
+| Path                           | Status      | Intended responsibility                                          |
+| ------------------------------ | ----------- | ---------------------------------------------------------------- |
+| `packages/assets-3d`           | Implemented | Optimized, versioned 3D models and asset metadata                |
+| `packages/scene-engine`        | Planned     | Shared rendering primitives and runtime scene infrastructure     |
+| `packages/scene-composer`      | Planned     | Deterministic assembly of scenes from validated configuration    |
+| `packages/simulation-engine`   | Planned     | Vehicle movement, trajectories, timing, and collision prevention |
+| `packages/country-rules`       | Planned     | Country-specific rulesets behind a common legal contract         |
+| `packages/scenarios`           | Planned     | Educational situations, tickets, answers, and explanations       |
+| `packages/educational-content` | Planned     | Lessons, images, 2D tickets, localization, and translations      |
 
 These names describe target boundaries, not permission to create every package at once. Extraction
 must follow a concrete use case, dependency review, and the currently approved phase.
@@ -101,7 +102,9 @@ application's internals.
 
 **Dependencies:** Phase 1 completion and an approved product boundary for each new application.
 
-### Phase 3 — 3D Asset Library — Planned
+### Phase 3 — 3D Asset Library — Architectural foundation completed; expansion ongoing
+
+**Architectural delivery:** 21 real registry entries, measured local bounds, shared resources, typed Studio adapters, searchable Studio index, isolated development-only Web consumer, and automated boundary/geometry checks. Desktop Chrome visual smoke tests and scene counters passed; see [evidence and measurement limits](phase-3-audit.md). This does not authorize Phase 4.
 
 **Goal:** turn proven Studio assets into a governed, reusable catalog without degrading quality.
 

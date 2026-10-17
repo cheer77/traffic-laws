@@ -4,6 +4,7 @@ import { ASSET_BY_ID, VEHICLES } from "@/lib/studioConfig";
 import { useStudioStore } from "@/stores/useStudioStore";
 import type { Layer, Signal } from "@/types/studio";
 import { VehicleThumbnail } from "@/components/ui/VehicleThumbnail";
+import { AssetLibrary } from "./AssetLibrary";
 import { StudioTools } from "./StudioTools";
 
 const LAYERS:Array<{id:Layer;name:string;icon:typeof Building2}>=[
@@ -28,6 +29,7 @@ export function StudioPanel(){
    <div className="section-label"><span>СЕРЕДОВИЩЕ</span><Layers3 size={13}/></div>
    <div className="layer-list">{LAYERS.map(({id,name,icon:Icon})=><label key={id} className="layer-row"><span><Icon size={16}/>{name}</span><input type="checkbox" role="switch" checked={layers[id]} onChange={()=>useStudioStore.getState().toggleLayer(id)}/></label>)}</div>
    <details className="tuning-panel" open><summary><span><SlidersHorizontal size={15}/>Налаштування моделі</span><ChevronDown size={14}/></summary><TuningControls/></details>
+   <AssetLibrary/>
    <StudioTools/>
   </div>
   <div className="panel-footer"><span className="status-dot"/>Локальна сцена<span>01 / 01</span></div>

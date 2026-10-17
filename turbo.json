@@ -14,11 +14,13 @@
       "cache": false
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "dependsOn": ["^lint"]
     },
     "test": {
       "outputs": [],
-      "env": ["STUDIO_ASSET_REPORT", "STUDIO_ASSET_PREVIEW"]
+      "env": ["STUDIO_ASSET_REPORT", "STUDIO_ASSET_PREVIEW"],
+      "dependsOn": ["^test"]
     }
   }
 }
