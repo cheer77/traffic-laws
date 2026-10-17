@@ -4,8 +4,9 @@ import {
   validateTrafficSituation,
   type TrafficSituation,
 } from "@traffic-laws/country-rules/traffic-situation";
-import { analyzeTrafficSituation } from "@traffic-laws/country-rules/traffic-rules-engine";
-import { assessSceneConsistency } from "./scene-consistency";
+import { validateSceneTrafficBinding, type SceneTrafficBinding } from "./scene-binding";
+import { evaluateScenarioDecision } from "./scenario-decision";
+import type { ScenarioClaim } from "./scenario-claim";
 
 export interface Answer {
   id: string;
@@ -30,9 +31,8 @@ export interface Scenario {
   /** Optional machine-checkable claim. Text-only tickets keep this absent. */
   trafficDecision?: {
     situation: TrafficSituation;
-    claim:
-      | { kind: "yield"; fromVehicleId: string; toVehicleId: string; affirmativeAnswerId: string }
-      | { kind: "prohibited"; vehicleId: string; affirmativeAnswerId: string };
+    sceneBinding?: SceneTrafficBinding;
+    claim: ScenarioClaim;
   };
   contentStatus: ContentStatus;
 }
@@ -175,7 +175,7 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
   let trafficDecision: Scenario["trafficDecision"];
   if (value.trafficDecision !== undefined) {
     const rawDecision = object(value.trafficDecision, "trafficDecision");
-    fields(rawDecision, ["situation", "claim"], "trafficDecision");
+    fields(rawDecision, ["situation", "claim", "sceneBinding"], "trafficDecision");
     let situation: TrafficSituation;
     try {
       situation = validateTrafficSituation(rawDecision.situation, rules);
@@ -186,7 +186,7 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
       );
     }
     const rawClaim = object(rawDecision.claim, "trafficDecision.claim");
-    let claim: NonNullable<Scenario["trafficDecision"]>["claim"];
+    let claim: ScenarioClaim;
     if (rawClaim.kind === "yield") {
       fields(
         rawClaim,
@@ -228,22 +228,41 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
         !situation.vehicles.some((vehicle) => vehicle.id === claim.vehicleId))
     )
       fail("trafficDecision.claim", "невідомий учасник");
-    const analysis = analyzeTrafficSituation(situation, rules);
+    if (!sceneReference) fail("sceneReference", "дорожнє рішення потребує знімка сцени");
+    let sceneBinding: SceneTrafficBinding | undefined;
+    if (rawDecision.sceneBinding !== undefined)
+      try {
+        sceneBinding = validateSceneTrafficBinding(
+          rawDecision.sceneBinding,
+          sceneReference.scene,
+          situation,
+        );
+      } catch (error) {
+        fail(
+          "trafficDecision.sceneBinding",
+          error instanceof Error ? error.message : "некоректна прив’язка",
+        );
+      }
+    const sharedDecision = evaluateScenarioDecision(
+      sceneReference.scene,
+      situation,
+      claim,
+      rules,
+      sceneBinding,
+    );
+    const analysis = sharedDecision.analysis;
+    const sceneConflict = sharedDecision.sceneFindings.find(
+      (finding) => finding.status === "conflict",
+    );
+    if (sceneConflict)
+      fail("trafficDecision.situation.scene", `${sceneConflict.subject}: ${sceneConflict.detail}`);
     if (analysis.technicalCertainty !== "determinate")
       fail(
         "trafficDecision.situation",
         `движок не дав однозначного технічного висновку: ${analysis.explanation}`,
       );
-    const supported =
-      claim.kind === "yield"
-        ? analysis.yieldObligations.some(
-            (edge) =>
-              edge.fromVehicleId === claim.fromVehicleId && edge.toVehicleId === claim.toVehicleId,
-          )
-        : analysis.maneuvers.some(
-            (entry) => entry.vehicleId === claim.vehicleId && entry.status === "prohibited",
-          );
-    if (!supported) fail("trafficDecision.claim", "твердження суперечить результату движка");
+    if (!sharedDecision.claimSupported)
+      fail("trafficDecision.claim", "твердження суперечить результату движка");
     for (const reference of analysis.ruleReferences) {
       if (!ruleReferences.includes(reference))
         fail("ruleReferences", `відсутнє застосоване правило «${reference}»`);
@@ -251,7 +270,6 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
       if (section && !string(value.explanation, "explanation", 3000).includes(section))
         fail("explanation", `немає точного пункту «${section}»`);
     }
-    if (!sceneReference) fail("sceneReference", "дорожнє рішення потребує знімка сцени");
     const objects = new Map(
       sceneReference.scene.objects.map((object) => [object.instanceId, object]),
     );
@@ -285,12 +303,7 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
       if (!object || (expectedAsset && object.assetId !== expectedAsset))
         fail("trafficDecision.situation.signs", `знак «${sign.id}» не збігається зі сценою`);
     }
-    const conflict = assessSceneConsistency(sceneReference.scene, situation).find(
-      (finding) => finding.status === "conflict",
-    );
-    if (conflict)
-      fail("trafficDecision.situation.scene", `${conflict.subject}: ${conflict.detail}`);
-    trafficDecision = { situation, claim };
+    trafficDecision = { situation, claim, ...(sceneBinding ? { sceneBinding } : {}) };
     if (contentStatus.state === "verified" || contentStatus.state === "published")
       fail(
         "contentStatus",

@@ -223,6 +223,25 @@ export function analyzeTrafficSituation(
       "Стан виїзду з перехрестя не визначений або заблокований (16.4).",
     );
   const lanes = new Map(situation.lanes.map((lane) => [lane.id, lane]));
+  for (let i = 0; i < situation.lanes.length; i++)
+    for (let j = i + 1; j < situation.lanes.length; j++) {
+      const first = situation.lanes[i],
+        second = situation.lanes[j];
+      if (
+        first.approach === second.approach &&
+        first.roadPriority &&
+        second.roadPriority &&
+        first.roadPriority !== "unknown" &&
+        second.roadPriority !== "unknown" &&
+        first.roadPriority !== second.roadPriority
+      )
+        problem(
+          "ambiguous",
+          `Смуги ${first.id} і ${second.id} одного під’їзду мають суперечливий пріоритет дороги.`,
+        );
+    }
+  if (situation.signs.some((sign) => sign.kind === "stop"))
+    problem("unsupported", "Знак STOP потребує окремого моделювання обов’язкової зупинки.");
   for (const vehicle of situation.vehicles)
     if (vehicle.vehicleType !== "non-rail")
       problem(

@@ -101,16 +101,17 @@ export function assessSceneConsistency(
     for (const fixture of [...situation.signals, ...situation.signs]) {
       const object = fixture.sceneInstanceId && objects.get(fixture.sceneInstanceId);
       if (!object) continue;
+      const isSignal = "indication" in fixture;
       const matches = fixture.laneIds.every((laneId) => {
         const lane = lanes.get(laneId);
         return lane && onApproach(object, lane.approach) && faces(object, lane.approach);
       });
       add(
-        `${"indication" in fixture ? "signal" : "sign"}:${fixture.id}`,
+        `${isSignal ? "signal" : "sign"}:${fixture.id}`,
         matches ? "confirmed" : "conflict",
         matches
           ? "Об’єкт стоїть на потрібному під’їзді та звернений до потоку."
-          : "Об’єкт стоїть або звернений не до заявленого під’їзду.",
+          : `${isSignal ? "Сигнал" : "знак"} стоїть або звернений не до заявленого під’їзду.`,
       );
     }
   }

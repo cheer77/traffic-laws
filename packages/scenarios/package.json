@@ -7,7 +7,9 @@
     ".": "./src/index.ts",
     "./demo": "./src/demo.ts",
     "./education-demo": "./src/education-demo.ts",
-    "./scene-consistency": "./src/scene-consistency.ts"
+    "./scene-consistency": "./src/scene-consistency.ts",
+    "./scene-binding": "./src/scene-binding.ts",
+    "./scenario-decision": "./src/scenario-decision.ts"
   },
   "scripts": {
     "lint": "eslint .",

@@ -287,6 +287,35 @@ describe("bounded deterministic UA traffic evaluator", () => {
       "unknown",
     );
   });
+  it("diagnoses contradictory road classes on one approach and unsupported STOP semantics", () => {
+    const situation = signalized();
+    situation.signals.forEach((signal) => {
+      signal.indication = "off";
+    });
+    situation.intersection.roadRelation = "main-secondary";
+    situation.intersection.mainRoadTurns = "no";
+    situation.lanes[0].roadPriority = "secondary";
+    situation.lanes[1].approach = "south";
+    situation.lanes[1].roadPriority = "main";
+    situation.signs = [
+      { id: "stop", kind: "stop", officialCode: null, laneIds: ["south"], sceneInstanceId: null },
+      {
+        id: "main",
+        kind: "priority",
+        officialCode: null,
+        laneIds: ["north"],
+        sceneInstanceId: null,
+      },
+    ];
+    const result = analyzeTrafficSituation(situation, reviewedFixture);
+    expect(result.certainty).toBe("ambiguous");
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/суперечливий пріоритет/),
+        expect.stringMatching(/STOP/),
+      ]),
+    );
+  });
   it("rejects a forged source edition and does not report verified legal support", () => {
     const wrongEdition = reviewedFixture.map((rule) => ({
       ...rule,

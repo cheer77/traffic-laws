@@ -12,6 +12,15 @@ const uncontrolledScene = createScene();
 for (const object of uncontrolledScene.objects)
   if (object.assetId === "traffic-light.standard") object.properties.signal = "off";
 
+const INACTIVE_PEOPLE = ["person-man", "person-woman", "person-senior", "person-youth"];
+const PRIORITY_SIGNS = [
+  "sign-yield-s",
+  "sign-yield-n",
+  "sign-priority-e",
+  "sign-priority-w",
+  "sign-stop",
+];
+
 /** Authored study drafts. Correct-answer choices and scene interpretation await human review. */
 export const EDUCATIONAL_DEMO_SCENARIOS: Scenario[] = validateScenarios(
   [
@@ -35,6 +44,20 @@ export const EDUCATIONAL_DEMO_SCENARIOS: Scenario[] = validateScenarios(
       ruleReferences: ["ua-pdr-16.1", "ua-pdr-8.7.3-e"],
       sceneReference: { kind: "snapshot", scene: validateScene(redScene) },
       trafficDecision: {
+        sceneBinding: {
+          schemaVersion: 1,
+          roadInstanceId: "road",
+          laneRoadLinks: [{ laneId: "south", roadInstanceId: "road" }],
+          inactiveSceneInstanceIds: [
+            ...INACTIVE_PEOPLE,
+            "vehicle-suv",
+            "vehicle-motorcycle",
+            "vehicle-ambulance",
+            "vehicle-police",
+            "vehicle-fire",
+          ],
+          outOfScopeControlInstanceIds: [...PRIORITY_SIGNS, "light-n", "light-e", "light-w"],
+        },
         situation: {
           schemaVersion: 1,
           id: "red-signal",
@@ -115,6 +138,22 @@ export const EDUCATIONAL_DEMO_SCENARIOS: Scenario[] = validateScenarios(
       ruleReferences: ["ua-pdr-16.1", "ua-pdr-8.7.3-a", "ua-pdr-16.6"],
       sceneReference: { kind: "snapshot", scene: validateScene(greenScene) },
       trafficDecision: {
+        sceneBinding: {
+          schemaVersion: 1,
+          roadInstanceId: "road",
+          laneRoadLinks: [
+            { laneId: "south", roadInstanceId: "road" },
+            { laneId: "north", roadInstanceId: "road" },
+          ],
+          inactiveSceneInstanceIds: [
+            ...INACTIVE_PEOPLE,
+            "vehicle-motorcycle",
+            "vehicle-ambulance",
+            "vehicle-police",
+            "vehicle-fire",
+          ],
+          outOfScopeControlInstanceIds: [...PRIORITY_SIGNS, "light-e", "light-w"],
+        },
         situation: {
           schemaVersion: 1,
           id: "left-turn-green",
@@ -243,6 +282,28 @@ export const EDUCATIONAL_DEMO_SCENARIOS: Scenario[] = validateScenarios(
       ruleReferences: ["ua-pdr-16.1", "ua-pdr-16.11"],
       sceneReference: { kind: "snapshot", scene: validateScene(uncontrolledScene) },
       trafficDecision: {
+        sceneBinding: {
+          schemaVersion: 1,
+          roadInstanceId: "road",
+          laneRoadLinks: [
+            { laneId: "south", roadInstanceId: "road" },
+            { laneId: "west", roadInstanceId: "road" },
+          ],
+          inactiveSceneInstanceIds: [
+            ...INACTIVE_PEOPLE,
+            "vehicle-suv",
+            "vehicle-motorcycle",
+            "vehicle-police",
+            "vehicle-fire",
+          ],
+          outOfScopeControlInstanceIds: [
+            "sign-yield-n",
+            "sign-priority-e",
+            "sign-stop",
+            "light-n",
+            "light-e",
+          ],
+        },
         situation: {
           schemaVersion: 1,
           id: "secondary-road",
