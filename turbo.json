@@ -4,11 +4,20 @@
   "tasks": {
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": [
+        "DATABASE_URL",
+        "NODE_ENV",
+        "PORT",
+        "HOST",
+        "CORS_ORIGINS",
+        "SESSION_TTL_SECONDS",
+        "SWAGGER_ENABLED"
+      ]
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "out/**"]
+      "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**"]
     },
     "typecheck": {
       "cache": false

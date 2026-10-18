@@ -42,7 +42,7 @@
     "@types/three": "^0.180.0",
     "@types/node": "^24.8.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
+    "vitest": "4.1.11",
     "@react-three/test-renderer": "^9.1.1"
   }
 }

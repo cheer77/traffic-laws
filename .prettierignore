@@ -14,3 +14,5 @@ docs/SCENE_STUDIO_UPGRADE.md
 docs/VEHICLE_MODELS.md
 AGENTS.md
 **/AGENTS.md
+apps/api/.generated/
+**/dist/

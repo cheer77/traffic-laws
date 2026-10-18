@@ -23,6 +23,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - This is a pnpm Workspaces + Turborepo monorepo.
 - `apps/web` is the minimal user-facing Next.js application; product features are not implemented yet.
 - `apps/studio` is the existing Next.js 3D Asset Library and Scene Studio.
+- `apps/api` is the independent NestJS/PostgreSQL backend foundation on port 3002; see `apps/api/README.md`.
 - `packages/assets-3d` owns shared procedural models, resources, and the asset registry.
 - `packages/scene-engine` owns validated versioned scene data, presets and independent rendering; Studio and a development-only Web check consume it.
 - Scene Composer operations, storage and UI stay inside Studio; there is no separate `scene-composer` package. Create other packages only for proven reuse.
@@ -40,7 +41,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Three.js, React Three Fiber, Drei, Zustand, Tailwind CSS.
 - Vitest for the current automated test suite.
 - Turborepo orchestrates root development and verification commands.
-- NestJS is planned for `apps/api`; it is not installed or implemented yet.
+- NestJS 11, Prisma 7 and PostgreSQL 17 implement `apps/api`; use the pinned stable versions.
 - Check installed versions and compatibility before changing dependencies.
 - Do not use beta, canary, or experimental releases without explicit approval.
 
@@ -66,13 +67,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Preserve static-export compatibility in Studio unless the approved phase changes that requirement.
 - Read the installed Next.js documentation described in the generated block above before Next.js work.
 
-## Future NestJS rules
+## NestJS rules
 
-- Apply these only after the roadmap phase explicitly creates `apps/api`.
+- Phase 6 explicitly creates `apps/api`; keep it a modular monolith.
 - Keep controllers thin, business logic in services/use cases, and infrastructure behind clear boundaries.
 - Validate DTOs at API boundaries and expose intentional response contracts.
 - Do not share database entities directly with UI or 3D packages.
-- Do not install NestJS, Prisma, or backend infrastructure before its approved phase.
+- Do not introduce further backend infrastructure without an approved requirement.
 
 ## 3D and simulation rules
 
@@ -143,7 +144,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Phase 1, Audit & Monorepo Foundation, is complete.
 - Phase 2, Applications Separation, is complete.
-- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete. Phase 5 has unverified official-source records, engine-linked study drafts and a bounded deterministic evaluator, but human legal review, broader maneuver truth and protected publication remain open; see `docs/phase-5-audit.md`. Backend, Admin, Mobile, simulation, and product learning features remain Planned.
+- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete. Phase 5 has unverified official-source records, engine-linked study drafts and a bounded deterministic evaluator, but human legal review, broader maneuver truth and protected publication remain open; see `docs/phase-5-audit.md`. Phase 6 backend foundation is separately authorized; see `docs/phase-6-audit.md`. Admin, Mobile, simulation, and product learning UI remain Planned.
 - Before implementation, confirm the active phase in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - If a request crosses phase boundaries, document the conflict and ask for explicit direction.
 - Do not turn roadmap examples into production code without an approved implementation task.
@@ -164,3 +165,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `packages/scenarios` owns versioned questions, answers, explanations and validated optional Scene Definition snapshots. The demo examples are drafts and must never enter a production content feed.
 - A locally recorded review and `publishScenario` enforce structural publication gates, but do not authenticate editors or prove legal correctness. Only separately reviewed, sourced content can advance to publication.
 - Official-text research records under `country-rules/ua-pdr-references` remain `unverified` until competent independent human review. The traffic-situation model describes authored facts and candidates; `country-rules/traffic-rules-engine` computes only the documented narrow cases and keeps technical completeness distinct from normative confirmation. Priority-dependent tickets cannot advance to local verified/published status; production publication additionally needs protected approval tied to immutable revisions.
+
+## Phase 6 backend boundary
+
+- API reuses shared domain validators; never change legal algorithms or promote unverified references to make persistence tests pass.
+- Scenario revisions, rule snapshots, reviews, attempts and audit records are immutable. Updates append a revision with an expected previous revision.
+- Runtime database credentials must be separate from migration-owner credentials and cannot write Publication. The publish HTTP endpoint is disabled for all roles.
+- Review recommendations are authenticated evidence of an action, not proof of legal approval. Production publication remains a separately approved Backend/Admin workflow.
+- Keep synthetic approved fixtures inside isolated tests; development seed imports only in_review demonstrations.
+- Bearer sessions store token hashes, expire absolutely and revoke on logout. Do not log tokens, passwords, emails, request bodies or connection strings.
+- Run `pnpm test:api:integration` for backend behavior/schema changes in addition to `pnpm check`; it owns a disposable Docker database and recovery drill. Never point destructive tests at a developer database.
+- Do not start Phase 7 or change Phase 5 status as part of backend work.

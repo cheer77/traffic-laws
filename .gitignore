@@ -57,3 +57,7 @@ pnpm-debug.log*
 ._*
 Thumbs.db
 Desktop.ini
+
+# API generated Prisma client and disposable recovery artifacts
+apps/api/.generated/
+*.dump

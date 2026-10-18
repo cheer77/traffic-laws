@@ -110,3 +110,36 @@ pnpm check
 В production маршрут отвечает 404 и не включает редактор/Three.js. Детальный формат, ограничения
 и добавление новых сцен: [README движка](../packages/scene-engine/README.md),
 [отчёт Фазы 4](phase-4-audit.md). Не начинайте Phase 5 без нового задания.
+
+## Backend (Phase 6)
+
+`apps/api` runs independently on 3002; Web 3000 and Studio 3001 remain unchanged. Follow the
+[API startup and operations guide](../apps/api/README.md) to generate local credentials, start
+PostgreSQL on loopback 5433, apply migrations, provision the restricted runtime role, bootstrap an
+admin and seed protected drafts. Never use the database owner as the HTTP service identity.
+
+```sh
+pnpm dev:api
+pnpm build:api
+pnpm --filter @traffic-laws/api test
+pnpm test:api:integration
+pnpm check
+```
+
+The integration command requires Docker and creates/removes only its own disposable database. It
+verifies authentication, access restrictions, exact revisions, private attempts, migration integrity
+and backup/restore. Ordinary `pnpm test` does not start Docker and explicitly skips those DB tests.
+Run both before handing off backend behavior/schema changes. For a manual Chrome inspection during
+the disposable run, use `pnpm --filter @traffic-laws/api test:integration --browser`, open the printed
+Swagger URL, then press Enter in that terminal to finish recovery checks and cleanup.
+
+Use Swagger `/api/docs` to register a test student, login and authorize requests. Real development
+seeds have no publishable tickets; public scenario lists remain empty. Successful attempt flows
+are exercised only against isolated synthetic fixtures. Publishing is disabled for every role.
+OpenAPI output, environment variables, migrations, safe administrator bootstrap and manual recovery
+commands are documented in the API guide. No Phase 7 UI or frontend redesign is included.
+
+For dependency security, run both `pnpm audit --prod` and `pnpm audit`. The Phase 6 runtime graph
+has no reported advisory; the full audit still reports the existing unpatched `braces` lint-tool
+issue. See [the Phase 6 audit](phase-6-audit.md). Vitest is pinned to stable 4.1.11 throughout the
+workspace to address test-tool advisories; Vite remains 7.3.7.

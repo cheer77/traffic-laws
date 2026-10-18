@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client"
+  output = "../.generated/client"
+  moduleFormat = "cjs"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum Role {
+  student
+  reviewer
+  admin
+}
+enum AccountStatus {
+  active
+  disabled
+}
+enum ReviewDecision {
+  recommend_approval
+  changes_requested
+  rejected
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique @db.VarChar(254)
+  passwordHash String
+  role Role @default(student)
+  status AccountStatus @default(active)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  sessions Session[]
+  revisions ScenarioRevision[]
+  reviews Review[]
+  attempts Attempt[]
+  events AuditEvent[]
+}
+model Session {
+  id String @id @default(uuid()) @db.Uuid
+  tokenHash String @unique @db.Char(64)
+  userId String @db.Uuid
+  user User @relation(fields:[userId], references:[id], onDelete:Restrict)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt DateTime @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  @@index([userId, expiresAt])
+}
+model ScenarioRevision {
+  scenarioId String @db.VarChar(80)
+  revision Int
+  country String @default("UA") @db.Char(2)
+  payload Json
+  payloadHash String @db.Char(64)
+  rulesSnapshot Json
+  rulesHash String @db.Char(64)
+  authorId String @db.Uuid
+  author User @relation(fields:[authorId], references:[id], onDelete:Restrict)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  reviews Review[]
+  release Publication?
+  attempts Attempt[]
+  @@id([scenarioId, revision])
+  @@index([country, createdAt])
+}
+model Review {
+  id String @id @default(uuid()) @db.Uuid
+  scenarioId String @db.VarChar(80)
+  revision Int
+  scenario ScenarioRevision @relation(fields:[scenarioId,revision], references:[scenarioId,revision], onDelete:Restrict)
+  reviewerId String @db.Uuid
+  reviewer User @relation(fields:[reviewerId], references:[id], onDelete:Restrict)
+  decision ReviewDecision
+  evidence String @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  release Publication?
+  @@unique([id,scenarioId,revision])
+  @@index([scenarioId,revision])
+}
+model Publication {
+  scenarioId String @db.VarChar(80)
+  revision Int
+  scenario ScenarioRevision @relation(fields:[scenarioId,revision], references:[scenarioId,revision], onDelete:Restrict)
+  reviewId String @unique @db.Uuid
+  review Review @relation(fields:[reviewId,scenarioId,revision], references:[id,scenarioId,revision], onDelete:Restrict)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@id([scenarioId,revision])
+  @@unique([reviewId,scenarioId,revision])
+}
+model Attempt {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields:[userId], references:[id], onDelete:Restrict)
+  scenarioId String @db.VarChar(80)
+  revision Int
+  scenario ScenarioRevision @relation(fields:[scenarioId,revision], references:[scenarioId,revision], onDelete:Restrict)
+  answerId String @db.VarChar(80)
+  correct Boolean
+  completedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([userId,completedAt,id])
+}
+model AuditEvent {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String @db.Uuid
+  actor User @relation(fields:[actorId], references:[id], onDelete:Restrict)
+  action String @db.VarChar(80)
+  subject String @db.VarChar(160)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([actorId,createdAt])
+}

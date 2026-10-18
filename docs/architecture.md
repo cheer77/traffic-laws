@@ -2,8 +2,8 @@
 
 ## Как устроен проект
 
-Это pnpm workspace с двумя независимыми приложениями: пользовательским `apps/web` и инструментальным
-`apps/studio`. Turborepo запускает задачи пакетов и кеширует сборки, lint и тесты. Он не является
+Это pnpm workspace с тремя независимыми приложениями: пользовательским `apps/web`, инструментальным
+`apps/studio` и серверным `apps/api`. Turborepo запускает задачи пакетов и кеширует сборки, lint и тесты. Он не является
 дополнительным сервером или приложением.
 
 Раньше Next.js-приложение находилось в корне и использовало npm. Теперь в корне находятся только управление репозиторием, документация и общие настройки. Studio использует общую библиотеку `packages/assets-3d`; её интерфейс и состояние остались внутри приложения.
@@ -33,8 +33,8 @@
 Приложение может использовать общий пакет из `packages`, когда он действительно понадобится. Общий
 пакет не должен импортировать приложение. Приложения не должны напрямую импортировать внутренние
 файлы друг друга. `apps/web` отвечает за пользовательский продукт, `apps/studio` — за инструменты
-3D-разработки. Будущие `apps/admin` и `apps/api` будут отвечать соответственно за административные
-процессы и NestJS API; `apps/mobile` остаётся возможным будущим клиентом.
+3D-разработки. `apps/api` отвечает за NestJS API; будущий `apps/admin` будет отвечать за административные
+процессы; `apps/mobile` остаётся возможным будущим клиентом.
 
 `packages/assets-3d` — общий runtime-пакет без зависимости от Studio. Второй потребитель — lazy-loaded dev-проверка Web `/dev/assets-3d`; production отвечает 404 и не включает тяжёлый 3D-чанк. Метаданные экспортируются отдельно через `/registry`, рендереры — через явные публичные exports.
 
@@ -66,7 +66,7 @@ Studio разделяет состояние документа (`useComposerSto
 
 Путь `apps/studio/out` относится только к статическому экспорту Studio. Web и Studio используют
 собственные каталоги `.next` внутри своих директорий, поэтому их сборочные состояния не смешиваются.
-Решения об авторизации и хранении данных принимаются отдельно на следующих фазах.
+Авторизация и хранение серверных данных реализованы отдельно в `apps/api`; клиентские продуктовые экраны остаются будущей работой.
 
 ## Scene Engine и Composer (Фаза 4)
 
@@ -98,3 +98,29 @@ Web-маршрут `/dev/scenarios` показывает два техничес
 возвращает 404. Локальная проверка статусов — редакционный барьер, но не защищённая публикация.
 Детали схемы и порядок проверки контента: [аудит Фазы 5](phase-5-audit.md). Дальнейшая логика
 описана в [проекте Traffic Rules Engine](traffic-rules-engine-design.md).
+
+## Backend foundation (Phase 6)
+
+`apps/api` is a standalone NestJS modular monolith on port 3002. Modules own configuration,
+database access, authentication, safe user profiles, scenario revisions/reviews, learning attempts
+and health. Controllers contain transport plumbing; services own use cases. There is no Next.js,
+React, Studio or rendering dependency in the API runtime. Its bundle consumes shared package public
+exports, preserving the existing source-export workspace convention without changing shared packages.
+
+PostgreSQL owns users, hashed revocable sessions, immutable scenario/review/attempt/audit records and
+a separate publication relation. Prisma supplies typed access and deterministic migrations; SQL adds
+identity checks and append-only triggers. Authoritative educational data is one versioned JSONB
+payload plus an immutable rule context snapshot. Indexed relational IDs must match the payload;
+answers are never separately editable. Attempts reference exact immutable revisions.
+
+The API reuses `@traffic-laws/scenarios` and `@traffic-laws/country-rules`; no legal algorithms are
+reimplemented. Bearer credentials identify a current active account; public registration grants only
+student. Staff can append drafts and independent review recommendations, never publish. Runtime DB
+credentials cannot insert publications. Current unverified material fails public eligibility even
+if a trusted database owner inserts a release. The public question projection excludes answers,
+explanations and traffic-decision claims; authoritative scoring occurs after an authenticated attempt.
+
+The full protected legal approval workflow remains a separately scoped Backend/Admin responsibility.
+Phase 5 status is unchanged and Phase 7 has not started. Operational instructions, schemas, auth
+tradeoffs, security controls and recovery limits: [API guide](../apps/api/README.md) and
+[Phase 6 audit](phase-6-audit.md).

@@ -1,0 +1,50 @@
+{
+  "name": "@traffic-laws/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm db:generate && node --env-file-if-exists=.env scripts/dev.mjs",
+    "build": "pnpm db:generate && node scripts/build.mjs",
+    "start": "node --env-file-if-exists=.env dist/main.cjs",
+    "lint": "eslint .",
+    "typecheck": "pnpm db:generate && tsc --noEmit",
+    "test": "pnpm db:generate && vitest run",
+    "test:integration": "pnpm db:generate && node scripts/integration.mjs",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:seed": "node --env-file-if-exists=.env dist/seed.cjs",
+    "admin:bootstrap": "node --env-file-if-exists=.env dist/bootstrap-admin.cjs",
+    "openapi": "node dist/openapi.cjs"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.7",
+    "@nestjs/core": "11.2.7",
+    "@nestjs/platform-express": "11.2.7",
+    "@nestjs/swagger": "11.4.7",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "@traffic-laws/country-rules": "workspace:*",
+    "@traffic-laws/scenarios": "workspace:*",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "express": "5.2.1",
+    "express-rate-limit": "8.7.1",
+    "helmet": "8.3.0",
+    "pg": "8.16.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "^24.8.1",
+    "@types/pg": "8.15.6",
+    "esbuild": "0.25.12",
+    "eslint": "^9.37.0",
+    "eslint-config-next": "^16.0.0",
+    "prisma": "7.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.11"
+  }
+}

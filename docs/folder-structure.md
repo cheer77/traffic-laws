@@ -3,6 +3,13 @@
 ```text
 traffic-laws/
 ├── apps/
+│   ├── api/                       # Independent NestJS/PostgreSQL backend
+│   │   ├── src/                   # Auth, users, scenarios, progress, health
+│   │   ├── prisma/                # Schema and versioned SQL migrations
+│   │   ├── scripts/               # Build, restricted role, isolated DB/recovery runner
+│   │   ├── test/                  # Integration tests and synthetic fixtures
+│   │   ├── compose.yaml           # Local PostgreSQL (generated password required)
+│   │   └── README.md              # API contracts and operator runbook
 │   ├── web/
 │   │   ├── src/app/               # Минимальная пользовательская страница
 │   │   ├── package.json
@@ -67,7 +74,7 @@ traffic-laws/
 
 Генерируемые `node_modules`, `.next`, `out`, `next-env.d.ts` и кеш TypeScript не входят в Git. `pnpm-lock.yaml` — единственный lockfile репозитория. Старый `package-lock.json` доступен в Git-истории и в резервной папке миграции.
 
-Каталоги `apps/admin`, `apps/api` и `apps/mobile` не созданы. Они остаются планируемыми границами,
+Каталоги `apps/admin` и `apps/mobile` не созданы. Они остаются планируемыми границами,
 а не реализованными приложениями.
 
 ## Добавления Фазы 4
@@ -90,3 +97,12 @@ traffic-laws/
 Studio продолжает редактировать только Scene Definition. Снимок экспортированной сцены можно
 передать в `validateScenario` как `sceneReference.scene`; редактор билетов не создан. См.
 [аудит Фазы 5](phase-5-audit.md).
+
+## Добавления Фазы 6
+
+`apps/api/src` contains `config`, `common`, `database`, `auth`, `users`, `scenarios`, `progress`
+and `health`. Configuration and database providers use Nest dependency injection. Application-only
+operations stay in this app; no speculative shared backend package was created. `test/fixtures.ts`
+is intentionally excluded from production build entrypoints. `apps/api/.generated` (Prisma),
+`apps/api/dist`, `.env` and private dumps are ignored. The schema and SQL migration are committed
+source, not generated runtime state. See the [API guide](../apps/api/README.md).

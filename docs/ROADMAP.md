@@ -25,11 +25,12 @@ Status labels in this document have strict meanings:
 - **Phase 2 — Completed.** Application boundaries and the minimal user-facing Web shell are in place.
 - `apps/web` and `apps/studio` run and build independently; applications may not import each
   other's internal files.
-- Backend, Admin, product learning features, and Mobile are not implemented.
+- Backend foundation is implemented in `apps/api`; Admin, product learning UI and Mobile are not implemented.
 - **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
 - Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
 - **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md).
 - **Phase 5 — In progress; engineering foundation completed, independent domain acceptance pending.** A single bounded evaluator now drives scenario validation, answer feedback and development-only 3D indicators through a validated authored scene binding. Eight rule records and three tickets remain unverified / in review. See [`phase-5-audit.md`](phase-5-audit.md).
+- **Phase 6 — Completed.** Backend engineering, migration/recovery and security acceptance passed; the affected ESLint globbing dependency was replaced with a pinned, tested stable alternative. Both dependency audits are clear. See [`phase-6-audit.md`](phase-6-audit.md).
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -49,13 +50,15 @@ separate. A package is created only when its boundary and consumers are real.
 | `packages/assets-3d`    | Implemented | Shared procedural models, resources and registry        |
 | `packages/scene-engine` | Implemented | Versioned scene data, validation, presets and rendering |
 
+`apps/api` is the implemented NestJS/PostgreSQL modular monolith for authentication, protected content revisions and private learning attempts. It has no production publication capability; see the [API guide](../apps/api/README.md).
+
 ### Planned applications
 
-| Path          | Status  | Intended responsibility                                             |
-| ------------- | ------- | ------------------------------------------------------------------- |
-| `apps/admin`  | Planned | Content, users, payments, countries, assets, access, and operations |
-| `apps/api`    | Planned | NestJS backend and stable application APIs                          |
-| `apps/mobile` | Future  | Expo / React Native applications for iOS and Android                |
+| Path         | Status  | Intended responsibility                                             |
+| ------------ | ------- | ------------------------------------------------------------------- |
+| `apps/admin` | Planned | Content, users, payments, countries, assets, access, and operations |
+
+| `apps/mobile` | Future | Expo / React Native applications for iOS and Android |
 
 ### Shared packages: implemented and planned
 
@@ -188,14 +191,14 @@ gallery shows the same result in answers, diagnostics and neutral 3D route/parti
 Competent human legal/content/scene review and verified examples remain open. Wider rule coverage and
 production learning are separately scoped later work. See [the engine design](traffic-rules-engine-design.md).
 
-### Phase 6 — Backend Foundation — Planned
+### Phase 6 — Backend Foundation — Completed
 
 **Goal:** provide a secure NestJS backend for users, content, progress, access, and integrations.
 
 **Main tasks:** create `apps/api`; define modules, API contracts, validation, authentication,
 authorization, persistence strategy, migrations, observability, backups, privacy, and rate limits;
 support versioned content and progress synchronization. Prisma is considered only after persistence
-requirements are approved.
+requirements are approved. These requirements were explicitly approved for Phase 6.
 
 **Result:** a deployable API with clear domain boundaries and stable contracts for Web, Admin, and
 future Mobile clients.
@@ -203,6 +206,10 @@ future Mobile clients.
 **Done criteria:** security review passes; migrations and rollback are tested; contracts are documented;
 integration tests cover critical paths; logs exclude secrets and sensitive data; backup recovery is
 demonstrated.
+
+**Verified engineering delivery (2026-10-18):** independent NestJS 11 API; PostgreSQL/Prisma migrations; hashed bearer sessions and role guards; immutable domain-validated revisions, rule snapshots and staff review recommendations; private server-scored attempts; OpenAPI, health/readiness, request IDs, limits and restricted runtime database access. Publication stays disabled. Synthetic test approvals never enter development or production seeds. Phase 5's independent legal review gate and status are unchanged; Phase 7 is not started. Evidence, operational limits and final acceptance are recorded in [the Phase 6 audit](phase-6-audit.md).
+
+**Final acceptance (2026-10-18):** all 219 prior tests plus 8 new dependency security regressions pass (227 total), including 25 disposable PostgreSQL integration tests. Lint, typecheck, import checks, Web/Studio/API builds, migration integrity, TLS startup and backup recovery pass. Both full and production dependency audits report zero advisories. A scoped stable tinyglobby replacement and minimal Next ESLint compatibility patch remove the braces dependency; no risk exception or advisory suppression is used. See [dependency security](dependency-security.md) for evidence and maintenance conditions. No Phase 6 acceptance blockers remain; public deployment and protected content approval retain their documented separate prerequisites.
 
 **Dependencies:** Phase 2 service boundaries and Phase 5 domain contracts. Backend capabilities are
 delivered incrementally; Phase 7 may begin when its required authenticated contracts are stable,
@@ -288,8 +295,8 @@ the educational situation and its verified answer change independently.
 
 ### Users
 
-Planned account capabilities include registration, a personal dashboard, learning history, statistics,
-cross-device progress, and recommendations. Personalization must be explainable, privacy-conscious,
+The backend foundation supports registration, login, private attempt history and basic progress totals.
+User-facing account screens, a personal dashboard, richer statistics, synchronization semantics and recommendations remain planned. Personalization must be explainable, privacy-conscious,
 and separable from the authoritative correctness of road-rule answers.
 
 ### Monetization
