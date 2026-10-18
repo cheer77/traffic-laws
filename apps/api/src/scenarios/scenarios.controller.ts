@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentIdentity, Public, Roles, type Identity } from "../auth/auth.guard";
 import { bodyValidation } from "../common/http";
 import { PaginationDto } from "../common/pagination";
-import { DraftDto, ReviewDto } from "./scenarios.dto";
+import { DraftDto, InternalScenarioQueryDto, ReviewDto } from "./scenarios.dto";
 import { questionView, ScenariosService } from "./scenarios.service";
 @ApiTags("scenarios")
 @Controller("scenarios")
@@ -40,6 +40,16 @@ export class InternalScenariosController {
   @ApiBody({ type: DraftDto })
   create(@Body(bodyValidation(DraftDto)) body: DraftDto, @CurrentIdentity() identity: Identity) {
     return this.scenarios.saveDraft(body, identity.user.id);
+  }
+  @Get()
+  @ApiOperation({ description: "Paginated staff-only revision metadata, newest first." })
+  list(@Query(bodyValidation(InternalScenarioQueryDto)) query: InternalScenarioQueryDto) {
+    return this.scenarios.listInternal(query);
+  }
+  @Get(":id/revisions")
+  @ApiOperation({ description: "Paginated immutable revision history for one scenario." })
+  history(@Param("id") id: string, @Query(bodyValidation(PaginationDto)) page: PaginationDto) {
+    return this.scenarios.history(id, page);
   }
   @Get(":id/revisions/:revision")
   get(@Param("id") id: string, @Param("revision", RevisionPipe) revision: number) {

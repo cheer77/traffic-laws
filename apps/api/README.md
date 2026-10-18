@@ -2,7 +2,7 @@
 
 Independent NestJS modular monolith on port **3002**. Web (3000) and Studio (3001) are unchanged.
 No educational scenario is approved for production. The three UA demonstrations remain `in_review`.
-No Admin UI, payments, mobile application, simulation or full learning dashboard is implemented.
+The Phase 7 Admin UI is in progress; payments, mobile, simulation and the learning dashboard are not implemented.
 
 ## Start locally
 
@@ -75,6 +75,8 @@ Avoid screenshots, logs and shared terminals containing the login response.
 
 Login with the bootstrapped administrator to inspect:
 
+- `GET /api/v1/internal/scenarios` — protected paginated revision metadata; optional `q` (ID substring) and `status` (`draft` or `in_review`) filters.
+- `GET /api/v1/internal/scenarios/:id/revisions` — protected history for one scenario.
 - `GET /api/v1/internal/scenarios/draft-ua-red-signal/revisions/1` — full protected draft.
 - `POST /api/v1/internal/scenarios/revisions` — `{payload: <Scenario v1>, expectedRevision: 0}`
   creates an ID at revision 1. To update, submit a complete payload with revision N+1 and
@@ -111,6 +113,8 @@ advances by stored release slots, so hidden or invalid releases may produce shor
 | GET    | `/users/me`                                           | Own safe profile; no credential/hash                           |
 | GET    | `/scenarios`                                          | Public; paginated eligible revision metadata                   |
 | GET    | `/scenarios/:id/revisions/:revision`                  | Public; question/options/scene only                            |
+| GET    | `/internal/scenarios`                                 | Reviewer/admin; paginated revision metadata                    |
+| GET    | `/internal/scenarios/:id/revisions`                   | Reviewer/admin; paginated immutable history                    |
 | POST   | `/internal/scenarios/revisions`                       | Reviewer/admin; append validated revision                      |
 | GET    | `/internal/scenarios/:id/revisions/:revision`         | Reviewer/admin; payload, hashes, reviews                       |
 | POST   | `/internal/scenarios/:id/revisions/:revision/reviews` | Independent reviewer/admin; append review                      |

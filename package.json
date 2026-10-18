@@ -24,7 +24,10 @@
     "check": "pnpm audit:imports && pnpm lint && pnpm test && pnpm typecheck && pnpm build && pnpm format:check",
     "dev:api": "turbo run dev --filter=@traffic-laws/api",
     "build:api": "turbo run build --filter=@traffic-laws/api",
-    "test:api:integration": "pnpm --filter @traffic-laws/api test:integration"
+    "test:api:integration": "pnpm --filter @traffic-laws/api test:integration",
+    "test:admin:integration": "pnpm --filter @traffic-laws/api test:integration --admin",
+    "dev:admin": "turbo run dev --filter=@traffic-laws/admin",
+    "build:admin": "turbo run build --filter=@traffic-laws/admin"
   },
   "devDependencies": {
     "eslint": "9.39.5",

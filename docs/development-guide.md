@@ -137,9 +137,24 @@ Use Swagger `/api/docs` to register a test student, login and authorize requests
 seeds have no publishable tickets; public scenario lists remain empty. Successful attempt flows
 are exercised only against isolated synthetic fixtures. Publishing is disabled for every role.
 OpenAPI output, environment variables, migrations, safe administrator bootstrap and manual recovery
-commands are documented in the API guide. No Phase 7 UI or frontend redesign is included.
+commands are documented in the API guide.
 
 For dependency security, run both `pnpm audit --prod` and `pnpm audit`. The Phase 6 runtime graph
 has no reported advisory; the full audit still reports the existing unpatched `braces` lint-tool
 issue. See [the Phase 6 audit](phase-6-audit.md). Vitest is pinned to stable 4.1.11 throughout the
 workspace to address test-tool advisories; Vite remains 7.3.7.
+
+## Admin (Phase 7)
+
+Start PostgreSQL and the API with the [API guide](../apps/api/README.md), including the restricted
+runtime role, administrator bootstrap and optional development seed. In a second terminal run:
+
+```sh
+pnpm dev:admin
+```
+
+Open `http://localhost:3003`, sign in with the bootstrapped administrator credentials, then open
+Scenarios. The Admin server uses `API_INTERNAL_URL=http://127.0.0.1:3002` by default; set it to the
+internal API origin if deployed separately. Serve Admin over HTTPS in production for Secure cookies.
+The UI uses real protected API records; public demos are never presented as published content.
+See [Phase 7 audit](phase-7-audit.md) for workflow and known limits.

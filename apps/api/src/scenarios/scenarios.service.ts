@@ -13,7 +13,7 @@ import { UA_PDR_REFERENCES } from "@traffic-laws/country-rules/ua-pdr-references
 import { Prisma, type Review, type ScenarioRevision } from "../../.generated/client/client";
 import { DatabaseService } from "../database/database.service";
 import { pageResult, type PaginationDto } from "../common/pagination";
-import type { DraftDto, ReviewDto } from "./scenarios.dto";
+import type { DraftDto, InternalScenarioQueryDto, ReviewDto } from "./scenarios.dto";
 // JSON round-trip gives Prisma a checked JSON value; never cast a domain object to ORM input.
 export function jsonValue(value: unknown): Prisma.InputJsonValue {
   const parsed: unknown = JSON.parse(JSON.stringify(value));
@@ -84,6 +84,47 @@ export function questionView(scenario: Scenario) {
 @Injectable()
 export class ScenariosService {
   constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
+  private revisionMetadata(record: ScenarioRevision) {
+    const scenario = readRevision(record);
+    return {
+      id: record.scenarioId,
+      revision: record.revision,
+      category: scenario.category,
+      question: scenario.question,
+      contentStatus: scenario.contentStatus.state,
+      authorId: record.authorId,
+      createdAt: record.createdAt,
+    };
+  }
+  async listInternal(page: InternalScenarioQueryDto) {
+    const records = await this.db.scenarioRevision.findMany({
+      where: {
+        ...(page.q ? { scenarioId: { contains: page.q, mode: "insensitive" as const } } : {}),
+        ...(page.status
+          ? { payload: { path: ["contentStatus", "state"], equals: page.status } }
+          : {}),
+      },
+      orderBy: [{ createdAt: "desc" }, { scenarioId: "asc" }, { revision: "desc" }],
+      skip: (page.page - 1) * page.limit,
+      take: page.limit + 1,
+    });
+    return pageResult(
+      records.map((record) => this.revisionMetadata(record)),
+      page,
+    );
+  }
+  async history(id: string, page: PaginationDto) {
+    const records = await this.db.scenarioRevision.findMany({
+      where: { scenarioId: id },
+      orderBy: { revision: "desc" },
+      skip: (page.page - 1) * page.limit,
+      take: page.limit + 1,
+    });
+    return pageResult(
+      records.map((record) => this.revisionMetadata(record)),
+      page,
+    );
+  }
   async saveDraft(body: DraftDto, authorId: string) {
     let scenario: Scenario;
     try {
@@ -139,6 +180,7 @@ export class ScenariosService {
     if (!record) throw new NotFoundException();
     return {
       payload: readRevision(record),
+      authorId: record.authorId,
       payloadHash: record.payloadHash,
       rulesHash: record.rulesHash,
       createdAt: record.createdAt,

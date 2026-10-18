@@ -1,8 +1,10 @@
 import { spawn, spawnSync } from "node:child_process";
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createServer as createHttpsServer } from "node:https";
+import { request as httpRequest } from "node:http";
 import pg from "pg";
 import { provisionRuntime } from "./runtime-role.mjs";
 const suffix = randomBytes(8).toString("hex");
@@ -19,13 +21,38 @@ function run(command, args, options = {}) {
     maxBuffer: 20 * 1024 * 1024,
     ...options,
   });
-  if (result.status !== 0) throw new Error(`${command} failed: ${result.stderr ?? ""}`);
+  if (result.status !== 0)
+    throw new Error(`${command} failed: ${result.stdout ?? ""}\n${result.stderr ?? ""}`);
   return result.stdout;
 }
+async function runAsync(command, args, options = {}) {
+  const child = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"], ...options });
+  let output = "";
+  child.stdout.on("data", (data) => {
+    output += data;
+  });
+  child.stderr.on("data", (data) => {
+    output += data;
+  });
+  const code = await new Promise((resolve, reject) => {
+    child.once("error", reject);
+    child.once("exit", resolve);
+  });
+  if (code !== 0) throw new Error(`${command} failed: ${output}`);
+  return output;
+}
 const docker = (args, options = {}) => run("docker", args, { env: dockerEnv, ...options });
-let api, dev, owner, restored, certificateDirectory;
+let api, admin, adminProxy, dev, owner, restored, certificateDirectory;
+const proxySockets = new Set();
+async function closeProxy() {
+  if (!adminProxy) return;
+  for (const socket of proxySockets) socket.destroy();
+  adminProxy.closeAllConnections();
+  await new Promise((resolve) => adminProxy.close(resolve));
+  adminProxy = undefined;
+}
 async function stop(child) {
-  if (!child || child.exitCode !== null) return;
+  if (!child || child.exitCode !== null || child.signalCode !== null) return;
   const exited = new Promise((resolve) => child.once("exit", resolve));
   child.kill("SIGTERM");
   await exited;
@@ -222,6 +249,85 @@ try {
     productionLogs += data;
   });
   await waitFor(`http://127.0.0.1:${apiPort}/api/v1/health/ready`);
+  if (process.argv.includes("--admin")) {
+    const adminDirectory = join(process.cwd(), "../admin");
+    await owner.query(
+      `INSERT INTO "User" (id, email, "passwordHash", role, status, "createdAt", "updatedAt")
+       SELECT $1, 'disabled-admin-qa@example.org', "passwordHash", 'reviewer', 'disabled', now(), now()
+       FROM "User" WHERE email = 'admin@example.org'`,
+      [randomUUID()],
+    );
+    console.log(
+      run("node", ["scripts/check-contract.mjs", "../api/dist/openapi.json"], {
+        cwd: adminDirectory,
+      }),
+    );
+    console.log(
+      run("pnpm", ["build"], {
+        cwd: adminDirectory,
+        env: { ...process.env, API_INTERNAL_URL: `http://127.0.0.1:${apiPort}` },
+      }),
+    );
+    const adminPort = await availablePort();
+    admin = spawn(
+      "pnpm",
+      ["exec", "next", "start", "--port", String(adminPort), "--hostname", "127.0.0.1"],
+      {
+        cwd: adminDirectory,
+        env: {
+          ...process.env,
+          NODE_ENV: "production",
+          API_INTERNAL_URL: `http://127.0.0.1:${apiPort}`,
+        },
+        stdio: "ignore",
+      },
+    );
+    await waitFor(`http://127.0.0.1:${adminPort}/login`);
+    const proxyPort = await availablePort();
+    adminProxy = createHttpsServer(
+      { key: await readFile(keyFile), cert: await readFile(certificateFile) },
+      (incoming, outgoing) => {
+        const upstream = httpRequest(
+          {
+            hostname: "127.0.0.1",
+            port: adminPort,
+            path: incoming.url,
+            method: incoming.method,
+            headers: {
+              ...incoming.headers,
+              host: `127.0.0.1:${proxyPort}`,
+              "x-forwarded-host": `127.0.0.1:${proxyPort}`,
+              "x-forwarded-proto": "https",
+            },
+          },
+          (response) => {
+            outgoing.writeHead(response.statusCode ?? 502, response.headers);
+            response.pipe(outgoing);
+          },
+        );
+        upstream.on("error", () => outgoing.destroy());
+        incoming.pipe(upstream);
+      },
+    );
+    adminProxy.on("connection", (socket) => {
+      proxySockets.add(socket);
+      socket.once("close", () => proxySockets.delete(socket));
+    });
+    await new Promise((resolve) => adminProxy.listen(proxyPort, "127.0.0.1", resolve));
+    console.log(
+      await runAsync("pnpm", ["exec", "playwright", "test"], {
+        cwd: adminDirectory,
+        env: {
+          ...process.env,
+          ADMIN_TEST_BASE_URL: `https://127.0.0.1:${proxyPort}`,
+          ADMIN_TEST_API_URL: `http://127.0.0.1:${apiPort}/api/v1`,
+        },
+      }),
+    );
+    await closeProxy();
+    await stop(admin);
+    admin = undefined;
+  }
   if (process.argv.includes("--browser")) {
     console.log(
       `Browser verification: http://127.0.0.1:${apiPort}/api/docs — press Enter here to continue and remove the disposable database.`,
@@ -236,6 +342,8 @@ try {
     headers: { Authorization: "Bearer never-log-me" },
   });
   await stop(api);
+  await stop(admin);
+  await closeProxy();
   api = undefined;
   if (
     !productionLogs.includes('"event":"http"') ||

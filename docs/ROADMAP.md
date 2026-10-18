@@ -25,12 +25,13 @@ Status labels in this document have strict meanings:
 - **Phase 2 — Completed.** Application boundaries and the minimal user-facing Web shell are in place.
 - `apps/web` and `apps/studio` run and build independently; applications may not import each
   other's internal files.
-- Backend foundation is implemented in `apps/api`; Admin, product learning UI and Mobile are not implemented.
+- Backend foundation is implemented in `apps/api`; the Phase 7 Admin application is in progress. Product learning UI and Mobile are not implemented.
 - **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
 - Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
 - **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md).
 - **Phase 5 — In progress; engineering foundation completed, independent domain acceptance pending.** A single bounded evaluator now drives scenario validation, answer feedback and development-only 3D indicators through a validated authored scene binding. Eight rule records and three tickets remain unverified / in review. See [`phase-5-audit.md`](phase-5-audit.md).
 - **Phase 6 — Completed.** Backend engineering, migration/recovery and security acceptance passed; the affected ESLint globbing dependency was replaced with a pinned, tested stable alternative. Both dependency audits are clear. See [`phase-6-audit.md`](phase-6-audit.md).
+- **Phase 7 — In progress.** Admin login, protected revision editing/review, shared 3D preview, and automated security/browser coverage are implemented. Protected legal approval and publication, plus backend-backed operational workflows in the Phase 7 done criteria, remain unapproved or unavailable. See [`phase-7-audit.md`](phase-7-audit.md).
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -45,6 +46,7 @@ separate. A package is created only when its boundary and consumers are real.
 | ----------------------- | ----------- | ------------------------------------------------------- |
 | `apps/web`              | Implemented | Minimal Ukrainian user-platform shell                   |
 | `apps/studio`           | Implemented | Existing 3D Asset Library and Scene Studio              |
+| `apps/admin`            | In progress | Protected Ukrainian staff content dashboard             |
 | `tooling`               | Implemented | Shared TypeScript and ESLint configuration              |
 | `scripts`               | Implemented | Repository validation utilities                         |
 | `packages/assets-3d`    | Implemented | Shared procedural models, resources and registry        |
@@ -54,10 +56,8 @@ separate. A package is created only when its boundary and consumers are real.
 
 ### Planned applications
 
-| Path         | Status  | Intended responsibility                                             |
-| ------------ | ------- | ------------------------------------------------------------------- |
-| `apps/admin` | Planned | Content, users, payments, countries, assets, access, and operations |
-
+| Path          | Status | Intended responsibility                              |
+| ------------- | ------ | ---------------------------------------------------- |
 | `apps/mobile` | Future | Expo / React Native applications for iOS and Android |
 
 ### Shared packages: implemented and planned
@@ -207,7 +207,7 @@ future Mobile clients.
 integration tests cover critical paths; logs exclude secrets and sensitive data; backup recovery is
 demonstrated.
 
-**Verified engineering delivery (2026-10-18):** independent NestJS 11 API; PostgreSQL/Prisma migrations; hashed bearer sessions and role guards; immutable domain-validated revisions, rule snapshots and staff review recommendations; private server-scored attempts; OpenAPI, health/readiness, request IDs, limits and restricted runtime database access. Publication stays disabled. Synthetic test approvals never enter development or production seeds. Phase 5's independent legal review gate and status are unchanged; Phase 7 is not started. Evidence, operational limits and final acceptance are recorded in [the Phase 6 audit](phase-6-audit.md).
+**Verified engineering delivery (2026-10-18):** independent NestJS 11 API; PostgreSQL/Prisma migrations; hashed bearer sessions and role guards; immutable domain-validated revisions, rule snapshots and staff review recommendations; private server-scored attempts; OpenAPI, health/readiness, request IDs, limits and restricted runtime database access. Publication stays disabled. Synthetic test approvals never enter development or production seeds. Phase 5's independent legal review gate and status are unchanged; this is the Phase 6 delivery record. Evidence, operational limits and final acceptance are recorded in [the Phase 6 audit](phase-6-audit.md).
 
 **Final acceptance (2026-10-18):** all 219 prior tests plus 8 new dependency security regressions pass (227 total), including 25 disposable PostgreSQL integration tests. Lint, typecheck, import checks, Web/Studio/API builds, migration integrity, TLS startup and backup recovery pass. Both full and production dependency audits report zero advisories. A scoped stable tinyglobby replacement and minimal Next ESLint compatibility patch remove the braces dependency; no risk exception or advisory suppression is used. See [dependency security](dependency-security.md) for evidence and maintenance conditions. No Phase 6 acceptance blockers remain; public deployment and protected content approval retain their documented separate prerequisites.
 
@@ -215,7 +215,7 @@ demonstrated.
 delivered incrementally; Phase 7 may begin when its required authenticated contracts are stable,
 without waiting for all server-side business logic to be implemented.
 
-### Phase 7 — Admin Dashboard — Planned
+### Phase 7 — Admin Dashboard — In progress
 
 **Goal:** provide controlled workflows for managing educational content and platform operations.
 

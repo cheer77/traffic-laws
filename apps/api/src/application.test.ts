@@ -12,6 +12,10 @@ describe("bootstrap and API contract", () => {
     );
     try {
       expect(document.paths["/api/v1/auth/login"].post?.requestBody).toBeDefined();
+      expect(document.paths["/api/v1/internal/scenarios"].get?.security).toEqual([{ bearer: [] }]);
+      expect(document.paths["/api/v1/internal/scenarios/{id}/revisions"].get?.security).toEqual([
+        { bearer: [] },
+      ]);
       expect(document.paths["/api/v1/progress/attempts"].post?.security).toEqual([{ bearer: [] }]);
       expect(
         document.paths["/api/v1/scenarios/{id}/revisions/{revision}"].get?.security,
@@ -28,7 +32,11 @@ describe("bootstrap and API contract", () => {
       for (const [path, item] of Object.entries(document.paths)) {
         if (!path.includes("{revision}")) continue;
         const operation = item.get ?? item.post;
-        expect(operation?.parameters).toEqual([
+        expect(
+          operation?.parameters?.filter(
+            (parameter) => "in" in parameter && parameter.in === "path",
+          ),
+        ).toEqual([
           expect.objectContaining({ name: "id", in: "path", required: true }),
           expect.objectContaining({
             name: "revision",

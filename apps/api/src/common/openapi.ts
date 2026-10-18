@@ -69,15 +69,49 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
       payloadHash: string,
       createdAt: date,
     }),
+    "/api/v1/internal/scenarios": page(
+      object({
+        id: string,
+        revision: integer,
+        category: string,
+        question: string,
+        contentStatus: { type: "string", enum: ["draft", "in_review"] },
+        authorId: string,
+        createdAt: date,
+      }),
+    ),
+    "/api/v1/internal/scenarios/{id}/revisions": page(
+      object({
+        id: string,
+        revision: integer,
+        category: string,
+        question: string,
+        contentStatus: { type: "string", enum: ["draft", "in_review"] },
+        authorId: string,
+        createdAt: date,
+      }),
+    ),
     "/api/v1/internal/scenarios/{id}/revisions/{revision}": object({
       payload: {
         type: "object",
         description: "Validated Scenario v1 (staff only, contains answer)",
       },
+      authorId: string,
       payloadHash: string,
       rulesHash: string,
       createdAt: date,
-      reviews: array({ type: "object" }),
+      reviews: array(
+        object({
+          id: string,
+          reviewerId: string,
+          decision: {
+            type: "string",
+            enum: ["recommend_approval", "changes_requested", "rejected"],
+          },
+          evidence: string,
+          createdAt: date,
+        }),
+      ),
     }),
     "/api/v1/internal/scenarios/{id}/revisions/{revision}/reviews": object({
       id: string,
@@ -155,6 +189,35 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
             schema: { type: "integer", default: 20, minimum: 1, maximum: 50 },
           },
         ];
+      if (method === "get" && path.startsWith("/api/v1/internal/scenarios")) {
+        operation.parameters = [
+          ...(operation.parameters ?? []),
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1, minimum: 1, maximum: 200 },
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 20, minimum: 1, maximum: 50 },
+          },
+          ...(path === "/api/v1/internal/scenarios"
+            ? [
+                {
+                  name: "q",
+                  in: "query" as const,
+                  schema: { type: "string" as const, maxLength: 80 },
+                },
+                {
+                  name: "status",
+                  in: "query" as const,
+                  schema: { type: "string" as const, enum: ["draft", "in_review"] },
+                },
+              ]
+            : []),
+        ];
+      }
     }
   return document;
 }

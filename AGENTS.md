@@ -22,6 +22,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - This is a pnpm Workspaces + Turborepo monorepo.
 - `apps/web` is the minimal user-facing Next.js application; product features are not implemented yet.
+- `apps/admin` is the Phase 7 Next.js staff dashboard on port 3003; its secure content workflows are in progress.
 - `apps/studio` is the existing Next.js 3D Asset Library and Scene Studio.
 - `apps/api` is the independent NestJS/PostgreSQL backend foundation on port 3002; see `apps/api/README.md`.
 - `packages/assets-3d` owns shared procedural models, resources, and the asset registry.
@@ -144,7 +145,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Phase 1, Audit & Monorepo Foundation, is complete.
 - Phase 2, Applications Separation, is complete.
-- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete. Phase 5 has unverified official-source records, engine-linked study drafts and a bounded deterministic evaluator, but human legal review, broader maneuver truth and protected publication remain open; see `docs/phase-5-audit.md`. Phase 6 backend foundation is separately authorized; see `docs/phase-6-audit.md`. Admin, Mobile, simulation, and product learning UI remain Planned.
+- Phase 3 architectural foundation is complete; asset expansion is ongoing. Phase 4 is complete. Phase 5 has unverified official-source records, engine-linked study drafts and a bounded deterministic evaluator, but human legal review, broader maneuver truth and protected publication remain open; see `docs/phase-5-audit.md`. Phase 6 backend foundation is separately authorized; see `docs/phase-6-audit.md`. Admin is In Progress under Phase 7; Mobile, simulation, and product learning UI remain Planned.
 - Before implementation, confirm the active phase in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - If a request crosses phase boundaries, document the conflict and ask for explicit direction.
 - Do not turn roadmap examples into production code without an approved implementation task.
@@ -175,4 +176,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Keep synthetic approved fixtures inside isolated tests; development seed imports only in_review demonstrations.
 - Bearer sessions store token hashes, expire absolutely and revoke on logout. Do not log tokens, passwords, emails, request bodies or connection strings.
 - Run `pnpm test:api:integration` for backend behavior/schema changes in addition to `pnpm check`; it owns a disposable Docker database and recovery drill. Never point destructive tests at a developer database.
-- Do not start Phase 7 or change Phase 5 status as part of backend work.
+- Phase 7 is separately authorized; do not change Phase 5 status as part of backend work.
+
+## Phase 7 Admin boundary
+
+- Admin accesses NestJS only from server components and server actions. Keep revocable bearer tokens in HttpOnly, SameSite Strict cookies, with Secure in production; never expose them to client bundles or browser storage.
+- Every protected page resolves the current API profile. Mutations enforce same-origin requests and still rely on NestJS authorization.
+- Staff scenario listing and history are authenticated metadata endpoints. Draft edits append immutable revisions with expected-revision checks; reviews are recommendations only. Publication remains disabled.
+- Reuse the shared Scene Engine renderer for optional 3D previews. Do not duplicate Studio or legal decision logic.
+- See [`docs/phase-7-audit.md`](docs/phase-7-audit.md) for delivered functionality, checks and open acceptance items.

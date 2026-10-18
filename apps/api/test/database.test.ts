@@ -167,6 +167,11 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
       ).toBe(401);
   });
   it("rejects missing auth and student access to staff routes", async () => {
+    expect((await request("/internal/scenarios")).status).toBe(401);
+    expect((await request("/internal/scenarios", { token: studentToken })).status).toBe(403);
+    expect((await request("/internal/scenarios/x/revisions", { token: studentToken })).status).toBe(
+      403,
+    );
     expect((await request("/users/me")).status).toBe(401);
     expect((await request("/progress")).status).toBe(401);
     expect(
@@ -224,6 +229,24 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
       ).toBe(200);
     }
     expect((await request("/scenarios")).body).toMatchObject({ items: [] });
+    const staffList = await request("/internal/scenarios?limit=2", { token: reviewerToken });
+    expect(staffList.status).toBe(200);
+    expect(staffList.body).toMatchObject({ page: 1, limit: 2, nextPage: 2 });
+    expect(JSON.stringify(staffList.body)).not.toContain("correctAnswerId");
+    expect(
+      (await request("/internal/scenarios?status=published", { token: reviewerToken })).status,
+    ).toBe(400);
+    const filtered = await request(
+      `/internal/scenarios?q=${EDUCATIONAL_DEMO_SCENARIOS[0].id}&status=in_review`,
+      { token: reviewerToken },
+    );
+    expect(filtered.body).toMatchObject({ items: [{ id: EDUCATIONAL_DEMO_SCENARIOS[0].id }] });
+    const history = await request(
+      `/internal/scenarios/${EDUCATIONAL_DEMO_SCENARIOS[0].id}/revisions`,
+      { token: reviewerToken },
+    );
+    expect(history.status).toBe(200);
+    expect(history.body).toMatchObject({ items: [{ revision: 1, contentStatus: "in_review" }] });
   });
   it("rejects invalid scenarios and fabricated JSON publication", async () => {
     const demo = EDUCATIONAL_DEMO_SCENARIOS[0];

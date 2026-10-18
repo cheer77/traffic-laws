@@ -10,6 +10,10 @@ traffic-laws/
 │   │   ├── test/                  # Integration tests and synthetic fixtures
 │   │   ├── compose.yaml           # Local PostgreSQL (generated password required)
 │   │   └── README.md              # API contracts and operator runbook
+│   ├── admin/                     # Next.js staff dashboard and server-side API boundary
+│   │   ├── src/app/               # Protected pages and server actions
+│   │   ├── src/components/        # Forms and lazy 3D preview
+│   │   └── src/lib/               # Typed API contracts, auth and origin checks
 │   ├── web/
 │   │   ├── src/app/               # Минимальная пользовательская страница
 │   │   ├── package.json
@@ -74,7 +78,7 @@ traffic-laws/
 
 Генерируемые `node_modules`, `.next`, `out`, `next-env.d.ts` и кеш TypeScript не входят в Git. `pnpm-lock.yaml` — единственный lockfile репозитория. Старый `package-lock.json` доступен в Git-истории и в резервной папке миграции.
 
-Каталоги `apps/admin` и `apps/mobile` не созданы. Они остаются планируемыми границами,
+Каталог `apps/admin` реализуется в Phase 7; `apps/mobile` не создан и остаётся планируемой границей,
 а не реализованными приложениями.
 
 ## Добавления Фазы 4

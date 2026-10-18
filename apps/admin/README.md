@@ -1,0 +1,9 @@
+# Admin Dashboard
+
+Phase 7 staff application (`pnpm dev:admin`, port 3003). Set `API_INTERNAL_URL` to the server-side NestJS origin; it defaults to `http://127.0.0.1:3002`. Bootstrap an administrator as described in the [API guide](../api/README.md). No browser-side API credential is configured.
+
+The Admin stores the revocable API bearer in an HttpOnly, SameSite Strict cookie, marked Secure in production. Production requires HTTPS. Every protected page checks the current profile; protected actions check the request origin, and NestJS enforces the final role, revision, review and publication rules. Logout deletes the local cookie even if remote revocation fails, and reports that failure. A reviewer recommendation does not establish legal approval. Publication has no Admin control and the API endpoint returns 403.
+
+`pnpm test:admin:integration` from the repository root creates a disposable PostgreSQL 17 database, runs the real API integration suite, builds API and Admin, checks eight Admin OpenAPI contracts, then runs Chrome/Playwright against production Admin through a temporary local HTTPS proxy. It also runs the API recovery drill and removes test data and the container. The test requires Docker, Chrome, OpenSSL and a working local loopback interface. Do not point this test at a developer database.
+
+Admin unit tests run under `pnpm --filter @traffic-laws/admin test`. The browser test uses only isolated test credentials and data. The small server-side API adapter remains hand typed: eight endpoints and shared Scenario/Scene validators do not justify a generated client or additional runtime framework. `scripts/check-contract.mjs` compares required fields, authentication, query arguments and publication restriction against generated NestJS OpenAPI on every integrated run. Nested scenario and scene shape remains validated by the shared domain packages rather than OpenAPI code generation.

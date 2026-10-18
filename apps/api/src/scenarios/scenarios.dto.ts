@@ -1,5 +1,31 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsInt, IsObject, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsIn,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from "class-validator";
+import { PaginationDto } from "../common/pagination";
+export class InternalScenarioQueryDto extends PaginationDto {
+  @ApiPropertyOptional({
+    type: String,
+    maxLength: 80,
+    description: "Case-insensitive scenario ID substring.",
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  q?: string;
+  @ApiPropertyOptional({ enum: ["draft", "in_review"] })
+  @IsOptional()
+  @IsIn(["draft", "in_review"])
+  status?: "draft" | "in_review";
+}
 export class DraftDto {
   @ApiProperty({
     type: Object,

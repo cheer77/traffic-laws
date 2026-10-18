@@ -1,0 +1,35 @@
+{
+  "name": "@traffic-laws/admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3003",
+    "build": "next build --webpack",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.8.2",
+    "@traffic-laws/country-rules": "workspace:*",
+    "@traffic-laws/scenarios": "workspace:*",
+    "@traffic-laws/scene-engine": "workspace:*",
+    "next": "16.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.180.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}
