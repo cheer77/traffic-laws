@@ -6,6 +6,7 @@ import { UsersModule } from "./users/users.module";
 import { ScenariosModule } from "./scenarios/scenarios.module";
 import { ProgressModule } from "./progress/progress.module";
 import { HealthModule } from "./health/health.module";
+import { ImportsModule } from "./imports/imports.module";
 @Module({})
 class ConfigModule {
   static register(config: ApiConfig): DynamicModule {
@@ -29,6 +30,7 @@ export class AppModule {
         UsersModule,
         ScenariosModule,
         ProgressModule,
+        ImportsModule,
         HealthModule,
       ],
     };

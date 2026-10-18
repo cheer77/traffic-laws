@@ -21,6 +21,10 @@ describe("bootstrap and API contract", () => {
         document.paths["/api/v1/scenarios/{id}/revisions/{revision}"].get?.security,
       ).toBeUndefined();
       expect(
+        document.paths["/api/v1/internal/scenarios/{id}/revisions/{revision}/unpublish"].post
+          ?.responses[201],
+      ).toBeDefined();
+      expect(
         JSON.stringify(
           document.paths["/api/v1/scenarios/{id}/revisions/{revision}"].get?.responses[200],
         ),
@@ -28,7 +32,7 @@ describe("bootstrap and API contract", () => {
       expect(
         document.paths["/api/v1/internal/scenarios/{id}/revisions/{revision}/publish"].post
           ?.responses[201],
-      ).toBeUndefined();
+      ).toBeDefined();
       for (const [path, item] of Object.entries(document.paths)) {
         if (!path.includes("{revision}")) continue;
         const operation = item.get ?? item.post;

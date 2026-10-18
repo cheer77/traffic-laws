@@ -1,33 +1,17 @@
-import { ScenarioForm } from "@/components/ActionForm";
+import { UA_PDR_REFERENCES } from "@traffic-laws/country-rules/ua-pdr-references";
+import { ScenarioEditor } from "@/components/ScenarioEditor";
 import { requireStaff } from "@/lib/api";
-const template = {
-  schemaVersion: 1,
-  revision: 1,
-  id: "new-ua-scenario",
-  country: "UA",
-  language: "uk",
-  category: "Навчальний сценарій",
-  question: "Введіть запитання",
-  answers: [
-    { id: "a", text: "Варіант А" },
-    { id: "b", text: "Варіант Б" },
-  ],
-  correctAnswerId: "a",
-  explanation: "Введіть пояснення",
-  ruleReferences: [],
-  sceneReference: null,
-  contentStatus: { state: "draft" },
-};
 export default async function NewScenario() {
   await requireStaff();
   return (
     <>
       <h1>Нова чернетка</h1>
       <p className="notice">
-        Шаблон є технічним початком. Заповніть зміст і нормативні посилання перед рецензуванням.
+        Створіть текстовий або 3D-білет через звичайні поля. Публікація буде окремою дією після
+        перевірки конкретної ревізії.
       </p>
       <section className="card">
-        <ScenarioForm payload={JSON.stringify(template, null, 2)} expectedRevision={0} />
+        <ScenarioEditor rules={UA_PDR_REFERENCES} />
       </section>
     </>
   );

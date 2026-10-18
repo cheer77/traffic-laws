@@ -33,7 +33,7 @@ export async function provisionRuntime(ownerUrl, password, reuseExisting = false
     await db.query("REVOKE CREATE ON SCHEMA public FROM PUBLIC");
     await db.query("GRANT USAGE ON SCHEMA public TO traffic_runtime");
     await db.query(
-      'REVOKE ALL ON "User", "Session", "ScenarioRevision", "Review", "Attempt", "AuditEvent", "Publication" FROM traffic_runtime',
+      'REVOKE ALL ON "User", "Session", "ScenarioRevision", "Review", "Attempt", "AuditEvent", "Publication", "ImportRun" FROM traffic_runtime',
     );
     await db.query('GRANT SELECT, INSERT ON "User", "Session" TO traffic_runtime');
     await db.query('GRANT UPDATE ("revokedAt") ON "Session" TO traffic_runtime');
@@ -41,6 +41,10 @@ export async function provisionRuntime(ownerUrl, password, reuseExisting = false
       'GRANT SELECT, INSERT ON "ScenarioRevision", "Review", "Attempt", "AuditEvent" TO traffic_runtime',
     );
     await db.query('GRANT SELECT ON "Publication" TO traffic_runtime');
+    await db.query('GRANT SELECT, INSERT ON "ImportRun" TO traffic_runtime');
+    await db.query(
+      "GRANT EXECUTE ON FUNCTION owner_publish_scenario(text, integer, uuid, uuid, uuid, text), owner_unpublish_scenario(text, integer, uuid, uuid, text) TO traffic_runtime",
+    );
     await db.query("COMMIT");
   } catch (error) {
     await db.query("ROLLBACK");

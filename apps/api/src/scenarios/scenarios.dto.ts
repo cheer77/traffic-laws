@@ -60,3 +60,10 @@ export class ReviewDto {
   @MaxLength(2000)
   evidence!: string;
 }
+export class PublicationDto {
+  @ApiProperty({ type: String, minLength: 10, maxLength: 500 })
+  @IsString()
+  @MinLength(10)
+  @MaxLength(500)
+  evidence!: string;
+}

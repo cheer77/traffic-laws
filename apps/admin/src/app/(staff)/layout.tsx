@@ -13,6 +13,7 @@ export default async function StaffLayout({ children }: { children: ReactNode })
         <nav aria-label="Основна навігація">
           <Link href="/">Огляд</Link>
           <Link href="/scenarios">Сценарії</Link>
+          <Link href="/imports">Імпорт питань</Link>
           <Link href="/account">Мій профіль</Link>
         </nav>
         <p style={{ marginTop: 40, opacity: 0.8 }}>

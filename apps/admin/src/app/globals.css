@@ -140,8 +140,101 @@ textarea {
   font-family: ui-monospace, monospace;
   font-size: 0.88rem;
 }
+.publication-form textarea,
+.danger-zone textarea {
+  min-height: 110px;
+  font-family: inherit;
+}
+.danger-zone {
+  margin-top: 18px;
+  border: 1px solid #efc2b7;
+  background: #fff8f5;
+  border-radius: 12px;
+  padding: 18px;
+}
+.danger-zone .button {
+  background: #9a341f;
+}
+.scenario-editor {
+  display: grid;
+  gap: 14px;
+}
+.scenario-editor .short-textarea {
+  min-height: 100px;
+  font-family: inherit;
+}
+.answers-editor {
+  border: 1px solid #d8e0e9;
+  border-radius: 12px;
+  padding: 16px;
+}
+.answers-editor legend {
+  font-weight: 700;
+  padding: 0 8px;
+}
+.answers-editor > div {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.answers-editor input[type="radio"] {
+  width: 18px;
+}
+.advanced-editor {
+  border: 1px solid #d8e0e9;
+  border-radius: 12px;
+  padding: 16px;
+}
+.advanced-editor summary {
+  cursor: pointer;
+  font-weight: 700;
+}
 .table-wrap {
   overflow-x: auto;
+}
+
+.source-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.45fr);
+  gap: 24px;
+}
+.source-links {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+.source-links a {
+  color: #155db1;
+  font-weight: 700;
+}
+.legal-warning {
+  border-left: 5px solid #d58b12;
+  background: #fffaf0;
+}
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.metric {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.metric span {
+  color: #61708a;
+  font-size: 0.85rem;
+}
+.metric strong {
+  font-size: 1.8rem;
+}
+@media (max-width: 760px) {
+  .source-card {
+    grid-template-columns: 1fr;
+  }
 }
 table {
   width: 100%;

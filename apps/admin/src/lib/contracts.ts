@@ -37,4 +37,38 @@ export interface RevisionDetail {
   rulesHash: string;
   createdAt: string;
   reviews: Review[];
+  published: boolean;
+}
+export interface ImportRun {
+  id: string;
+  edition: string;
+  status: "completed" | "blocked" | "failed";
+  reuseStatus: "unclear" | "authorized" | "forbidden";
+  found: number;
+  imported: number;
+  updated: number;
+  rejected: number;
+  published: number;
+  withImages: number;
+  threeDCandidates: number;
+  message: string;
+  createdAt: string;
+  completedAt: string;
+}
+export interface ImportOverview {
+  source: {
+    key: string;
+    name: string;
+    pageUrl: string;
+    edition: string;
+    sourceUpdatedAt: string;
+    questionsUrl: string;
+    answersUrl: string;
+    questionsPages: number;
+    answersPages: number;
+    reuseStatus: "unclear" | "authorized" | "forbidden";
+    automaticPublicationAllowed: boolean;
+    note: string;
+  };
+  runs: ImportRun[];
 }

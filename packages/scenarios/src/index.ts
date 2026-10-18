@@ -168,9 +168,15 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
   if (contentStatus.state === "verified" || contentStatus.state === "published") {
     if (ruleReferences.length === 0)
       fail("ruleReferences", "перевірений білет потребує нормативного посилання");
-    for (const ruleId of ruleReferences)
-      if (ruleMap.get(ruleId)?.verification.status !== "verified")
+    for (const ruleId of ruleReferences) {
+      if (
+        contentStatus.state === "verified" &&
+        ruleMap.get(ruleId)?.verification.status !== "verified"
+      )
         fail("ruleReferences", `правило «${ruleId}» не перевірене`);
+      if (!ruleMap.get(ruleId)?.source)
+        fail("ruleReferences", `правило «${ruleId}» не має нормативного джерела`);
+    }
   }
   let trafficDecision: Scenario["trafficDecision"];
   if (value.trafficDecision !== undefined) {
@@ -304,10 +310,10 @@ export function validateScenario(input: unknown, context: ScenarioContext): Scen
         fail("trafficDecision.situation.signs", `знак «${sign.id}» не збігається зі сценою`);
     }
     trafficDecision = { situation, claim, ...(sceneBinding ? { sceneBinding } : {}) };
-    if (contentStatus.state === "verified" || contentStatus.state === "published")
+    if (contentStatus.state === "verified")
       fail(
         "contentStatus",
-        "для дорожніх рішень потрібна захищена незалежна перевірка; публікацію заблоковано",
+        "формалізоване дорожнє рішення не можна позначити як незалежно перевірене автоматично",
       );
   }
   return {

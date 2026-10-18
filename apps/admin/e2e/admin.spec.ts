@@ -14,7 +14,7 @@ async function login(page: Page, email: string, password = adminPassword, staff 
 }
 
 test("protected pages reject anonymous access", async ({ page }) => {
-  for (const path of ["/", "/scenarios", "/scenarios/new", "/account"]) {
+  for (const path of ["/", "/scenarios", "/scenarios/new", "/imports", "/account"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
   }
@@ -119,16 +119,12 @@ test("real staff list filters and pagination; scene loads lazily", async ({ page
   await expect(page.getByRole("heading", { name: "Перегляд сцени" })).toBeVisible();
   await expect(page.locator("canvas")).toBeVisible();
   await expect(page.getByText("не перевірено незалежно").first()).toBeVisible();
-  await expect(page.getByText("Публікація недоступна", { exact: false })).toBeVisible();
+  await expect(page.getByLabel("Обґрунтування рішення власника")).toBeVisible();
 });
 
 test("draft validation, immutable revision and stale edit conflict", async ({ page, request }) => {
   await login(page, "admin@example.org");
   await page.goto("/scenarios/new");
-  const editor = page.getByLabel("Сценарій JSON v1");
-  await editor.fill("{");
-  await page.getByRole("button", { name: "Зберегти ревізію" }).click();
-  await expect(page.locator("main [role=alert]")).toContainText("синтаксичну помилку");
   const id = `admin-e2e-${Date.now()}`;
   const payload = {
     schemaVersion: 1,
@@ -139,17 +135,22 @@ test("draft validation, immutable revision and stale edit conflict", async ({ pa
     category: "Навчальний сценарій",
     question: "Автоматизована перевірка чернетки",
     answers: [
-      { id: "a", text: "А" },
-      { id: "b", text: "Б" },
+      { id: "answer-1", text: "А" },
+      { id: "answer-2", text: "Б" },
     ],
-    correctAnswerId: "a",
+    correctAnswerId: "answer-1",
     explanation: "Тестове пояснення",
     ruleReferences: [],
     sceneReference: null,
     contentStatus: { state: "draft" },
   };
-  await editor.fill(JSON.stringify(payload));
-  await page.getByRole("button", { name: "Зберегти ревізію" }).click();
+  await page.getByLabel("Технічний ID").fill(id);
+  await page.getByLabel("Категорія").fill(payload.category);
+  await page.getByLabel("Запитання").fill(payload.question);
+  await page.getByPlaceholder("Варіант 1 (обов’язково)").fill("А");
+  await page.getByPlaceholder("Варіант 2 (обов’язково)").fill("Б");
+  await page.getByLabel("Пояснення після відповіді").fill(payload.explanation);
+  await page.getByRole("button", { name: "Створити незмінну ревізію" }).click();
   await expect(page).toHaveURL(new RegExp(`/scenarios/${id}/1$`));
   await expect(page.getByText("Автор не може рецензувати власну ревізію.")).toBeVisible();
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -172,11 +173,16 @@ test("draft validation, immutable revision and stale edit conflict", async ({ pa
   const forbidden = await request.post(`${api}/internal/scenarios/${id}/revisions/2/publish`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  expect(forbidden.status()).toBe(403);
+  expect(forbidden.status()).toBe(400);
 });
 
 test("reviewer submits recommendation but cannot publish", async ({ page, request }) => {
   await login(page, "reviewer@example.org");
+  await page.goto("/imports");
+  await expect(page.getByRole("heading", { name: "Імпорт офіційних питань" })).toBeVisible();
+  await expect(page.getByText("Автопублікацію призупинено")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Імпортувати / Оновити питання" })).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Журнал імпорту" })).toBeVisible();
   await page.goto("/scenarios");
   const links = page.locator("tbody tr a");
   await links.first().click();

@@ -44,7 +44,13 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
       expiresAt: date,
     }),
     "/api/v1/auth/logout": object({ revoked: { type: "boolean" } }),
-    "/api/v1/scenarios": page(object(metadata)),
+    "/api/v1/scenarios": page(
+      object({
+        ...metadata,
+        question: string,
+        presentation: { type: "string", enum: ["text", "3d"] },
+      }),
+    ),
     "/api/v1/scenarios/{id}/revisions/{revision}": object({
       ...metadata,
       question: string,
@@ -100,6 +106,7 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
       payloadHash: string,
       rulesHash: string,
       createdAt: date,
+      published: { type: "boolean" },
       reviews: array(
         object({
           id: string,
@@ -121,6 +128,16 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
       decision: { type: "string", enum: ["recommend_approval", "changes_requested", "rejected"] },
       evidence: string,
       createdAt: date,
+    }),
+    "/api/v1/internal/scenarios/{id}/revisions/{revision}/publish": object({
+      id: string,
+      revision: integer,
+      published: { type: "boolean", enum: [true] },
+    }),
+    "/api/v1/internal/scenarios/{id}/revisions/{revision}/unpublish": object({
+      id: string,
+      revision: integer,
+      published: { type: "boolean", enum: [false] },
     }),
   };
   schemas["/api/v1/users/me"] = schemas["/api/v1/auth/register"];
@@ -147,24 +164,21 @@ export function completeOpenApi(document: OpenAPIObject): OpenAPIObject {
               ? { type: "integer", minimum: 1, maximum: 2147483647 }
               : { type: "string", maxLength: 80, pattern: "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" },
         }));
-      if (path.endsWith("/publish")) operation.responses = {};
-      else {
-        const schema =
-          path === "/api/v1/progress/attempts"
-            ? method === "get"
-              ? page(object(attempt))
-              : object({
-                  ...attempt,
-                  correctAnswerId: string,
-                  explanation: string,
-                  ruleReferences: array(string),
-                })
-            : schemas[path];
-        if (schema)
-          for (const response of Object.values(operation.responses))
-            if (response && !("$ref" in response))
-              response.content = { "application/json": { schema } };
-      }
+      const schema =
+        path === "/api/v1/progress/attempts"
+          ? method === "get"
+            ? page(object(attempt))
+            : object({
+                ...attempt,
+                correctAnswerId: string,
+                explanation: string,
+                ruleReferences: array(string),
+              })
+          : schemas[path];
+      if (schema)
+        for (const response of Object.values(operation.responses))
+          if (response && !("$ref" in response))
+            response.content = { "application/json": { schema } };
       for (const status of [400, 401, 403, 404, 409, 413, 429, 500, 503])
         operation.responses[status] = {
           description:

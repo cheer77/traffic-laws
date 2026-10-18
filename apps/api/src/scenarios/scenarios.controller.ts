@@ -1,19 +1,10 @@
 import { RevisionPipe } from "../common/revision.pipe";
-import {
-  Body,
-  Controller,
-  ForbiddenException,
-  Get,
-  Inject,
-  Param,
-  Post,
-  Query,
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentIdentity, Public, Roles, type Identity } from "../auth/auth.guard";
 import { bodyValidation } from "../common/http";
 import { PaginationDto } from "../common/pagination";
-import { DraftDto, InternalScenarioQueryDto, ReviewDto } from "./scenarios.dto";
+import { DraftDto, InternalScenarioQueryDto, PublicationDto, ReviewDto } from "./scenarios.dto";
 import { questionView, ScenariosService } from "./scenarios.service";
 @ApiTags("scenarios")
 @Controller("scenarios")
@@ -67,11 +58,28 @@ export class InternalScenariosController {
   }
   @Post(":id/revisions/:revision/publish")
   @Roles("admin")
-  @ApiOperation({
-    description:
-      "Disabled in Phase 6. Always 403. Review recommendations and JSON flags cannot authorize publication.",
-  })
-  publish(): never {
-    throw new ForbiddenException();
+  @ApiBody({ type: PublicationDto })
+  @ApiCreatedResponse({ description: "Revision published." })
+  @ApiOperation({ description: "Publish one immutable revision by an active administrator." })
+  publish(
+    @Param("id") id: string,
+    @Param("revision", RevisionPipe) revision: number,
+    @Body(bodyValidation(PublicationDto)) body: PublicationDto,
+    @CurrentIdentity() identity: Identity,
+  ) {
+    return this.scenarios.publish(id, revision, body.evidence, identity.user.id);
+  }
+  @Post(":id/revisions/:revision/unpublish")
+  @Roles("admin")
+  @ApiBody({ type: PublicationDto })
+  @ApiCreatedResponse({ description: "Revision withdrawn." })
+  @ApiOperation({ description: "Withdraw one published revision while retaining an audit event." })
+  unpublish(
+    @Param("id") id: string,
+    @Param("revision", RevisionPipe) revision: number,
+    @Body(bodyValidation(PublicationDto)) body: PublicationDto,
+    @CurrentIdentity() identity: Identity,
+  ) {
+    return this.scenarios.unpublish(id, revision, body.evidence, identity.user.id);
   }
 }

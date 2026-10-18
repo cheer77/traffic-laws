@@ -107,4 +107,24 @@ describe("scenario boundary and editorial lifecycle", () => {
       validateScenario({ ...reviewed, ruleReferences: [] }, { rules: [verified] }),
     ).toThrow(/нормативного/);
   });
+  it("keeps owner publication distinct from independent rule verification", () => {
+    const sourcedUnverified = validateRule({
+      ...verified,
+      verification: { status: "unverified" },
+    });
+    expect(
+      validateScenario(
+        {
+          ...draft,
+          ruleReferences: [sourcedUnverified.id],
+          contentStatus: {
+            state: "published",
+            reviewedAt: "2026-10-18",
+            reviewedBy: "Власник",
+          },
+        },
+        { rules: [sourcedUnverified] },
+      ).contentStatus.state,
+    ).toBe("published");
+  });
 });

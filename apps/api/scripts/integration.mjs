@@ -85,6 +85,7 @@ async function snapshot(client) {
     "Publication",
     "Attempt",
     "AuditEvent",
+    "ImportRun",
   ]) {
     result[table] = (
       await client.query(`SELECT to_jsonb(t) AS value FROM "${table}" t ORDER BY to_jsonb(t)::text`)
@@ -143,12 +144,32 @@ try {
   );
   owner = new pg.Client({ connectionString: ownerUrl });
   await owner.connect();
-  const checksum = createHash("sha256")
-    .update(await readFile("prisma/migrations/202610170001_foundation/migration.sql"))
-    .digest("hex");
+  const migrationFiles = [
+    ["202610170001_foundation", "prisma/migrations/202610170001_foundation/migration.sql"],
+    [
+      "202610180002_owner_publication",
+      "prisma/migrations/202610180002_owner_publication/migration.sql",
+    ],
+    ["202610180003_import_runs", "prisma/migrations/202610180003_import_runs/migration.sql"],
+  ];
+  const checksums = new Map(
+    await Promise.all(
+      migrationFiles.map(async ([name, path]) => [
+        name,
+        createHash("sha256")
+          .update(await readFile(path))
+          .digest("hex"),
+      ]),
+    ),
+  );
+  const appliedMigrations = (
+    await owner.query(
+      'SELECT migration_name, checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL',
+    )
+  ).rows;
   if (
-    (await owner.query('SELECT checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL'))
-      .rows[0].checksum !== checksum
+    appliedMigrations.length !== checksums.size ||
+    appliedMigrations.some((row) => checksums.get(row.migration_name) !== row.checksum)
   )
     throw new Error("Migration checksum mismatch");
   await provisionRuntime(ownerUrl, runtimePassword);
@@ -405,10 +426,16 @@ try {
   });
   await restored.connect();
   if ((await snapshot(restored)) !== before) throw new Error("Restored records differ");
-  const restoredChecksum = (
-    await restored.query('SELECT checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL')
-  ).rows[0].checksum;
-  if (restoredChecksum !== checksum) throw new Error("Restored migration mismatch");
+  const restoredMigrations = (
+    await restored.query(
+      'SELECT migration_name, checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL',
+    )
+  ).rows;
+  if (
+    restoredMigrations.length !== checksums.size ||
+    restoredMigrations.some((row) => checksums.get(row.migration_name) !== row.checksum)
+  )
+    throw new Error("Restored migration mismatch");
   let rejected = false;
   try {
     await restored.query('UPDATE "ScenarioRevision" SET revision = revision');

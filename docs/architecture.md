@@ -114,8 +114,10 @@ answers are never separately editable. Attempts reference exact immutable revisi
 
 The API reuses `@traffic-laws/scenarios` and `@traffic-laws/country-rules`; no legal algorithms are
 reimplemented. Bearer credentials identify a current active account; public registration grants only
-student. Staff can append drafts and independent review recommendations, never publish. Runtime DB
-credentials cannot insert publications. Current unverified material fails public eligibility even
+student. Staff can append drafts and review recommendations. An active administrator can explicitly
+publish or withdraw one immutable revision through narrow audited database functions. Runtime DB
+credentials still cannot directly insert/delete publications. Owner publication does not change
+unverified rule metadata or claim independent legal verification. Invalid or unsourced material fails
 if a trusted database owner inserts a release. The public question projection excludes answers,
 explanations and traffic-decision claims; authoritative scoring occurs after an authenticated attempt.
 
@@ -131,4 +133,5 @@ NestJS REST API on the server; browsers receive only HttpOnly same-site session 
 actions require a matching Origin and Host. Each protected render asks the API for the current
 profile; its role guard remains authoritative. Draft edits append immutable revisions using expected
 revision concurrency. Staff listing supports API-side ID and status filters. The shared Scene Engine renderer is loaded only for snapshots. Publication
-remains disabled and no operator user-management route exists. See [Phase 7 audit](phase-7-audit.md).
+is available only to admins; no operator user-management route exists. See
+[Phase 7 audit](phase-7-audit.md) and [MVP audit](mvp-audit.md).

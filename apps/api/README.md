@@ -1,8 +1,9 @@
-# Traffic Laws API — Phase 6
+# Traffic Laws API — Phase 6 foundation + MVP publication increment
 
 Independent NestJS modular monolith on port **3002**. Web (3000) and Studio (3001) are unchanged.
 No educational scenario is approved for production. The three UA demonstrations remain `in_review`.
-The Phase 7 Admin UI is in progress; payments, mobile, simulation and the learning dashboard are not implemented.
+The Phase 7 Admin UI and first Web learning dashboard are in progress. Payments, mobile and
+simulation are not implemented. See `docs/mvp-audit.md` for the current product slice.
 
 ## Start locally
 
@@ -85,7 +86,10 @@ Login with the bootstrapped administrator to inspect:
   or administrator can append a recommendation, requested changes, or rejection with evidence.
   This authenticates the author of the recommendation; it does not prove their qualifications or
   the legal truth of its text.
-- `POST /api/v1/internal/scenarios/:id/revisions/:revision/publish` — **always 403**, even for admin.
+- `POST /api/v1/internal/scenarios/:id/revisions/:revision/publish` — active admin only; validates
+  the exact immutable revision for public use and requires a 10–500 character owner evidence note.
+- `POST /api/v1/internal/scenarios/:id/revisions/:revision/unpublish` — active admin only; withdraws
+  the exact revision and records the action.
 
 `GET /api/v1/scenarios` returns an empty list on the real development seed. Fetching a demonstration
 through a public question endpoint, or submitting a learning attempt against it, returns 404.
@@ -105,25 +109,29 @@ are JSON objects; lists use `{items, page, limit, nextPage}`. `page` is 1–200 
 Scenario lists contain published **revisions**, not an implicit mutable "latest" alias. Pagination
 advances by stored release slots, so hidden or invalid releases may produce short/empty pages.
 
-| Method | Route after `/api/v1`                                 | Access / response                                              |
-| ------ | ----------------------------------------------------- | -------------------------------------------------------------- |
-| POST   | `/auth/register`                                      | Public; 201 safe student profile                               |
-| POST   | `/auth/login`                                         | Public; 200 bearer token and absolute expiry                   |
-| POST   | `/auth/logout`                                        | Authenticated; 200 `{revoked: true}`                           |
-| GET    | `/users/me`                                           | Own safe profile; no credential/hash                           |
-| GET    | `/scenarios`                                          | Public; paginated eligible revision metadata                   |
-| GET    | `/scenarios/:id/revisions/:revision`                  | Public; question/options/scene only                            |
-| GET    | `/internal/scenarios`                                 | Reviewer/admin; paginated revision metadata                    |
-| GET    | `/internal/scenarios/:id/revisions`                   | Reviewer/admin; paginated immutable history                    |
-| POST   | `/internal/scenarios/revisions`                       | Reviewer/admin; append validated revision                      |
-| GET    | `/internal/scenarios/:id/revisions/:revision`         | Reviewer/admin; payload, hashes, reviews                       |
-| POST   | `/internal/scenarios/:id/revisions/:revision/reviews` | Independent reviewer/admin; append review                      |
-| POST   | `/internal/scenarios/:id/revisions/:revision/publish` | Admin; disabled, 403                                           |
-| POST   | `/progress/attempts`                                  | Own attempt; `{scenarioId, revision, answerId}`; 201 feedback  |
-| GET    | `/progress/attempts`                                  | Own paginated history                                          |
-| GET    | `/progress`                                           | Own attempt count, correct count, distinct attempted revisions |
-| GET    | `/health/live`                                        | Public; process health, no database query                      |
-| GET    | `/health/ready`                                       | Public; queries required DB table; 503 if unavailable          |
+| Method | Route after `/api/v1`                                   | Access / response                                              |
+| ------ | ------------------------------------------------------- | -------------------------------------------------------------- |
+| POST   | `/auth/register`                                        | Public; 201 safe student profile                               |
+| POST   | `/auth/login`                                           | Public; 200 bearer token and absolute expiry                   |
+| POST   | `/auth/logout`                                          | Authenticated; 200 `{revoked: true}`                           |
+| GET    | `/users/me`                                             | Own safe profile; no credential/hash                           |
+| GET    | `/scenarios`                                            | Public; paginated eligible revision metadata                   |
+| GET    | `/scenarios/:id/revisions/:revision`                    | Public; question/options/scene only                            |
+| GET    | `/internal/scenarios`                                   | Reviewer/admin; paginated revision metadata                    |
+| GET    | `/internal/scenarios/:id/revisions`                     | Reviewer/admin; paginated immutable history                    |
+| POST   | `/internal/scenarios/revisions`                         | Reviewer/admin; append validated revision                      |
+| GET    | `/internal/scenarios/:id/revisions/:revision`           | Reviewer/admin; payload, hashes, reviews                       |
+| POST   | `/internal/scenarios/:id/revisions/:revision/reviews`   | Independent reviewer/admin; append review                      |
+| POST   | `/internal/scenarios/:id/revisions/:revision/publish`   | Admin; protected exact-revision owner publication              |
+| POST   | `/internal/scenarios/:id/revisions/:revision/unpublish` | Admin; protected withdrawal with audit evidence                |
+| GET    | `/internal/imports`                                     | Reviewer/admin; official source status and last 20 runs        |
+| POST   | `/internal/imports/sync`                                | Admin; source recheck and immutable blocked-run audit          |
+| POST   | `/internal/imports/publish`                             | Admin; disabled with 403 while reuse rights are unclear        |
+| POST   | `/progress/attempts`                                    | Own attempt; `{scenarioId, revision, answerId}`; 201 feedback  |
+| GET    | `/progress/attempts`                                    | Own paginated history                                          |
+| GET    | `/progress`                                             | Own attempt count, correct count, distinct attempted revisions |
+| GET    | `/health/live`                                          | Public; process health, no database query                      |
+| GET    | `/health/ready`                                         | Public; queries required DB table; 503 if unavailable          |
 
 A question response explicitly omits the correct answer, explanation, rule references and
 `trafficDecision` claim. Feedback exposes the answer and explanation only after a valid attempt.
@@ -150,13 +158,17 @@ PostgreSQL tables:
   No mutable second answer/question copy exists. Indexed identity columns are constrained to agree
   with the payload. A new timestamp belongs to a new revision; revisions have no mutable `updatedAt`.
 - `Review`: reviewer FK, exact revision FK, decision, evidence reference/text and timestamp.
-  Database triggers reject self-review, student or disabled reviewers.
-- `Publication`: separate exact revision/review FKs and release timestamp. Runtime has **SELECT only**.
-  No API/CLI can issue releases. Future publication requires a separately approved protected human
-  approval workflow; neither this table nor a recommendation establishes legal validity alone.
+  Database triggers reject students and disabled reviewers. An admin may record explicit owner
+  approval of their own revision; the ordinary review endpoint still rejects author self-review.
+- `Publication`: separate exact revision/review FKs and release timestamp. Runtime has **SELECT only**
+  at the table level. It can execute only the owner publication/withdrawal security-definer
+  functions, which re-check the active admin and append audit records. A release is an editorial
+  decision and does not establish independent legal validity.
 - `Attempt`: user and exact revision FKs, submitted answer, server result and completion timestamp.
   SQL additionally rejects nonexistent answer IDs, un-released revisions and incorrect scoring.
 - `AuditEvent`: immutable actor, action, subject and timestamp for bootstrap, revisions and reviews.
+- `ImportRun`: immutable source revision, rights state, counters and outcome for each official-bank
+  check. Runtime may read and insert runs, but cannot update or delete them.
   It deliberately excludes passwords, tokens, emails and free-form request bodies.
 
 Prisma supplies typed relational operations and migrations; versioned nested scenario/scene data
@@ -165,11 +177,10 @@ checks/triggers and append-only protection not expressible in Prisma. FKs preser
 attempts. Rule snapshots pin the exact context used to validate a revision, even after a package
 update. Domain validators are reused; traffic algorithms and Scene Definition are untouched.
 
-Eligibility requires a release, an active independent staff reviewer, matching revision, intact
-hashes, valid domain payload and verified rule context. The shared validator still blocks engine
-priority tickets from publication. Current rules are unverified. Even an owner-inserted release of
-a current demo fails the API's eligibility check. The DB owner remains a trusted operational
-principal, outside the protection offered by an application role.
+Eligibility requires a release tied to an active admin, matching revision, intact hashes, a valid
+domain payload and sourced rule context. `verified` remains reserved for separately verified rules;
+owner publication may use sourced `unverified` research without relabelling it. The DB owner remains
+a trusted operational principal outside application-role protection.
 
 ## Authentication and security decisions
 
@@ -196,9 +207,10 @@ single API instance with trusted edge limiting until shared limiting is separate
 No forwarded IP headers are trusted. Behind a proxy this deliberately limits by proxy IP; configure
 an exact trusted proxy topology and edge policy before exposing the service. Never set blanket trust.
 
-The runtime role can insert only active students, cannot update users, and can update only a session’s revocation timestamp. It has no schema creation, DDL, publication write, revision update, review update,
-attempt update or audit update rights. The migration owner is separate. The API checks publication
-INSERT privilege at startup and refuses an owner connection. Password/session retention and
+The runtime role can insert only active students, cannot update users, and can update only a session’s revocation timestamp. It has no schema creation, DDL, direct publication write, revision update, review update,
+attempt update or audit update rights. It receives only EXECUTE on the two audited publication
+transition functions. The migration owner is separate. The API checks publication INSERT privilege
+at startup and refuses an owner connection. Password/session retention and
 privacy deletion workflows need approved requirements before public onboarding.
 
 ## Environment and operations

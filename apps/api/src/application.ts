@@ -97,7 +97,7 @@ export async function createApplication(config: ApiConfig, log = true) {
       new DocumentBuilder()
         .setTitle("Traffic Laws API")
         .setDescription(
-          "Phase 6 foundation. No approved educational content. Bearer sessions; reviews do not publish. See apps/api/README.md for contracts and limitations.",
+          "MVP API. Bearer sessions, immutable revisions, owner-controlled publication and private learning progress. See apps/api/README.md for contracts and limitations.",
         )
         .setVersion("1.0.0")
         .addBearerAuth()

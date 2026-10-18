@@ -155,3 +155,55 @@ export async function reviewAction(
   revalidatePath(`/scenarios/${encodeURIComponent(id)}/${revision}`);
   return { error: null, success: "Рекомендацію збережено для цієї ревізії." };
 }
+export async function publicationAction(
+  mode: "publish" | "unpublish",
+  id: string,
+  revision: number,
+  _state: FormState,
+  data: FormData,
+): Promise<FormState> {
+  try {
+    await assertSameOrigin();
+    const profile = await requireStaff();
+    if (profile.role !== "admin") return { error: "Публікувати може лише адміністратор." };
+    const evidence = data.get("evidence");
+    const confirmation = data.get("confirmation");
+    if (confirmation !== mode) return { error: "Підтвердьте дію, ввівши контрольне слово." };
+    if (typeof evidence !== "string" || evidence.trim().length < 10 || evidence.length > 500)
+      return { error: "Обґрунтування має містити від 10 до 500 символів." };
+    await apiFetch(`/internal/scenarios/${encodeURIComponent(id)}/revisions/${revision}/${mode}`, {
+      method: "POST",
+      body: JSON.stringify({ evidence: evidence.trim() }),
+    });
+  } catch (error) {
+    return failed(error);
+  }
+  revalidatePath(`/scenarios/${encodeURIComponent(id)}/${revision}`);
+  revalidatePath("/scenarios");
+  return {
+    error: null,
+    success:
+      mode === "publish"
+        ? "Ревізію опубліковано для учнів. Дію записано в аудит."
+        : "Ревізію знято з публікації. Дію записано в аудит.",
+  };
+}
+
+export async function syncQuestionsAction(_state: FormState, _data: FormData): Promise<FormState> {
+  void _state;
+  void _data;
+  try {
+    await assertSameOrigin();
+    const profile = await requireStaff();
+    if (profile.role !== "admin") return { error: "Імпорт доступний лише адміністратору." };
+    await apiFetch("/internal/imports/sync", { method: "POST" });
+  } catch (error) {
+    return failed(error);
+  }
+  revalidatePath("/");
+  revalidatePath("/imports");
+  return {
+    error: null,
+    success: "Джерело перевірено. Результат і причину блокування записано в журнал.",
+  };
+}

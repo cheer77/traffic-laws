@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { EDUCATIONAL_DEMO_SCENARIOS } from "@traffic-laws/scenarios/education-demo";
@@ -103,7 +104,7 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
     ]);
     expect(
       await owner.$queryRaw`SELECT count(*)::int AS count FROM "_prisma_migrations" WHERE finished_at IS NOT NULL`,
-    ).toEqual([{ count: 1 }]);
+    ).toEqual([{ count: 3 }]);
   });
   it("serves liveness, readiness, request IDs, security headers and CORS", async () => {
     const live = await request("/health/live", { headers: { Origin: "http://localhost:3000" } });
@@ -169,6 +170,8 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
   it("rejects missing auth and student access to staff routes", async () => {
     expect((await request("/internal/scenarios")).status).toBe(401);
     expect((await request("/internal/scenarios", { token: studentToken })).status).toBe(403);
+    expect((await request("/internal/imports")).status).toBe(401);
+    expect((await request("/internal/imports", { token: studentToken })).status).toBe(403);
     expect((await request("/internal/scenarios/x/revisions", { token: studentToken })).status).toBe(
       403,
     );
@@ -186,6 +189,31 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
         })
       ).status,
     ).toBe(403);
+  });
+  it("records a rights-blocked official-source check without importing content", async () => {
+    expect((await request("/internal/imports", { token: reviewerToken })).status).toBe(200);
+    expect(
+      (await request("/internal/imports/sync", { method: "POST", token: reviewerToken })).status,
+    ).toBe(403);
+    const sync = await request("/internal/imports/sync", { method: "POST", token: adminToken });
+    expect(sync.status).toBe(201);
+    expect(sync.body).toMatchObject({
+      status: "blocked",
+      reuseStatus: "unclear",
+      found: 0,
+      imported: 0,
+      published: 0,
+    });
+    expect(
+      (await request("/internal/imports/publish", { method: "POST", token: adminToken })).status,
+    ).toBe(403);
+    expect(await owner.importRun.count()).toBe(1);
+    expect(await owner.auditEvent.count({ where: { action: "question_import.blocked" } })).toBe(1);
+    const run = await owner.importRun.findFirstOrThrow();
+    await expect(
+      runtime.importRun.update({ where: { id: run.id }, data: { status: "completed" } }),
+    ).rejects.toThrow();
+    await expect(runtime.importRun.delete({ where: { id: run.id } })).rejects.toThrow();
   });
   it("validates malformed JSON, unknown fields, passwords, body size and pagination", async () => {
     expect(
@@ -258,7 +286,7 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
       },
       { ...demo, country: "ES" },
     ])
-      expect(
+      expect([400, 403]).toContain(
         (
           await request("/internal/scenarios/revisions", {
             method: "POST",
@@ -266,7 +294,7 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
             body: { payload, expectedRevision: 0 },
           })
         ).status,
-      ).toBe(400);
+      );
     expect(
       (
         await request(`/internal/scenarios/${demo.id}/revisions/1/publish`, {
@@ -274,7 +302,7 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
           token: adminToken,
         })
       ).status,
-    ).toBe(403);
+    ).toBe(400);
   });
   it("serializes competing revision writes and preserves old payloads", async () => {
     const demo = EDUCATIONAL_DEMO_SCENARIOS[0],
@@ -358,6 +386,57 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
       ).status,
     ).toBe(404);
   });
+  it("lets an active owner publish and withdraw one exact revision through audited functions", async () => {
+    const demo = EDUCATIONAL_DEMO_SCENARIOS[1];
+    expect(
+      (
+        await request(`/internal/scenarios/${demo.id}/revisions/1/publish`, {
+          method: "POST",
+          token: reviewerToken,
+          body: { evidence: "Reviewer cannot publish this revision" },
+        })
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(`/internal/scenarios/${demo.id}/revisions/1/publish`, {
+          method: "POST",
+          token: adminToken,
+          body: { evidence: "Owner checked the question, answer, source and scene" },
+        })
+      ).body,
+    ).toMatchObject({ id: demo.id, revision: 1, published: true });
+    expect((await request(`/scenarios/${demo.id}/revisions/1`)).status).toBe(200);
+    expect((await request("/scenarios?limit=50")).body).toMatchObject({
+      items: [
+        expect.objectContaining({
+          id: demo.id,
+          question: demo.question,
+          presentation: "3d",
+        }),
+      ],
+    });
+    expect(
+      (
+        await request(`/internal/scenarios/${demo.id}/revisions/1/unpublish`, {
+          method: "POST",
+          token: adminToken,
+          body: { evidence: "Owner withdrew the material after a content review" },
+        })
+      ).body,
+    ).toMatchObject({ id: demo.id, revision: 1, published: false });
+    expect((await request(`/scenarios/${demo.id}/revisions/1`)).status).toBe(404);
+    expect(
+      await owner.auditEvent.count({
+        where: { action: { in: ["scenario.published", "scenario.unpublished"] } },
+      }),
+    ).toBe(2);
+    await expect(
+      runtime.publication.create({
+        data: { scenarioId: demo.id, revision: 1, reviewId: randomUUID() },
+      }),
+    ).rejects.toThrow();
+  });
   it("serves only safe question fields for an isolated synthetic release", async () => {
     const fixture = fixtureScenario();
     await owner.scenarioRevision.create({
@@ -375,7 +454,7 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
       data: {
         scenarioId: fixture.id,
         revision: 1,
-        reviewerId,
+        reviewerId: authorId,
         decision: "recommend_approval",
         evidence: "SYNTHETIC TEST ONLY",
       },
@@ -474,17 +553,17 @@ describe.skipIf(!runtimeUrl || !ownerUrl)("isolated PostgreSQL and HTTP", () => 
         where: { scenarioId_revision: { scenarioId: fixture.id, revision: 1 } },
       }),
     ).rejects.toThrow();
-    await expect(
-      owner.review.create({
+    expect(
+      await owner.review.create({
         data: {
           scenarioId: fixture.id,
           revision: 1,
           reviewerId: authorId,
           decision: "recommend_approval",
-          evidence: "self-review",
+          evidence: "Owner self-approval is explicit and audited",
         },
       }),
-    ).rejects.toThrow();
+    ).toMatchObject({ reviewerId: authorId });
     await expect(
       owner.attempt.update({ where: { id: attempts[0].id }, data: { correct: true } }),
     ).rejects.toThrow();

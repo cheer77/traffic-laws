@@ -65,8 +65,22 @@ for (const name of ["page", "limit"])
   );
 const publish =
   document.paths["/api/v1/internal/scenarios/{id}/revisions/{revision}/publish"]?.post;
-assert.ok(publish, "Publish route must remain explicitly forbidden");
-assert.ok(!Object.keys(publish.responses).some((status) => /^2\d\d$/.test(status)));
+assert.ok(publish, "Protected owner publish route must exist");
+assert.ok(publish.security?.some((entry) => "bearer" in entry));
+assert.ok(Object.keys(publish.responses).some((status) => /^2\d\d$/.test(status)));
+const unpublish =
+  document.paths["/api/v1/internal/scenarios/{id}/revisions/{revision}/unpublish"]?.post;
+assert.ok(unpublish, "Protected owner withdrawal route must exist");
+assert.ok(unpublish.security?.some((entry) => "bearer" in entry));
+for (const [path, method] of [
+  ["/api/v1/internal/imports", "get"],
+  ["/api/v1/internal/imports/sync", "post"],
+  ["/api/v1/internal/imports/publish", "post"],
+]) {
+  const operation = document.paths[path]?.[method];
+  assert.ok(operation, `Missing Admin import contract: ${method.toUpperCase()} ${path}`);
+  assert.ok(operation.security?.some((entry) => "bearer" in entry));
+}
 console.log(
-  `PASS: ${contracts.length} Admin API contracts and forbidden publication match OpenAPI`,
+  `PASS: ${contracts.length + 3} Admin API contracts and protected owner publication match OpenAPI`,
 );

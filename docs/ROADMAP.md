@@ -25,13 +25,18 @@ Status labels in this document have strict meanings:
 - **Phase 2 — Completed.** Application boundaries and the minimal user-facing Web shell are in place.
 - `apps/web` and `apps/studio` run and build independently; applications may not import each
   other's internal files.
-- Backend foundation is implemented in `apps/api`; the Phase 7 Admin application is in progress. Product learning UI and Mobile are not implemented.
+- Backend foundation is implemented in `apps/api`; the Phase 7 Admin application is in progress.
+  The first Web MVP slice (landing, authentication, learning catalog, text/3D attempt flow and
+  progress) is implemented. Mobile remains future work.
 - **Phase 3 — Architectural foundation completed.** `packages/assets-3d` is consumed by Studio and a development-only Web check. Asset expansion is ongoing; desktop browser smoke testing and before/after scene metrics are recorded in the audit.
 - Evidence and limitations: [`phase-3-audit.md`](phase-3-audit.md).
 - **Phase 4 — Completed.** Validated JSON v1, the shared Scene Engine, Studio Composer, local persistence and portable JSON are implemented and verified. See [`phase-4-audit.md`](phase-4-audit.md).
-- **Phase 5 — In progress; engineering foundation completed, independent domain acceptance pending.** A single bounded evaluator now drives scenario validation, answer feedback and development-only 3D indicators through a validated authored scene binding. Eight rule records and three tickets remain unverified / in review. See [`phase-5-audit.md`](phase-5-audit.md).
+- **Phase 5 — In progress; engineering foundation completed, owner content acceptance pending.** A single bounded evaluator drives scenario validation and 3D indicators through a validated authored scene binding. Eight rule records and three tickets remain unverified / in review. Owner publication is now available but never changes source verification metadata. See [`phase-5-audit.md`](phase-5-audit.md).
 - **Phase 6 — Completed.** Backend engineering, migration/recovery and security acceptance passed; the affected ESLint globbing dependency was replaced with a pinned, tested stable alternative. Both dependency audits are clear. See [`phase-6-audit.md`](phase-6-audit.md).
-- **Phase 7 — In progress.** Admin login, protected revision editing/review, shared 3D preview, and automated security/browser coverage are implemented. Protected legal approval and publication, plus backend-backed operational workflows in the Phase 7 done criteria, remain unapproved or unavailable. See [`phase-7-audit.md`](phase-7-audit.md).
+- **Phase 7 — In progress.** Admin login, field-based ticket creation, immutable revision editing,
+  shared 3D preview, protected owner publication/withdrawal and automated security/browser coverage
+  are implemented. User, analytics and subscription operations remain open. See
+  [`phase-7-audit.md`](phase-7-audit.md) and [`mvp-audit.md`](mvp-audit.md).
 - Detailed evidence is recorded in [`phase-1-audit.md`](phase-1-audit.md).
 
 ## Architecture strategy
@@ -168,15 +173,16 @@ explicit unknown results for absent, conflicting or unsupported conditions; auto
 acceptance. This is a separately reported engineering milestone, **not a replacement** for the done
 criteria above. Scene Definition v1 is unchanged and does not itself prove author-declared legal facts.
 
-**Unchanged Phase 5 completion gate:** a competent independent Ukrainian specialist must still review
-each applicable provision, exception, answer, explanation and authored/visual scene interpretation.
-The three drafts cannot become legally accepted tickets from automated or browser tests. The existing
-requirement that UI and 3D consume the same maneuver truth is now demonstrated in the development
-gallery; it does not imply production content approval. Phase 5 remains In progress until domain
-acceptance is evidenced, with no `verified` status inferred from technical tests.
+**Updated owner-approved completion gate (2026-10-18):** the owner reviews and decides whether an
+exact revision is ready for the MVP learning catalog. A separate external specialist is not a
+business prerequisite. Every published ticket still needs an official source, explicit owner
+evidence and protected revision-bound publication. Owner publication does not change an
+`unverified` source to `verified`, and automated/browser tests never establish legal correctness.
+Phase 5 remains In progress while the initial real content set, broader maneuver truth and source
+review are incomplete.
 
-**Later release dependencies:** authenticated, revision-bound content approval belongs to the
-Backend/Admin phases; production tickets require that workflow plus independent review. Full PDR
+**Later release dependencies:** authenticated, revision-bound content approval is now delivered by
+the Backend/Admin MVP slice. Full PDR
 coverage is a gradual, separately scoped rules-engine expansion, not a precondition for the bounded
 foundation. No publication is authorized by this milestone. See the
 [independent reviewer checklist](phase-5-legal-review-checklist.md).
@@ -188,8 +194,8 @@ were recorded as unverified research notes. Three sourced Ukrainian drafts conta
 and explicit scene bindings. The shared evaluator covers selected signal and priority clauses, reports
 pairwise yield and geometry/time conflicts, and refuses unsupported conditions. The development Web
 gallery shows the same result in answers, diagnostics and neutral 3D route/participant indicators.
-Competent human legal/content/scene review and verified examples remain open. Wider rule coverage and
-production learning are separately scoped later work. See [the engine design](traffic-rules-engine-design.md).
+Owner content/scene review and a small published MVP set remain open. Wider rule coverage and
+normative verification remain separate from editorial publication. See [the engine design](traffic-rules-engine-design.md).
 
 ### Phase 6 — Backend Foundation — Completed
 
@@ -232,6 +238,12 @@ are protected; audit events are recorded; Studio/Composer previews use productio
 **Dependencies:** Phases 4–6 and the authenticated API slices required by each Admin workflow. Admin
 development proceeds incrementally with Phase 6 capabilities and must not invent a temporary
 production backend or wait for unrelated backend business logic.
+
+**MVP increment (2026-10-18):** structured ticket creation, exact-revision owner publication and
+withdrawal are delivered. Database functions preserve the runtime role's lack of direct Publication
+writes and record both actions in the audit log. The Web learning client consumes only eligible
+published revisions and stores private attempts through the API. User operations, analytics, 2D media,
+subscriptions and deployed Studio access remain open; Phase 7 therefore stays In progress.
 
 ### Phase 8 — CI/CD, Testing & Architecture Quality — Planned
 

@@ -1,5 +1,10 @@
 # Phase 5 — Scenarios & Country Rules Foundation
 
+> **2026-10-18 owner-policy update:** this historical audit originally treated an independent
+> external specialist as a mandatory product gate. The owner has removed that business requirement.
+> Protected owner publication is now implemented, while `unverified` normative metadata remains
+> unchanged and technical tests still do not prove legal correctness. See [the MVP audit](mvp-audit.md).
+
 ## Acceptance status
 
 **Engineering foundation completed; overall Phase 5 In progress.** The unchanged Roadmap requires Ukrainian material to be validated for legal use. Eight regulatory research records remain `unverified` and all three educational tickets remain `in_review`: no independent competent Ukrainian reviewer has confirmed provision scope, exceptions, answers or authored 3D conditions. Tests and browser checks cannot supply that approval. Phase 6 has not started.

@@ -20,6 +20,16 @@ enum ReviewDecision {
   changes_requested
   rejected
 }
+enum ImportStatus {
+  completed
+  blocked
+  failed
+}
+enum ReuseStatus {
+  unclear
+  authorized
+  forbidden
+}
 model User {
   id String @id @default(uuid()) @db.Uuid
   email String @unique @db.VarChar(254)
@@ -33,6 +43,7 @@ model User {
   reviews Review[]
   attempts Attempt[]
   events AuditEvent[]
+  importRuns ImportRun[]
 }
 model Session {
   id String @id @default(uuid()) @db.Uuid
@@ -104,5 +115,30 @@ model AuditEvent {
   action String @db.VarChar(80)
   subject String @db.VarChar(160)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([actorId,createdAt])
+}
+model ImportRun {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String @db.Uuid
+  actor User @relation(fields:[actorId], references:[id], onDelete:Restrict)
+  sourceKey String @db.VarChar(80)
+  sourceUrl String @db.VarChar(1000)
+  edition String @db.VarChar(200)
+  questionsUrl String? @db.VarChar(1000)
+  answersUrl String? @db.VarChar(1000)
+  sourceUpdatedAt DateTime? @db.Date
+  status ImportStatus
+  reuseStatus ReuseStatus
+  found Int @default(0)
+  imported Int @default(0)
+  updated Int @default(0)
+  rejected Int @default(0)
+  published Int @default(0)
+  withImages Int @default(0)
+  threeDCandidates Int @default(0)
+  message String @db.VarChar(2000)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  completedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([sourceKey,createdAt])
   @@index([actorId,createdAt])
 }

@@ -7,6 +7,7 @@ import type { Page, RevisionDetail, RevisionMetadata } from "@/lib/contracts";
 import { ScenarioForm } from "@/components/ActionForm";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ScenePreview } from "@/components/ScenePreview";
+import { PublicationForm } from "@/components/PublicationForm";
 import { previewScene } from "@/lib/preview-scene";
 const rules = new Map(UA_PDR_REFERENCES.map((rule) => [rule.id, rule]));
 const certaintyLabels: Record<string, string> = {
@@ -76,7 +77,7 @@ export default async function Detail({
             published: "Опубліковано",
           }[scenario.contentStatus.state]
         }
-        . Рекомендація рецензента не підтверджує юридичну правильність. Публікація недоступна.
+        . {detail.published ? "Ця ревізія доступна учням." : "Ця ревізія не доступна учням."}
       </p>
       <div className="grid">
         <section className="card">
@@ -200,7 +201,16 @@ export default async function Detail({
       )}
       <section className="card">
         <h2>Публікація</h2>
-        <p>Немає дозволеного процесу публікації. API завжди повертає HTTP 403.</p>
+        <p>
+          Публікація — явне рішення власника для цієї незмінної ревізії. Воно підтверджує редакційну
+          готовність матеріалу, але не перетворює автоматичний висновок на гарантовано правильну
+          юридичну консультацію.
+        </p>
+        {profile.role === "admin" ? (
+          <PublicationForm id={id} revision={revision} published={detail.published} />
+        ) : (
+          <p className="muted">Цю дію може виконати лише адміністратор.</p>
+        )}
       </section>
     </>
   );

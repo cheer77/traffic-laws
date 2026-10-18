@@ -1,5 +1,11 @@
 # Phase 7 — Admin Dashboard audit
 
+> **MVP increment, 2026-10-18:** the protected owner publish/withdraw workflow and field-based new
+> ticket editor were implemented after the original audit below. Runtime keeps no direct Publication
+> table write permission; audited security-definer functions perform the narrow transitions. The
+> updated 26 API/PostgreSQL and 8 Chrome tests pass. See [the MVP audit](mvp-audit.md). Historical
+> statements below describe the earlier acceptance state and are retained as evidence.
+
 **Status: In progress.** Phase 5 and Phase 6 statuses are unchanged. Phase 8 has not started.
 
 ## Implemented

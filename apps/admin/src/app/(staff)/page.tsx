@@ -15,7 +15,13 @@ export default async function Overview() {
         </section>
         <section className="card">
           <h2>Публікація</h2>
-          <p>Недоступна: окремий захищений процес схвалення ще не впроваджено.</p>
+          <p>Доступна адміністратору для точних незмінних ревізій.</p>
+        </section>
+        <section className="card">
+          <h2>Офіційний банк</h2>
+          <p>
+            <Link href="/imports">Перевірити джерело та журнал імпорту →</Link>
+          </p>
         </section>
       </div>
       <section className="card">

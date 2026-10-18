@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   BadRequestException,
   ConflictException,
@@ -175,7 +175,7 @@ export class ScenariosService {
   async internalRevision(id: string, revision: number) {
     const record = await this.db.scenarioRevision.findUnique({
       where: { scenarioId_revision: { scenarioId: id, revision } },
-      include: { reviews: true },
+      include: { reviews: true, release: true },
     });
     if (!record) throw new NotFoundException();
     return {
@@ -185,7 +185,51 @@ export class ScenariosService {
       rulesHash: record.rulesHash,
       createdAt: record.createdAt,
       reviews: record.reviews.map(reviewView),
+      published: Boolean(record.release),
     };
+  }
+  async publish(id: string, revision: number, evidence: string, actorId: string) {
+    const record = await this.db.scenarioRevision.findUnique({
+      where: { scenarioId_revision: { scenarioId: id, revision } },
+    });
+    if (!record) throw new NotFoundException();
+    try {
+      const scenario = readRevision(record);
+      if (!Array.isArray(record.rulesSnapshot)) throw new Error("Invalid rules");
+      validateScenario(
+        {
+          ...scenario,
+          contentStatus: {
+            state: "published",
+            reviewedBy: actorId,
+            reviewedAt: new Date().toISOString().slice(0, 10),
+          },
+        },
+        { rules: validateRules(record.rulesSnapshot) },
+      );
+    } catch {
+      throw new BadRequestException();
+    }
+    try {
+      await this.db
+        .$queryRaw`SELECT owner_publish_scenario(${id}, ${revision}, ${actorId}::uuid, ${randomUUID()}::uuid, ${randomUUID()}::uuid, ${evidence})`;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2010")
+        throw new ConflictException();
+      throw error;
+    }
+    return { id, revision, published: true };
+  }
+  async unpublish(id: string, revision: number, evidence: string, actorId: string) {
+    try {
+      await this.db
+        .$queryRaw`SELECT owner_unpublish_scenario(${id}, ${revision}, ${actorId}::uuid, ${randomUUID()}::uuid, ${evidence})`;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2010")
+        throw new ConflictException();
+      throw error;
+    }
+    return { id, revision, published: false };
   }
   async review(id: string, revision: number, body: ReviewDto, reviewerId: string) {
     return this.db.$transaction(async (tx) => {
@@ -216,9 +260,8 @@ export class ScenariosService {
     if (
       !release ||
       release.review.decision !== "recommend_approval" ||
-      release.review.reviewerId === release.scenario.authorId ||
       release.review.reviewer.status !== "active" ||
-      !["admin", "reviewer"].includes(release.review.reviewer.role)
+      release.review.reviewer.role !== "admin"
     )
       throw new NotFoundException();
     try {
@@ -256,6 +299,8 @@ export class ScenariosService {
           country: scenario.country,
           language: scenario.language,
           category: scenario.category,
+          question: scenario.question,
+          presentation: scenario.sceneReference ? "3d" : "text",
         });
       } catch (error) {
         if (!(error instanceof NotFoundException)) throw error;
