@@ -2,8 +2,10 @@
 
 The owner's restoration brief explicitly authorizes this bounded frontend-only simulation prototype.
 The owner subsequently approved this trainer as the sole school UI at `/school`, including a shared
-2D/3D workspace. This does not authorize production publication of the five unverified examples,
-backend work, or changes to Studio/Admin.
+2D/3D workspace. The local prototype now uses ten questions from the supplied official Section 16.1
+PDF through the [local import pipeline](official-ticket-pipeline.md). The five authored 3D drafts
+are retained in source but are not exposed as verified reconstructions. This does not authorize
+public redistribution of the source illustrations, backend work, or changes to Studio/Admin.
 
 ## Run
 
@@ -19,17 +21,27 @@ unverified local examples. No demonstration records enter a production content f
 `/dev/trainer`, `/dev/school-ui`, `/school/tickets` and ticket-detail pages are removed, not aliases.
 Scenario switching occurs entirely inside `/school`.
 
-## Delivered scope
+## Current content gate
 
-Five Ukrainian authored examples share one four-way intersection: right-hand priority, main versus
-secondary road, left turn against oncoming traffic on main green, green/red signals, and simultaneous
-opposite straight-through traffic followed by a third car in the next signal phase. Search, selection,
-ordered answers, choice answers, scoring, explanations, replay and session-only completion are local.
-Playback is unlocked after checking an answer so the solution is not revealed beforehand.
+`TRAINING_SCENARIOS` is now built from the validated `official-tickets/imported.json` projection.
+All ten records are `needs_review`; the school shows original 2D and no active 3D toggle.
+The disconnected vision adapter cannot promote a scene, and missing answer evidence disables scoring.
+The retained `AUTHORED_TRAINING_DRAFTS` and their motion tests document previous authored work;
+they are not automatic output or proof of visual parity. The rendering descriptions below describe
+those retained drafts, not an available verified 3D feature in the current school pilot.
 
-Camera modes: isometric, near-vertical top view, elevated vehicle-follow view and orbit. Zoom and reset
-are available. Touch orbit/zoom uses OrbitControls; HTML car buttons provide keyboard and touch selection
-alongside 3D picking. The vehicle-follow camera is a chase view, not an interior driving simulation.
+## Retained authored scope
+
+The first ten questions of Section 16.1 retain the Ukrainian wording, answer options and answer-table
+indices from the supplied PDFs. Every ticket shows the original embedded JPEG extracted without
+recompression. Questions 1, 4, 5, 6 and 8 additionally have separate validated Scene Definitions and
+Web reconstruction layouts measured from their corresponding 2D references. Playback is unlocked
+after checking an answer so the authored movement does not reveal the answer beforehand.
+
+Each 3D ticket defines its own road widths, markings, stop lines, signal set, vehicle placement and
+reference camera. Camera modes include the reference view, near-vertical top view, elevated
+vehicle-follow view and orbit. Zoom and reset remain available. The vehicle-follow camera is a chase
+view, not an interior driving simulation.
 
 The existing Web Button, colors and typography are reused. No design-reference image accompanied the
 brief, so exact visual-reference parity remains unassessed. Responsive CSS places the question below
@@ -37,13 +49,11 @@ the scene at intermediate widths and stacks all panels on narrow screens.
 
 ## Shared 2D / 3D workspace
 
-The 2D mode is an interactive SVG drawing, not a screenshot or an official exam image. It uses the
-same scenario objects, `sampleMotion`, `routePose`, `signalAt` and mutable playback clock as 3D.
-Road/stop-line/crosswalk dimensions use the existing road constants. SVG maps world x/z to x/y and
-negates the Three yaw angle. Both modes support car selection, playback, pause, replay and speed.
-Only the mounted renderer advances time, and each cleans up its frame callbacks when unmounted.
-Switching views retains the answer, selection, speed and elapsed time. Camera controls are shown
-only in 3D; camera mode/zoom settings survive switching views. Manual orbit position is not persisted.
+The 2D mode displays the original illustration embedded in the supplied official PDF. It is the visual
+reference and is never presented as an image authored by this project. The 3D mode is explicitly
+labelled as a learning reconstruction, not an official illustration. Tickets without an authored scene
+do not show a 3D switch. Switching views retains the selected answer, selected vehicle and playback
+settings; camera controls appear only in 3D.
 
 Removed UI: the old school dashboard/list/detail screens, two dev preview pages, `AttemptForm`,
 `TicketNavigation`, and `TicketMedia`. Their import consumers were checked before removal. The
@@ -54,10 +64,11 @@ learning links now all target `/school`. Historical UI audit documents describe 
 
 ## Boundaries and motion
 
-Implementation is app-local under `apps/web/src/features/trainer`. Models, road markings, trees,
-signs and light housings come from `assets-3d`; lighting comes from `scene-engine/react`. Shared
-packages and the Studio preset are not modified. Vehicle orientation is local +Z forward; world +Z
-is south. Lane centers and stop positions use the existing road geometry constants.
+Implementation is app-local under `apps/web/src/features/trainer`. Models and light housings come from
+`assets-3d`; validation, scene traversal and lighting come from `scene-engine`. The Web renderer
+interprets the intersection object with a ticket-specific procedural road layout so the five scenes do
+not fall back to the shared urban intersection appearance. Shared packages and the Studio preset are
+not modified. Vehicle orientation is local +Z forward; world +Z is south.
 
 The pure motion sampler uses absolute scenario time, smoothstep acceleration/deceleration and analytic
 straight/quarter-circle/straight paths. Circle joins preserve position and tangent. Cars approach the
@@ -67,16 +78,10 @@ Every car ends at 30 metres from the center, clear of the junction and still on 
 plan, not universal physics or a general traffic simulation. Long background frame gaps are clamped
 so returning to the tab does not jump cars across the intersection.
 
-The signal-change examples have a yellow interval, all-red clearance and a subsequent perpendicular
-green. A left-turn example holds main green for both opposing directions throughout.
-
-`TrafficSituation` and `analyzeTrafficSituation` are reused to validate the initial authored conditions
-and test the supported yield relations. They are not replaced by a new legal engine. Initial red
-admission changes later only according to the authored signal schedule. All normative source records
-remain **unverified**; in particular the shared engine reports the simultaneous candidate as unknown
-because independent legal review is missing. Geometric separation is tested independently and is not
-presented as legal verification. The official site could not be retrieved during this implementation;
-links point to the existing official-reference records. Human content review remains outstanding.
+For tickets 5 and 6, movement starts from the position shown in the reference, stops at the internal
+stop line, waits for the target signal and then continues. Ticket 8 releases the red vehicle before the
+blue vehicle and changes the signal phase. These are deterministic authored demonstrations of the
+official answer, not a general traffic simulation or an independent legal evaluator.
 
 ## Rendering and verification limits
 
@@ -120,3 +125,14 @@ rendering performance require the owner's manual review at the local URL.
 - Formatting and diff whitespace checks passed. No browser automation, actual GPU/touch validation,
   or backend integration tests were performed. Authenticated production-content acceptance awaits
   a separately approved reviewed-content integration; this change intentionally does not publish drafts.
+
+### Official-reference reconstruction verification (2026-10-19)
+
+- `pnpm check` passed after replacing the shared visible intersection with five ticket-specific Web
+  layouts. Web has 14 passing tests, including exact answer indices, source-image SHA-256 checks,
+  Scene Definition validation, expected per-ticket object sets and distinct reference cameras.
+- The production build retains `/school` as the only school route. The three `/dev/*` routes are
+  documented technical consumers of shared packages, return `notFound()` outside development and
+  were not reclassified as school interfaces.
+- Browser automation, screenshots and GPU inspection were not performed by instruction. Camera
+  framing and visual similarity still require manual review at the local URL.

@@ -8,6 +8,14 @@ The working assumption is ten individual category-B questions, not ten full exam
 The existing `/school` UI and safe local Preview boundary remain the target. No production content
 approval, Backend/Admin changes, or promotion of unverified legal references is implied.
 
+## Current implementation — 2026-10-19
+
+The supplied local PDFs unblock extraction. The reusable importer now supplies ten Section 16.1
+questions to local `/school`; all 3D is blocked pending analysis and independent verification.
+The scanned answer key currently uses an explicitly recorded assistant visual transcription, not
+successful automatic OCR. See [pipeline commands, evidence and remaining work](official-ticket-pipeline.md).
+The acquisition failure below is historical; it does not describe the local files now available.
+
 ## Source discovery — 2026-10-19
 
 The [official GSC MVS question page](https://hsc.gov.ua/index/poslugi/vidacha-posvidchennya-vodiya/pitannya-ta-ispit-z-pdr/)

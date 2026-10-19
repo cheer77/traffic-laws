@@ -8,6 +8,11 @@ import type { SceneObject } from "@traffic-laws/scene-engine";
 import { SceneEnvironment, SceneModel, SceneRenderer } from "@traffic-laws/scene-engine/react";
 import { advancePlayback, routeLength, routePose, sampleMotion, type Playback } from "./motion";
 import { durationOf, type TrainingCar, type TrainingScenario } from "./scenarios";
+import {
+  isReconstructedTicket,
+  REFERENCE_CAMERAS,
+  TicketReferenceRoad,
+} from "./ticket-reference-scene";
 
 export type CameraMode = "iso" | "top" | "driver" | "free";
 export interface CameraCommand {
@@ -77,6 +82,9 @@ function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) 
     orbit.enableRotate = cameraCommand.mode !== "top";
     const entry = scenario.cars.find((car) => car.id === selected) ?? scenario.cars[0];
     sampleMotion(entry, playback.current.time, pose);
+    const reference = isReconstructedTicket(scenario.number)
+      ? REFERENCE_CAMERAS[scenario.number]
+      : REFERENCE_CAMERAS[1];
     if (cameraCommand.mode === "driver") {
       goal.set(
         pose.x - Math.sin(pose.yaw) * 7 * cameraCommand.zoom,
@@ -85,13 +93,11 @@ function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) 
       );
       target.set(pose.x + Math.sin(pose.yaw) * 7, 0.8, pose.z + Math.cos(pose.yaw) * 7);
     } else {
-      target.set(pose.x * 0.12, 0, pose.z * 0.12);
+      target.set(...reference.target);
       const zoom = cameraCommand.zoom;
-      goal.set(
-        cameraCommand.mode === "top" ? 0 : 31 * zoom,
-        (cameraCommand.mode === "top" ? 49 : 32) * zoom,
-        cameraCommand.mode === "top" ? 0.05 : 36 * zoom,
-      );
+      if (cameraCommand.mode === "top")
+        goal.set(reference.target[0], 54 * zoom, reference.target[2] + 0.05);
+      else goal.set(...reference.position).multiplyScalar(zoom);
     }
     if (moving.current || cameraCommand.mode === "driver") {
       const blend = 1 - Math.exp(-Math.min(delta, 0.1) * 7);
@@ -188,7 +194,7 @@ function MovingCar({
 function Route({ entry, selected }: { entry: TrainingCar; selected: boolean }) {
   const geometry = useMemo(() => {
     const points: THREE.Vector3[] = [];
-    const start = entry.startDistance ?? 0;
+    const start = entry.startDistance ?? entry.initialDistance ?? 0;
     const extent = Math.min(routeLength(entry.maneuver), start + 27);
     for (let index = 0; index < 40; index++) {
       for (const distance of [
@@ -234,6 +240,8 @@ function AnimatedSceneModel({
       : scenario.number === 4 && object.instanceId === "waiting-gray"
         ? "#78898d"
         : undefined;
+  if (object.assetId === "intersection.city.standard" && isReconstructedTicket(scenario.number))
+    return <TicketReferenceRoad ticket={scenario.number} />;
   if (staticColor && object.assetId.startsWith("vehicle."))
     return (
       <VehicleModel
@@ -290,29 +298,21 @@ function SupplementaryArrow({
   );
 }
 
-function InternalStopLine({ ticket }: { ticket: number }) {
-  const position: [number, number, number] = ticket === 5 ? [2.4, 0.07, -9.6] : [-8, 0.07, -2.4];
-  const scale: [number, number, number] = ticket === 5 ? [4.7, 0.035, 0.28] : [0.28, 0.035, 4.7];
-  return (
-    <mesh position={position} scale={scale} receiveShadow>
-      <boxGeometry />
-      <meshStandardMaterial color="#f4f2df" roughness={0.9} />
-    </mesh>
-  );
-}
-
 export default function TrainerScene(props: SceneProps) {
   const scene = props.scenario.scene;
   if (!scene) return null;
   const movingIds = new Set(props.scenario.cars.map((entry) => entry.sceneInstanceId));
+  const reference = isReconstructedTicket(props.scenario.number)
+    ? REFERENCE_CAMERAS[props.scenario.number]
+    : REFERENCE_CAMERAS[1];
   return (
     <Canvas
       frameloop="demand"
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: [31, 32, 36], fov: 43, near: 0.1, far: 180 }}
+      camera={{ position: reference.position, fov: 38, near: 0.1, far: 180 }}
       fallback={<p>WebGL недоступний. Увімкніть апаратне прискорення для 3D.</p>}
-      onCreated={({ camera }) => camera.lookAt(0, 0, 0)}
+      onCreated={({ camera }) => camera.lookAt(...reference.target)}
     >
       <Clock {...props} />
       <CameraRig {...props} />
@@ -325,21 +325,18 @@ export default function TrainerScene(props: SceneProps) {
         )}
       />
       {props.scenario.number === 1 && (
-        <group position={[5.8, 0, 9.2]}>
+        <group position={[5.7, 0, 9.6]}>
           <SupplementaryArrow direction="left" playback={props.playback} />
         </group>
       )}
       {props.scenario.number === 8 && (
-        <group position={[5.8, 0, 9.2]}>
+        <group position={[6.7, 0, 10]}>
           <SupplementaryArrow
             direction="straight"
             playback={props.playback}
             activeUntil={props.scenario.signalChange}
           />
         </group>
-      )}
-      {(props.scenario.number === 5 || props.scenario.number === 6) && (
-        <InternalStopLine ticket={props.scenario.number} />
       )}
       {props.scenario.cars.map((entry) => (
         <group key={entry.id}>

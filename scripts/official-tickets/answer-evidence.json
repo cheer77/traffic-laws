@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+  "section": "16.1",
+  "review": "Assistant visual transcription of original PDF page 4 rendered at 2x; not OCR, human legal review, or edition verification.",
+  "entries": [
+    {
+      "question": 1,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 2,
+      "answer": 3,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 3,
+      "answer": 1,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 4,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 5,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 6,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 7,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 8,
+      "answer": 1,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 9,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    },
+    {
+      "question": 10,
+      "answer": 2,
+      "page": 4,
+      "status": "source_checked",
+      "method": "assistant_visual_transcription"
+    }
+  ],
+  "questionDocumentSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf"
+}

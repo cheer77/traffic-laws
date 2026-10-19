@@ -3,15 +3,16 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { validateScene } from "@traffic-laws/scene-engine";
 import { advancePlayback, routeLength, routePose, sampleMotion, STOP_CENTER } from "./motion";
-import { checkAnswer, TRAINING_SCENARIOS } from "./scenarios";
+import { checkAnswer, AUTHORED_TRAINING_DRAFTS as TRAINING_SCENARIOS } from "./scenarios";
+import { isReconstructedTicket, REFERENCE_CAMERAS } from "./ticket-reference-scene";
 
 const EXPECTED_ANSWERS = [2, 3, 1, 2, 2, 2, 2, 1, 2, 2];
 const WITH_3D = [1, 4, 5, 6, 8];
 
-describe("official Section 16.1 tickets", () => {
+describe("retained authored Section 16.1 drafts (not school content)", () => {
   it("preserves the first ten answer-table entries and required 3D split", () => {
     expect(TRAINING_SCENARIOS).toHaveLength(10);
-    expect(TRAINING_SCENARIOS.map((scenario) => scenario.answer.correct + 1)).toEqual(
+    expect(TRAINING_SCENARIOS.map((scenario) => (scenario.answer.correct ?? -1) + 1)).toEqual(
       EXPECTED_ANSWERS,
     );
     expect(
@@ -25,6 +26,7 @@ describe("official Section 16.1 tickets", () => {
 
   it("keeps every extracted original image byte-for-byte identifiable", () => {
     for (const scenario of TRAINING_SCENARIOS) {
+      if (!scenario.image) throw new Error("Authored draft image missing");
       const file = new URL(`../../../public${scenario.image.src}`, import.meta.url);
       const digest = createHash("sha256").update(readFileSync(file)).digest("hex");
       expect(digest, scenario.id).toBe(scenario.image.sha256);
@@ -45,6 +47,26 @@ describe("official Section 16.1 tickets", () => {
       expect(validateScene(scene)).toEqual(scene);
       expect(scene?.objects[0].assetId).toBe("intersection.city.standard");
     }
+  });
+
+  it("uses a ticket-specific reference camera and authored object set for every reconstruction", () => {
+    const expectedObjects = new Map([
+      [1, ["light-s", "car-white", "queue-dark", "queue-a", "queue-b"]],
+      [4, ["light-s", "light-n", "light-e", "light-w", "car-white", "waiting-gray"]],
+      [5, ["light-s", "light-target", "car-white"]],
+      [6, ["light-s", "light-target", "car-green"]],
+      [8, ["light-s", "light-w", "car-red", "car-blue", "pedestrian-a", "pedestrian-b"]],
+    ]);
+    const cameraPositions = new Set<string>();
+    for (const scenario of TRAINING_SCENARIOS.filter((entry) => entry.scene)) {
+      expect(isReconstructedTicket(scenario.number)).toBe(true);
+      if (!isReconstructedTicket(scenario.number)) continue;
+      cameraPositions.add(REFERENCE_CAMERAS[scenario.number].position.join(","));
+      expect(scenario.scene?.objects.slice(1).map(({ instanceId }) => instanceId)).toEqual(
+        expectedObjects.get(scenario.number),
+      );
+    }
+    expect(cameraPositions.size).toBe(5);
   });
 });
 

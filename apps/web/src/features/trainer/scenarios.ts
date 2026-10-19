@@ -3,6 +3,8 @@ import type { SceneDefinition } from "@traffic-laws/scene-engine";
 import type { MotionPlan } from "./motion";
 import { DRIVE_SECONDS } from "./motion";
 import { OFFICIAL_TICKET_SCENES } from "./official-scenes";
+import imported from "../official-tickets/imported.json";
+import { parseImportedTickets } from "../official-tickets/pipeline";
 
 export interface TrainingCar extends MotionPlan {
   id: string;
@@ -18,9 +20,12 @@ export interface TrainingScenario {
   title: string;
   summary: string;
   question: string;
-  answer: { options: string[]; correct: number };
-  image: { src: string; width: number; height: number; sha256: string; sourcePage: number };
+  answer: { options: string[]; correct: number | null };
+  image?: { src: string; width: number; height: number; sha256: string; sourcePage: number };
   answerSourcePage: number;
+  section?: string;
+  importReason?: string;
+  answerMethod?: string;
   cars: TrainingCar[];
   scene?: SceneDefinition;
   signalChange?: number;
@@ -49,6 +54,7 @@ const movingCar = (
   kind: TrainingCar["kind"] = "sedan",
   startDistance?: number,
   stopDistance?: number,
+  initialDistance?: number,
 ): TrainingCar => ({
   id,
   sceneInstanceId: `car-${id}`,
@@ -60,9 +66,11 @@ const movingCar = (
   kind,
   startDistance,
   stopDistance,
+  initialDistance,
 });
 
-export const TRAINING_SCENARIOS: TrainingScenario[] = [
+/** Retained authored drafts; these are not verified automatic reconstructions. */
+export const AUTHORED_TRAINING_DRAFTS: TrainingScenario[] = [
   {
     id: "ua-16-1-01",
     number: 1,
@@ -189,6 +197,7 @@ export const TRAINING_SCENARIOS: TrainingScenario[] = [
         "sedan",
         undefined,
         22,
+        5.4,
       ),
     ],
     scene: OFFICIAL_TICKET_SCENES["ua-16-1-05"],
@@ -216,7 +225,18 @@ export const TRAINING_SCENARIOS: TrainingScenario[] = [
     ),
     answerSourcePage: 4,
     cars: [
-      movingCar("green", "Зелений автомобіль", "south", "left", 6, "#63804f", "suv", undefined, 22),
+      movingCar(
+        "green",
+        "Зелений автомобіль",
+        "south",
+        "left",
+        6,
+        "#63804f",
+        "suv",
+        undefined,
+        22,
+        -2.6,
+      ),
     ],
     scene: OFFICIAL_TICKET_SCENES["ua-16-1-06"],
     signalChange: 6,
@@ -304,11 +324,29 @@ export const TRAINING_SCENARIOS: TrainingScenario[] = [
   },
 ];
 
+/** School uses extracted data only; authored 3D drafts never grant the 3D toggle. */
+export const TRAINING_SCENARIOS: TrainingScenario[] = parseImportedTickets(imported).map(
+  (ticket) => ({
+    id: ticket.id,
+    number: ticket.number,
+    section: ticket.section,
+    title: `Розділ ${ticket.section} · Питання ${ticket.number}`,
+    summary: "Оригінал 2D · потребує перевірки",
+    question: ticket.question,
+    answer: { options: ticket.options, correct: ticket.answer?.index ?? null },
+    image: ticket.images[0],
+    answerSourcePage: ticket.answer?.page ?? 0,
+    answerMethod: ticket.answer?.method,
+    importReason: ticket.classification.reason,
+    cars: [],
+  }),
+);
+
 export function durationOf(scenario: TrainingScenario): number {
   return scenario.cars.length
     ? Math.max(...scenario.cars.map((entry) => entry.release + DRIVE_SECONDS))
     : 0;
 }
 export function checkAnswer(scenario: TrainingScenario, choice: number | null): boolean {
-  return choice === scenario.answer.correct;
+  return scenario.answer.correct !== null && choice !== null && choice === scenario.answer.correct;
 }

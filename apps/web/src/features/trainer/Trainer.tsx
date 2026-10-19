@@ -63,8 +63,8 @@ export default function Trainer() {
       <div className="trainer-heading">
         <div>
           <span className="trainer-eyebrow">НАВЧАЙСЯ · РОЗУМІЙ · КЕРУЙ</span>
-          <h1>Перехрестя без сумнівів</h1>
-          <p>Розбери ситуацію. Обери відповідь. Побач правильний рух.</p>
+          <h1>Офіційні питання ПДР</h1>
+          <p>Розглянь оригінал. Обери відповідь. Перевір себе.</p>
         </div>
         <div className="trainer-progress">
           <CheckCircle2 size={20} />
@@ -102,7 +102,11 @@ export default function Trainer() {
                     onClick={() => setIndex(position)}
                   >
                     <span className="trainer-ticket-number">
-                      {completed.includes(entry.id) ? <Check size={18} /> : `0${position + 1}`}
+                      {completed.includes(entry.id) ? (
+                        <Check size={18} />
+                      ) : (
+                        String(position + 1).padStart(2, "0")
+                      )}
                     </span>
                     <span>
                       <strong>{entry.title}</strong>
@@ -118,8 +122,10 @@ export default function Trainer() {
           </nav>
           <div className="trainer-tip">
             <CircleHelp size={21} />
-            <strong>Спочатку — спостерігай</strong>
-            <p>Обери авто на сцені, роздивись його напрямок та дорожні сигнали.</p>
+            <strong>Оригінал і реконструкція</strong>
+            <p>
+              3D стане доступним після перевірки реконструкції. Зараз досліджуй оригінал із PDF.
+            </p>
           </div>
           <div className="trainer-draft">
             Оригінальні 2D-матеріали з наданого офіційного PDF. Лише локальний прототип.
@@ -136,7 +142,7 @@ export default function Trainer() {
         />
       </div>
       <footer className="trainer-footer">
-        Розділ 16.1 · Офіційні 2D-зображення та авторські 3D-реконструкції. Права на публічне
+        Розділ 16.1 · Офіційні 2D-зображення. 3D-реконструкції очікують перевірки. Права на публічне
         використання ілюстрацій окремо не підтверджені. Прогрес зберігається лише до оновлення
         сторінки.
       </footer>
@@ -180,7 +186,7 @@ function Exercise({
   const selectCar = (id: string) => {
     setSelected(id);
   };
-  const ready = choice !== null;
+  const ready = choice !== null && scenario.answer.correct !== null;
   return (
     <>
       <section className="trainer-stage">
@@ -222,24 +228,26 @@ function Exercise({
               />
             ) : null}
           </SceneBoundary>
-          {view === "2d" && (
+          {view === "2d" && scenario.image && (
             <div className="trainer-official-image">
               <Image
                 src={scenario.image.src}
                 width={scenario.image.width}
                 height={scenario.image.height}
                 sizes="(max-width: 720px) 100vw, 60vw"
-                alt={`Офіційна ілюстрація до питання 16.1 №${scenario.number}`}
+                alt={`Офіційна ілюстрація до питання ${scenario.section ?? "16.1"} №${scenario.number}`}
                 priority={index === 0}
               />
             </div>
           )}
           <div className="trainer-scene-hint">
             {view === "2d"
-              ? `Оригінальна ілюстрація · сторінка ${scenario.image.sourcePage} PDF`
+              ? scenario.image
+                ? `Оригінальна ілюстрація · сторінка ${scenario.image.sourcePage} PDF`
+                : "Питання без ілюстрації"
               : cameraCommand.mode === "driver"
                 ? "Камера слідує за обраним авто"
-                : "Обертай сцену · наближай · обирай авто"}
+                : "Навчальна 3D-реконструкція за офіційним 2D-референсом"}
           </div>
           {view === "3d" && (
             <div className="trainer-zoom">
@@ -292,7 +300,7 @@ function Exercise({
           <div className="trainer-camera" role="group" aria-label="Режим камери">
             {(
               [
-                ["iso", "Ізометрія"],
+                ["iso", "Ракурс референсу"],
                 ["top", "Зверху"],
                 ["driver", "За авто"],
                 ["free", "Вільна"],
@@ -378,7 +386,7 @@ function Exercise({
               ? "Перевір відповідь, щоб відкрити анімований розбір."
               : ended
                 ? "Проїзд завершено. Можна повторити або перейти далі."
-                : "3D-реконструкція · не є офіційною ілюстрацією"}
+                : "Навчальна 3D-реконструкція офіційної ситуації · не є офіційною ілюстрацією"}
           </p>
         )}
       </section>
@@ -390,6 +398,23 @@ function Exercise({
           </span>
         </div>
         <h2>{scenario.question}</h2>
+        {scenario.importReason && (
+          <div className="trainer-draft">
+            <p>{scenario.importReason}</p>
+            <p>
+              3D потребує перевірки. Пояснення за перевіреними положеннями ПДР ще не підготовлено.
+            </p>
+            {scenario.answerMethod === "assistant_visual_transcription" && (
+              <p>
+                Ключ відповіді зчитано асистентом зі скану таблиці; це не автоматичне OCR чи
+                юридична перевірка.
+              </p>
+            )}
+            {scenario.answer.correct === null && (
+              <p role="status">Відповідь не підтверджена: перевірку результату вимкнено.</p>
+            )}
+          </div>
+        )}
         <p className="trainer-question-hint">Обери одну відповідь.</p>
         <fieldset disabled={result !== null}>
           <legend className="sr-only">Відповідь</legend>
@@ -424,7 +449,8 @@ function Exercise({
           <div className={`trainer-result ${result ? "is-correct" : "is-incorrect"}`} role="status">
             <strong>{result ? "Так, правильно!" : "Спробуй розібратися ще раз"}</strong>
             <p>
-              Правильна відповідь за офіційною таблицею: варіант {scenario.answer.correct + 1}.
+              Правильна відповідь за таблицею: варіант{" "}
+              {scenario.answer.correct === null ? "не визначено" : scenario.answer.correct + 1}.
               Сторінка {scenario.answerSourcePage} PDF відповідей.
             </p>
             {scenario.scene && (

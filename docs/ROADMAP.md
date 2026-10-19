@@ -19,10 +19,12 @@ Status labels in this document have strict meanings:
 
 ## Current Project Status
 
-- **Official school pilot — authorized, source acquisition blocked.** The owner requested ten real
-  Ukrainian exam questions with question-specific 2D or Studio-authored 3D presentation. Official
-  source links and import acceptance criteria are recorded in [`official-school-pilot.md`](official-school-pilot.md).
-  No official question records have been imported yet; the five current examples remain authored demos.
+- **Official school pilot — local importer implemented; reconstruction blocked pending vision.**
+  The owner authorized a reusable local PDF-to-ticket pipeline and explicitly chose to leave the
+  vision adapter disconnected. Ten Section 16.1 questions are extracted from the supplied PDFs;
+  all ten remain `needs_review`, with original 2D only. Answers use a separately identified visual
+  transcription of the scanned key. No reconstructed scene, explanation or legal source is promoted
+  to verified status. See [`official-ticket-pipeline.md`](official-ticket-pipeline.md).
 
 - **Local interactive trainer — explicitly authorized frontend prototype.** The owner’s restoration
   brief authorizes five development-only Ukrainian examples with deterministic vehicle animation in

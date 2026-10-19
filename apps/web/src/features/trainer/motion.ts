@@ -8,6 +8,7 @@ export interface MotionPlan {
   release: number;
   startDistance?: number;
   stopDistance?: number;
+  initialDistance?: number;
 }
 export interface Pose {
   x: number;
@@ -69,7 +70,7 @@ export function sampleMotion(
 ): Pose {
   const start = plan.startDistance;
   const stagedStop = plan.stopDistance;
-  const initialDistance = -(20 - STOP_CENTER);
+  const initialDistance = plan.initialDistance ?? -(20 - STOP_CENTER);
   const distance =
     start !== undefined
       ? start + (routeLength(plan.maneuver) - start) * smooth((time - plan.release) / DRIVE_SECONDS)

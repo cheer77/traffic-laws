@@ -1,0 +1,3 @@
+# Existing local extraction runtime; PyMuPDF is AGPL/commercial dual licensed.
+# This is developer tooling, not a new browser/runtime dependency.
+PyMuPDF==2.0

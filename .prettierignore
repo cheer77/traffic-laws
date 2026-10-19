@@ -16,3 +16,6 @@ AGENTS.md
 **/AGENTS.md
 apps/api/.generated/
 **/dist/
+
+# Deterministic Python-generated PDF extraction evidence.
+apps/web/src/features/official-tickets/imported.json

@@ -1,0 +1,1476 @@
+[
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-01",
+    "section": "16.1",
+    "number": 1,
+    "question": "Як повинен у даній ситуації вчинити водій білого автомобіля, який очікує ввімкнення сигналу світлофора, що дозволяє рух, щоб їхати прямо?",
+    "options": [
+      "Продовжити рух у наміченому напрямку, тільки коли буде увімкнено зелений сигнал світлофора.",
+      "Увімкнути лівий покажчик повороту, продовжити рух у напрямку, вказаному стрілкою, увімкненою в додатковій секції.",
+      "Перестроїтися в правий ряд."
+    ],
+    "images": [
+      {
+        "src": "/official-import/e63f59deafb549b05ea897a74e36cfee6dbf2923f31a5c2819fc7a34c354838b.jpeg",
+        "sha256": "e63f59deafb549b05ea897a74e36cfee6dbf2923f31a5c2819fc7a34c354838b",
+        "width": 570,
+        "height": 447,
+        "sourcePage": 173,
+        "bbox": [
+          85.0989990234375,
+          580.6007690429688,
+          282.79901123046875,
+          734.7507934570312
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 173,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 173,
+        "text": "1. Як повинен у даній ситуації вчинити водій білого автомобіля, який",
+        "bbox": [
+          85.05000305175781,
+          548.726806640625,
+          530.5,
+          564.2247924804688
+        ]
+      },
+      {
+        "page": 173,
+        "text": "очікує ввімкнення сигналу світлофора, що дозволяє рух, щоб їхати прямо?",
+        "bbox": [
+          85.05000305175781,
+          564.976806640625,
+          561.2318725585938,
+          580.4747924804688
+        ]
+      },
+      {
+        "page": 173,
+        "text": "1) Продовжити рух у наміченому напрямку, тільки коли буде увімкнено",
+        "bbox": [
+          85.05000305175781,
+          735.4267578125,
+          520.6500244140625,
+          750.9247436523438
+        ]
+      },
+      {
+        "page": 173,
+        "text": "зелений сигнал світлофора.",
+        "bbox": [
+          85.05000305175781,
+          751.5267944335938,
+          249.08798217773438,
+          767.0247802734375
+        ]
+      },
+      {
+        "page": 173,
+        "text": "2) Увімкнути лівий покажчик повороту, продовжити рух у напрямку,",
+        "bbox": [
+          85.05000305175781,
+          767.6267700195312,
+          503.79998779296875,
+          783.124755859375
+        ]
+      },
+      {
+        "page": 173,
+        "text": "вказаному стрілкою, увімкненою в додатковій секції.",
+        "bbox": [
+          85.05000305175781,
+          783.7267456054688,
+          403.7460021972656,
+          799.2247314453125
+        ]
+      },
+      {
+        "page": 173,
+        "text": "3) Перестроїтися в правий ряд.",
+        "bbox": [
+          85.05000305175781,
+          799.5267944335938,
+          267.20001220703125,
+          815.0247802734375
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-02",
+    "section": "16.1",
+    "number": 2,
+    "question": "Повертаючи праворуч, водій синього автомобіля повинен:",
+    "options": [
+      "Проїхати перехрестя першим.",
+      "Дати дорогу тільки зустрічному трамваю.",
+      "Дати дорогу обом трамваям.",
+      "Дати дорогу тільки попутному трамваю."
+    ],
+    "images": [
+      {
+        "src": "/official-import/6e01443e0e3a0939ae185de4cffbbeba7cc24ad1f40f225df45fd212b09a7595.jpeg",
+        "sha256": "6e01443e0e3a0939ae185de4cffbbeba7cc24ad1f40f225df45fd212b09a7595",
+        "width": 514,
+        "height": 362,
+        "sourcePage": 174,
+        "bbox": [
+          85.0989990234375,
+          99.4007568359375,
+          311.29901123046875,
+          243.25079345703125
+        ]
+      }
+    ],
+    "answer": {
+      "index": 2,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 174,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 174,
+        "text": "2. Повертаючи праворуч, водій синього автомобіля повинен:",
+        "bbox": [
+          85.05000305175781,
+          83.8267822265625,
+          464.3799743652344,
+          99.32478332519531
+        ]
+      },
+      {
+        "page": 174,
+        "text": "1) Проїхати перехрестя першим.",
+        "bbox": [
+          85.05000305175781,
+          243.47674560546875,
+          274.8059387207031,
+          258.9747314453125
+        ]
+      },
+      {
+        "page": 174,
+        "text": "2) Дати дорогу тільки зустрічному трамваю.",
+        "bbox": [
+          85.05000305175781,
+          259.3267822265625,
+          346.96405029296875,
+          274.82476806640625
+        ]
+      },
+      {
+        "page": 174,
+        "text": "3) Дати дорогу обом трамваям.",
+        "bbox": [
+          85.05000305175781,
+          275.3267822265625,
+          268.62396240234375,
+          290.82476806640625
+        ]
+      },
+      {
+        "page": 174,
+        "text": "4) Дати дорогу тільки попутному трамваю.",
+        "bbox": [
+          85.05000305175781,
+          291.8267822265625,
+          339.5140380859375,
+          307.32476806640625
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-03",
+    "section": "16.1",
+    "number": 3,
+    "question": "Який транспортний засіб у даній ситуації має перевагу в русі?",
+    "options": [
+      "Трамвай.",
+      "Автомобіль."
+    ],
+    "images": [
+      {
+        "src": "/official-import/15a867f150992c9811f4d48ff5332c880e2094c95a6417dececdb1fcc23d6651.jpeg",
+        "sha256": "15a867f150992c9811f4d48ff5332c880e2094c95a6417dececdb1fcc23d6651",
+        "width": 746,
+        "height": 369,
+        "sourcePage": 174,
+        "bbox": [
+          85.0989990234375,
+          339.70074462890625,
+          362.9989929199219,
+          497.4007568359375
+        ]
+      }
+    ],
+    "answer": {
+      "index": 0,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 174,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 174,
+        "text": "3. Який транспортний засіб у даній ситуації має перевагу в русі?",
+        "bbox": [
+          85.05000305175781,
+          324.2267761230469,
+          490.4439697265625,
+          339.7247619628906
+        ]
+      },
+      {
+        "page": 174,
+        "text": "1) Трамвай.",
+        "bbox": [
+          85.05000305175781,
+          497.0767822265625,
+          153.76800537109375,
+          512.5747680664062
+        ]
+      },
+      {
+        "page": 174,
+        "text": "2) Автомобіль.",
+        "bbox": [
+          85.05000305175781,
+          512.8767700195312,
+          172.59799194335938,
+          528.374755859375
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-04",
+    "section": "16.1",
+    "number": 4,
+    "question": "Як повинен вчинити водій білого автомобіля, якщо він виїхав на перехрещення проїзних частин на сигнал світлофора, що дозволяє рух?",
+    "options": [
+      "Зупинитися перед світлофором на шляху руху і, дочекавшись ввімкнення зеленого сигналу, продовжити рух.",
+      "Закінчити поворот ліворуч незалежно від сигналу світлофора на шляху свого руху."
+    ],
+    "images": [
+      {
+        "src": "/official-import/5a2ad992cb7ae130caa764b8aa415a6b4c209f5b6d4458a67991395906772180.jpeg",
+        "sha256": "5a2ad992cb7ae130caa764b8aa415a6b4c209f5b6d4458a67991395906772180",
+        "width": 628,
+        "height": 346,
+        "sourcePage": 174,
+        "bbox": [
+          85.0989990234375,
+          581.7008056640625,
+          337.4989929199219,
+          726.95068359375
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 174,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 174,
+        "text": "4. Як повинен вчинити водій білого автомобіля, якщо він виїхав на",
+        "bbox": [
+          85.05000305175781,
+          549.7767333984375,
+          539.300048828125,
+          565.2747192382812
+        ]
+      },
+      {
+        "page": 174,
+        "text": "перехрещення проїзних частин на сигнал світлофора, що дозволяє рух?",
+        "bbox": [
+          85.05000305175781,
+          566.0267333984375,
+          539.8119506835938,
+          581.5247192382812
+        ]
+      },
+      {
+        "page": 174,
+        "text": "1) Зупинитися перед світлофором на шляху руху і, дочекавшись ввімкнення",
+        "bbox": [
+          85.05000305175781,
+          727.6267700195312,
+          549.156005859375,
+          743.124755859375
+        ]
+      },
+      {
+        "page": 174,
+        "text": "зеленого сигналу, продовжити рух.",
+        "bbox": [
+          85.05000305175781,
+          743.8767700195312,
+          295.7359924316406,
+          759.374755859375
+        ]
+      },
+      {
+        "page": 174,
+        "text": "2) Закінчити поворот ліворуч незалежно від сигналу світлофора на шляху",
+        "bbox": [
+          85.05000305175781,
+          760.1267700195312,
+          530.75,
+          775.624755859375
+        ]
+      },
+      {
+        "page": 174,
+        "text": "свого руху.",
+        "bbox": [
+          85.05000305175781,
+          776.2267456054688,
+          152.20797729492188,
+          791.7247314453125
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-05",
+    "section": "16.1",
+    "number": 5,
+    "question": "Як повинен вчинити водій білого автомобіля, що виїхав на перехрещення проїзних частин на зелений сигнал світлофора?",
+    "options": [
+      "Повинен продовжувати рух у наміченому напрямку, незважаючи на ввімкнений заборонний сигнал світлофора.",
+      "Повинен зупинитися перед дорожньою розміткою «Стоп-лінія» і продовжити рух, коли ввімкнеться зелений сигнал світлофора."
+    ],
+    "images": [
+      {
+        "src": "/official-import/04066c23b6357e9a8ac7023cbcad24ddbae90191b793880aceb8a7b2b850b240.jpeg",
+        "sha256": "04066c23b6357e9a8ac7023cbcad24ddbae90191b793880aceb8a7b2b850b240",
+        "width": 536,
+        "height": 432,
+        "sourcePage": 175,
+        "bbox": [
+          85.0989990234375,
+          80.500732421875,
+          282.197998046875,
+          255.4007568359375
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 175,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 175,
+        "text": "5. Як повинен вчинити водій білого",
+        "bbox": [
+          85.05000305175781,
+          48.62677001953125,
+          312.69390869140625,
+          64.12477111816406
+        ]
+      },
+      {
+        "page": 175,
+        "text": "автомобіля,",
+        "bbox": [
+          334.75,
+          48.62677001953125,
+          408.5019836425781,
+          64.12477111816406
+        ]
+      },
+      {
+        "page": 175,
+        "text": "що",
+        "bbox": [
+          437.04998779296875,
+          48.62677001953125,
+          455.54400634765625,
+          64.12477111816406
+        ]
+      },
+      {
+        "page": 175,
+        "text": "виїхав",
+        "bbox": [
+          483.3999938964844,
+          48.62677001953125,
+          523.9579467773438,
+          64.12477111816406
+        ]
+      },
+      {
+        "page": 175,
+        "text": "на перехрещення проїзних частин на зелений сигнал світлофора?",
+        "bbox": [
+          100.30000305175781,
+          64.87677001953125,
+          516.0698852539062,
+          80.37477111816406
+        ]
+      },
+      {
+        "page": 175,
+        "text": "1) Повинен",
+        "bbox": [
+          85.05000305175781,
+          256.0767822265625,
+          159.40000915527344,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "продовжувати",
+        "bbox": [
+          170.8000030517578,
+          256.0767822265625,
+          255.00997924804688,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "рух",
+        "bbox": [
+          267.04998779296875,
+          256.0767822265625,
+          287.657958984375,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "у наміченому",
+        "bbox": [
+          298.95001220703125,
+          256.0767822265625,
+          385.845947265625,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "напрямку,",
+        "bbox": [
+          397.8999938964844,
+          256.0767822265625,
+          457.8619384765625,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "незважаючи",
+        "bbox": [
+          469.45001220703125,
+          256.0767822265625,
+          541.43798828125,
+          271.57476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "на ввімкнений заборонний сигнал світлофора.",
+        "bbox": [
+          107.5999984741211,
+          272.1767578125,
+          382.7900390625,
+          287.67474365234375
+        ]
+      },
+      {
+        "page": 175,
+        "text": "2) Повинен зупинитися перед дорожньою розміткою «Стоп-лінія» і",
+        "bbox": [
+          85.05000305175781,
+          288.27679443359375,
+          492.79998779296875,
+          303.7747802734375
+        ]
+      },
+      {
+        "page": 175,
+        "text": "продовжити рух, коли ввімкнеться зелений сигнал світлофора.",
+        "bbox": [
+          85.05000305175781,
+          304.37677001953125,
+          460.2779846191406,
+          319.874755859375
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-06",
+    "section": "16.1",
+    "number": 6,
+    "question": "Як повинен діяти водій зеленого автомобіля, що повертає ліворуч, у даній ситуації?",
+    "options": [
+      "Виїхати в наміченому напрямку незалежно від сигналу світлофора на шляху свого руху.",
+      "Зупинитися перед дорожньою розміткою «Стоп-лінія» і продовжити рух, коли ввімкнеться зелений сигнал світлофора."
+    ],
+    "images": [
+      {
+        "src": "/official-import/a4f7c21075c8a73f3df217128f605a05ec1775bc8c6bf7c854df7b648e160b3c.jpeg",
+        "sha256": "a4f7c21075c8a73f3df217128f605a05ec1775bc8c6bf7c854df7b648e160b3c",
+        "width": 533,
+        "height": 387,
+        "sourcePage": 175,
+        "bbox": [
+          85.0989990234375,
+          366.80078125,
+          285.5989990234375,
+          529.30078125
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 175,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 175,
+        "text": "6. Як повинен діяти водій зеленого автомобіля, що повертає ліворуч, у",
+        "bbox": [
+          85.05000305175781,
+          335.2267761230469,
+          535.8499755859375,
+          350.7247619628906
+        ]
+      },
+      {
+        "page": 175,
+        "text": "даній ситуації?",
+        "bbox": [
+          85.05000305175781,
+          351.3267822265625,
+          179.85397338867188,
+          366.82476806640625
+        ]
+      },
+      {
+        "page": 175,
+        "text": "1) Виїхати в наміченому напрямку незалежно від сигналу світлофора на",
+        "bbox": [
+          85.05000305175781,
+          529.976806640625,
+          520.9500122070312,
+          545.4747924804688
+        ]
+      },
+      {
+        "page": 175,
+        "text": "шляху свого руху.",
+        "bbox": [
+          85.05000305175781,
+          546.3767700195312,
+          194.26400756835938,
+          561.874755859375
+        ]
+      },
+      {
+        "page": 175,
+        "text": "2) Зупинитися перед дорожньою розміткою «Стоп-лінія» і продовжити рух,",
+        "bbox": [
+          85.05000305175781,
+          562.7767333984375,
+          536.9500122070312,
+          578.2747192382812
+        ]
+      },
+      {
+        "page": 175,
+        "text": "коли ввімкнеться зелений сигнал світлофора.",
+        "bbox": [
+          85.05000305175781,
+          578.8767700195312,
+          355.4360046386719,
+          594.374755859375
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-07",
+    "section": "16.1",
+    "number": 7,
+    "question": "Хто в даній ситуації повинен дати дорогу?",
+    "options": [
+      "Водій автомобіля.",
+      "Водій трамвая."
+    ],
+    "images": [
+      {
+        "src": "/official-import/9dd36a1d26621fe38da6edf3c564c40da6287aeeaccc290f66fd3b5e9f4aa476.jpeg",
+        "sha256": "9dd36a1d26621fe38da6edf3c564c40da6287aeeaccc290f66fd3b5e9f4aa476",
+        "width": 820,
+        "height": 457,
+        "sourcePage": 175,
+        "bbox": [
+          85.0989990234375,
+          629.2008056640625,
+          355.49798583984375,
+          779.9007568359375
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 175,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 175,
+        "text": "7. Хто в даній ситуації повинен дати дорогу?",
+        "bbox": [
+          85.05000305175781,
+          613.6767578125,
+          365.093994140625,
+          629.1747436523438
+        ]
+      },
+      {
+        "page": 175,
+        "text": "1) Водій автомобіля.",
+        "bbox": [
+          85.05000305175781,
+          780.5767822265625,
+          206.26197814941406,
+          796.0747680664062
+        ]
+      },
+      {
+        "page": 175,
+        "text": "2) Водій трамвая.",
+        "bbox": [
+          85.05000305175781,
+          796.6767578125,
+          187.82395935058594,
+          812.1747436523438
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-08",
+    "section": "16.1",
+    "number": 8,
+    "question": "Який транспортний засіб першим проїде дане перехрестя?",
+    "options": [
+      "Червоний автомобіль.",
+      "Синій автомобіль."
+    ],
+    "images": [
+      {
+        "src": "/official-import/b5602457ef20981fadf7469bb464bd43218a301814ef18e87e5d55b39e4c970b.jpeg",
+        "sha256": "b5602457ef20981fadf7469bb464bd43218a301814ef18e87e5d55b39e4c970b",
+        "width": 791,
+        "height": 410,
+        "sourcePage": 176,
+        "bbox": [
+          85.0989990234375,
+          99.4007568359375,
+          351.99798583984375,
+          237.75079345703125
+        ]
+      }
+    ],
+    "answer": {
+      "index": 0,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 176,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 176,
+        "text": "8. Який транспортний засіб першим проїде дане перехрестя?",
+        "bbox": [
+          85.05000305175781,
+          83.8267822265625,
+          466.57196044921875,
+          99.32478332519531
+        ]
+      },
+      {
+        "page": 176,
+        "text": "1) Червоний автомобіль.",
+        "bbox": [
+          85.05000305175781,
+          237.47674560546875,
+          228.80596923828125,
+          252.97474670410156
+        ]
+      },
+      {
+        "page": 176,
+        "text": "2) Синій автомобіль.",
+        "bbox": [
+          85.05000305175781,
+          253.3267822265625,
+          207.10598754882812,
+          268.82476806640625
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-09",
+    "section": "16.1",
+    "number": 9,
+    "question": "Як велосипедист проїде перехрестя в даному випадку?",
+    "options": [
+      "Дасть дорогу трамваю.",
+      "Проїде першим, маючи перевагу."
+    ],
+    "images": [
+      {
+        "src": "/official-import/0c48676d2a5c1b50376c9287d6767b8610b789adcac5d2f46d991b89a8c065f0.jpeg",
+        "sha256": "0c48676d2a5c1b50376c9287d6767b8610b789adcac5d2f46d991b89a8c065f0",
+        "width": 817,
+        "height": 509,
+        "sourcePage": 176,
+        "bbox": [
+          85.0989990234375,
+          301.80078125,
+          354.99798583984375,
+          469.7507629394531
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 176,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 176,
+        "text": "9. Як велосипедист проїде перехрестя в даному випадку?",
+        "bbox": [
+          85.05000305175781,
+          286.3267822265625,
+          442.75799560546875,
+          301.82476806640625
+        ]
+      },
+      {
+        "page": 176,
+        "text": "1) Дасть дорогу трамваю.",
+        "bbox": [
+          85.05000305175781,
+          470.4267578125,
+          235.71395874023438,
+          485.92474365234375
+        ]
+      },
+      {
+        "page": 176,
+        "text": "2) Проїде першим, маючи перевагу.",
+        "bbox": [
+          85.05000305175781,
+          486.5267639160156,
+          296.8599853515625,
+          502.0247497558594
+        ]
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "id": "ua-16-1-10",
+    "section": "16.1",
+    "number": 10,
+    "question": "Як повинен вчинити водій червоного автомобіля, що збирається повертати праворуч, у даній ситуації?",
+    "options": [
+      "Продовжити рух тільки після ввімкнення зеленого сигналу світлофора.",
+      "Повернути праворуч, давши дорогу пішоходам і транспортним засобам, які рухаються з інших напрямків.",
+      "Повернути праворуч, давши дорогу лише транспортним засобам, що рухаються з інших напрямків."
+    ],
+    "images": [
+      {
+        "src": "/official-import/1203e9bc8c6d633b610037d421b40f92cf7671e00a43bad538c3fe8cf6205d9a.jpeg",
+        "sha256": "1203e9bc8c6d633b610037d421b40f92cf7671e00a43bad538c3fe8cf6205d9a",
+        "width": 668,
+        "height": 450,
+        "sourcePage": 176,
+        "bbox": [
+          85.0989990234375,
+          552.80078125,
+          352.89898681640625,
+          731.55078125
+        ]
+      }
+    ],
+    "answer": {
+      "index": 1,
+      "page": 4,
+      "method": "assistant_visual_transcription",
+      "documentSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "status": "source_checked"
+    },
+    "classification": {
+      "mode": "candidate-3d",
+      "reason": "Текст описує просторову ситуацію та має оригінальну ілюстрацію. Зміст рисунка ще не проаналізовано.",
+      "imageAnalysis": "pending"
+    },
+    "status": "needs_review",
+    "issues": [
+      "vision_adapter_not_connected",
+      "explanation_legal_review_pending"
+    ],
+    "history": [
+      {
+        "stage": "extracted",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "classified",
+        "result": "passed",
+        "issues": []
+      },
+      {
+        "stage": "analyzing",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected"
+        ]
+      },
+      {
+        "stage": "needs_review",
+        "result": "blocked",
+        "issues": [
+          "vision_adapter_not_connected",
+          "explanation_legal_review_pending"
+        ]
+      }
+    ],
+    "scene": null,
+    "explanation": {
+      "status": "unverified",
+      "text": null,
+      "references": []
+    },
+    "source": {
+      "questionDocument": "POLOTNO-NAKAZ_04_09_2025.pdf",
+      "questionSha256": "1aa8cb2f95262d1d72a9ee63e82daa68f7a23f75fb627f2c986cb5bc20fe0cbf",
+      "answerDocument": "Numer_-vidpovidej-do-nakazu.pdf",
+      "answerSha256": "40d2db5467af027c3e806db51bba9517be2e8487a8ad2d22a2bebf8c3830ccc6",
+      "page": 176,
+      "editionStatus": "not_independently_verified"
+    },
+    "textEvidence": [
+      {
+        "page": 176,
+        "text": "10. Як повинен вчинити водій червоного автомобіля, що",
+        "bbox": [
+          85.05000305175781,
+          521.1767578125,
+          462.802001953125,
+          536.6747436523438
+        ]
+      },
+      {
+        "page": 176,
+        "text": "збирається",
+        "bbox": [
+          497.54998779296875,
+          521.1767578125,
+          567.9000244140625,
+          536.6747436523438
+        ]
+      },
+      {
+        "page": 176,
+        "text": "повертати праворуч, у даній ситуації?",
+        "bbox": [
+          85.05000305175781,
+          537.2767333984375,
+          327.02593994140625,
+          552.7747192382812
+        ]
+      },
+      {
+        "page": 176,
+        "text": "1) Продовжити рух тільки після ввімкнення зеленого сигналу світлофора.",
+        "bbox": [
+          85.05000305175781,
+          732.7767944335938,
+          521.3499755859375,
+          748.2747802734375
+        ]
+      },
+      {
+        "page": 176,
+        "text": "2) Повернути праворуч, давши дорогу пішоходам і транспортним засобам,",
+        "bbox": [
+          85.05000305175781,
+          749.0267944335938,
+          536.9500122070312,
+          764.5247802734375
+        ]
+      },
+      {
+        "page": 176,
+        "text": "які рухаються з інших напрямків.",
+        "bbox": [
+          85.05000305175781,
+          765.1267700195312,
+          285.2920227050781,
+          780.624755859375
+        ]
+      },
+      {
+        "page": 176,
+        "text": "3) Повернути праворуч, давши",
+        "bbox": [
+          85.05000305175781,
+          781.2267456054688,
+          289.0439758300781,
+          796.7247314453125
+        ]
+      },
+      {
+        "page": 176,
+        "text": "дорогу лише транспортним",
+        "bbox": [
+          300.45001220703125,
+          781.2267456054688,
+          476.9979553222656,
+          796.7247314453125
+        ]
+      },
+      {
+        "page": 176,
+        "text": "засобам,",
+        "bbox": [
+          488.3999938964844,
+          781.2267456054688,
+          538.365966796875,
+          796.7247314453125
+        ]
+      },
+      {
+        "page": 176,
+        "text": "що",
+        "bbox": [
+          549.6500244140625,
+          781.2267456054688,
+          570.5,
+          796.7247314453125
+        ]
+      },
+      {
+        "page": 176,
+        "text": "рухаються з інших напрямків.",
+        "bbox": [
+          85.05000305175781,
+          797.3267822265625,
+          264.7120361328125,
+          812.8247680664062
+        ]
+      }
+    ]
+  }
+]
