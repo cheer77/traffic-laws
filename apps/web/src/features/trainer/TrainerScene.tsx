@@ -3,17 +3,11 @@ import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import {
-  Greenery,
-  IntersectionRoad,
-  RoadSign,
-  TrafficLight,
-  VehicleModel,
-} from "@traffic-laws/assets-3d";
-import { SceneEnvironment } from "@traffic-laws/scene-engine/react";
-import type { Direction } from "@traffic-laws/country-rules/traffic-situation";
+import { VehicleModel } from "@traffic-laws/assets-3d";
+import type { SceneObject } from "@traffic-laws/scene-engine";
+import { SceneEnvironment, SceneModel, SceneRenderer } from "@traffic-laws/scene-engine/react";
 import { advancePlayback, routeLength, routePose, sampleMotion, type Playback } from "./motion";
-import { durationOf, signalAt, type TrainingCar, type TrainingScenario } from "./scenarios";
+import { durationOf, type TrainingCar, type TrainingScenario } from "./scenarios";
 
 export type CameraMode = "iso" | "top" | "driver" | "free";
 export interface CameraCommand {
@@ -30,11 +24,10 @@ interface SceneProps {
   onFinished: () => void;
   playing: boolean;
 }
+
 function Clock({ playback, scenario, onFinished, playing }: SceneProps) {
   const invalidate = useThree((state) => state.invalidate);
-  useEffect(() => {
-    invalidate();
-  }, [playing, invalidate]);
+  useEffect(() => invalidate(), [playing, invalidate]);
   useFrame((_, delta) => {
     const wasRunning = playback.current.running;
     advancePlayback(playback.current, delta, durationOf(scenario));
@@ -43,6 +36,7 @@ function Clock({ playback, scenario, onFinished, playing }: SceneProps) {
   }, -2);
   return null;
 }
+
 function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) {
   const { camera, gl, invalidate } = useThree();
   const controls = useRef<OrbitControls | null>(null);
@@ -61,8 +55,8 @@ function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) 
     const start = () => {
       moving.current = false;
     };
-    orbit.addEventListener("start", start);
     const change = () => invalidate();
+    orbit.addEventListener("start", start);
     orbit.addEventListener("change", change);
     controls.current = orbit;
     return () => {
@@ -84,7 +78,6 @@ function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) 
     const entry = scenario.cars.find((car) => car.id === selected) ?? scenario.cars[0];
     sampleMotion(entry, playback.current.time, pose);
     if (cameraCommand.mode === "driver") {
-      // Elevated chase view keeps the lens above the road and away from roadside buildings.
       goal.set(
         pose.x - Math.sin(pose.yaw) * 7 * cameraCommand.zoom,
         4.5 * cameraCommand.zoom,
@@ -116,6 +109,7 @@ function CameraRig({ cameraCommand, playback, selected, scenario }: SceneProps) 
   });
   return null;
 }
+
 function CarLabel({ entry }: { entry: TrainingCar }) {
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
@@ -130,11 +124,11 @@ function CarLabel({ entry }: { entry: TrainingCar }) {
       context.strokeStyle = "white";
       context.lineWidth = 6;
       context.stroke();
-      context.fillStyle = "white";
-      context.font = "bold 70px sans-serif";
+      context.fillStyle = entry.color === "#f4f4ef" ? "#26332c" : "white";
+      context.font = "bold 58px sans-serif";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText(entry.id === "a" ? "А" : entry.id === "b" ? "Б" : "В", 64, 67);
+      context.fillText(entry.label.slice(0, 1), 64, 67);
     }
     return new THREE.CanvasTexture(canvas);
   }, [entry]);
@@ -145,6 +139,7 @@ function CarLabel({ entry }: { entry: TrainingCar }) {
     </sprite>
   );
 }
+
 function MovingCar({
   entry,
   playback,
@@ -157,7 +152,6 @@ function MovingCar({
   onSelect: (id: string) => void;
 }) {
   const group = useRef<THREE.Group>(null);
-  const indicators = useRef<THREE.Group>(null);
   const pose = useMemo(() => sampleMotion(entry, 0), [entry]);
   useFrame(() => {
     sampleMotion(entry, playback.current.time, pose);
@@ -165,11 +159,6 @@ function MovingCar({
       group.current.position.set(pose.x, 0.02, pose.z);
       group.current.rotation.y = pose.yaw;
     }
-    if (indicators.current)
-      indicators.current.visible =
-        entry.maneuver !== "straight" &&
-        playback.current.time < entry.release + 9 &&
-        Math.floor(playback.current.time / 0.4) % 2 === 0;
   });
   return (
     <group
@@ -181,7 +170,7 @@ function MovingCar({
         onSelect(entry.id);
       }}
     >
-      <VehicleModel kind={entry.kind} />
+      <VehicleModel kind={entry.kind} bodyColor={entry.color} />
       <CarLabel entry={entry} />
       <mesh rotation-x={-Math.PI / 2} position-y={0.035}>
         <ringGeometry args={[selected ? 2.8 : 2.5, selected ? 3.02 : 2.59, 48]} />
@@ -192,24 +181,20 @@ function MovingCar({
           depthWrite={false}
         />
       </mesh>
-      <group ref={indicators} visible={entry.maneuver !== "straight"}>
-        {[-2.15, 2.15].map((z) => (
-          <mesh key={z} position={[entry.maneuver === "left" ? 0.87 : -0.87, 0.83, z]}>
-            <boxGeometry args={[0.15, 0.12, 0.08]} />
-            <meshBasicMaterial color="#ffad19" />
-          </mesh>
-        ))}
-      </group>
     </group>
   );
 }
+
 function Route({ entry, selected }: { entry: TrainingCar; selected: boolean }) {
   const geometry = useMemo(() => {
     const points: THREE.Vector3[] = [];
-    // Only show the maneuver near the junction, not the offscreen end of the route.
-    const extent = Math.min(routeLength(entry.maneuver), 27);
+    const start = entry.startDistance ?? 0;
+    const extent = Math.min(routeLength(entry.maneuver), start + 27);
     for (let index = 0; index < 40; index++) {
-      for (const distance of [(extent * index) / 40, (extent * (index + 0.65)) / 40]) {
+      for (const distance of [
+        start + ((extent - start) * index) / 40,
+        start + ((extent - start) * (index + 0.65)) / 40,
+      ]) {
         const pose = routePose(entry, distance, { x: 0, z: 0, yaw: 0 });
         points.push(new THREE.Vector3(pose.x, 0.055, pose.z));
       }
@@ -217,61 +202,109 @@ function Route({ entry, selected }: { entry: TrainingCar; selected: boolean }) {
     return new THREE.BufferGeometry().setFromPoints(points);
   }, [entry]);
   useEffect(() => () => geometry.dispose(), [geometry]);
-  const tip = routePose(entry, 22, { x: 0, z: 0, yaw: 0 });
   return (
-    <group>
-      <lineSegments geometry={geometry}>
-        <lineBasicMaterial color={entry.color} transparent opacity={selected ? 1 : 0.4} />
-      </lineSegments>
-      <group position={[tip.x, 0.12, tip.z]} rotation-y={tip.yaw}>
-        <mesh rotation-x={Math.PI / 2}>
-          <coneGeometry args={[0.42, 1.1, 3]} />
-          <meshBasicMaterial color={entry.color} />
-        </mesh>
-      </group>
-    </group>
+    <lineSegments geometry={geometry}>
+      <lineBasicMaterial color={entry.color} transparent opacity={selected ? 1 : 0.4} />
+    </lineSegments>
   );
 }
-const APPROACHES: Direction[] = ["south", "east", "north", "west"];
-const ANGLES = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
-function Signal({
-  approach,
+
+function AnimatedSceneModel({
+  object,
   scenario,
   playback,
 }: {
-  approach: Direction;
+  object: SceneObject;
   scenario: TrainingScenario;
   playback: RefObject<Playback>;
 }) {
-  const lights = useRef<THREE.Group>(null);
+  const initial = useRef<THREE.Group>(null);
+  const changed = useRef<THREE.Group>(null);
+  const isSignal = object.assetId === "traffic-light.standard";
+  const nextSignal = object.properties.signal === "red" ? "green" : "red";
   useFrame(() => {
-    const indication = signalAt(scenario, approach, playback.current.time);
-    lights.current?.children.forEach((child) => {
-      child.visible = child.name === indication;
-    });
+    if (!isSignal || scenario.signalChange === undefined) return;
+    const afterChange = playback.current.time >= scenario.signalChange;
+    if (initial.current) initial.current.visible = !afterChange;
+    if (changed.current) changed.current.visible = afterChange;
   });
+  const staticColor =
+    scenario.number === 1
+      ? { "queue-dark": "#354247", "queue-a": "#537457", "queue-b": "#c47755" }[object.instanceId]
+      : scenario.number === 4 && object.instanceId === "waiting-gray"
+        ? "#78898d"
+        : undefined;
+  if (staticColor && object.assetId.startsWith("vehicle."))
+    return (
+      <VehicleModel
+        kind={object.assetId === "vehicle.suv.standard" ? "suv" : "sedan"}
+        bodyColor={staticColor}
+      />
+    );
+  if (!isSignal || scenario.signalChange === undefined) return <SceneModel object={object} />;
   return (
     <>
-      <TrafficLight signal="off" />
-      <group ref={lights}>
-        {(["red", "yellow", "green"] as const).map((color, index) => (
-          <mesh
-            key={color}
-            name={color}
-            position={[0, 4 - index * 0.4, 0.33]}
-            visible={signalAt(scenario, approach, 0) === color}
-          >
-            <sphereGeometry args={[0.15, 12, 8]} />
-            <meshBasicMaterial
-              color={color === "green" ? "#52ff7b" : color === "yellow" ? "#ffd43b" : "#ff453a"}
-            />
-          </mesh>
-        ))}
+      <group ref={initial}>
+        <SceneModel object={object} />
+      </group>
+      <group ref={changed} visible={false}>
+        <SceneModel object={object} signal={nextSignal} />
       </group>
     </>
   );
 }
+
+function SupplementaryArrow({
+  direction,
+  playback,
+  activeUntil,
+}: {
+  direction: "left" | "straight";
+  playback: RefObject<Playback>;
+  activeUntil?: number;
+}) {
+  const group = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (group.current)
+      group.current.visible = activeUntil === undefined || playback.current.time < activeUntil;
+  });
+  return (
+    <group
+      ref={group}
+      position={[0.62, 3.45, 0]}
+      rotation-z={direction === "left" ? Math.PI / 2 : 0}
+    >
+      <mesh>
+        <boxGeometry args={[0.62, 0.62, 0.3]} />
+        <meshStandardMaterial color="#1f292f" />
+      </mesh>
+      <mesh position={[0, -0.04, 0.17]}>
+        <boxGeometry args={[0.1, 0.3, 0.03]} />
+        <meshBasicMaterial color="#57f179" toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.17, 0.17]}>
+        <coneGeometry args={[0.17, 0.28, 3]} />
+        <meshBasicMaterial color="#57f179" toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function InternalStopLine({ ticket }: { ticket: number }) {
+  const position: [number, number, number] = ticket === 5 ? [2.4, 0.07, -9.6] : [-8, 0.07, -2.4];
+  const scale: [number, number, number] = ticket === 5 ? [4.7, 0.035, 0.28] : [0.28, 0.035, 4.7];
+  return (
+    <mesh position={position} scale={scale} receiveShadow>
+      <boxGeometry />
+      <meshStandardMaterial color="#f4f2df" roughness={0.9} />
+    </mesh>
+  );
+}
+
 export default function TrainerScene(props: SceneProps) {
+  const scene = props.scenario.scene;
+  if (!scene) return null;
+  const movingIds = new Set(props.scenario.cars.map((entry) => entry.sceneInstanceId));
   return (
     <Canvas
       frameloop="demand"
@@ -284,20 +317,30 @@ export default function TrainerScene(props: SceneProps) {
       <Clock {...props} />
       <CameraRig {...props} />
       <SceneEnvironment shadowSize={1024} shadowExtent={35} />
-      <IntersectionRoad />
-      <Greenery />
-      {APPROACHES.map((approach, index) => (
-        <group key={approach} rotation-y={ANGLES[index]}>
-          <group position={[5.7, 0.16, 9.5]}>
-            <Signal approach={approach} scenario={props.scenario} playback={props.playback} />
-          </group>
-          {props.scenario.control === "priority-signs" && (
-            <group position={[5.8, 0.16, 13]}>
-              <RoadSign kind={approach === "east" || approach === "west" ? "priority" : "yield"} />
-            </group>
-          )}
+      <SceneRenderer
+        scene={scene}
+        isVisible={(object) => !movingIds.has(object.instanceId)}
+        renderModel={(object) => (
+          <AnimatedSceneModel object={object} scenario={props.scenario} playback={props.playback} />
+        )}
+      />
+      {props.scenario.number === 1 && (
+        <group position={[5.8, 0, 9.2]}>
+          <SupplementaryArrow direction="left" playback={props.playback} />
         </group>
-      ))}
+      )}
+      {props.scenario.number === 8 && (
+        <group position={[5.8, 0, 9.2]}>
+          <SupplementaryArrow
+            direction="straight"
+            playback={props.playback}
+            activeUntil={props.scenario.signalChange}
+          />
+        </group>
+      )}
+      {(props.scenario.number === 5 || props.scenario.number === 6) && (
+        <InternalStopLine ticket={props.scenario.number} />
+      )}
       {props.scenario.cars.map((entry) => (
         <group key={entry.id}>
           <Route entry={entry} selected={props.selected === entry.id} />

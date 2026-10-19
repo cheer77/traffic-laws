@@ -1,224 +1,314 @@
-import type { Direction, TrafficSituation } from "@traffic-laws/country-rules/traffic-situation";
-import { analyzeTrafficSituation } from "@traffic-laws/country-rules/traffic-rules-engine";
-import { UA_PDR_REFERENCES } from "@traffic-laws/country-rules/ua-pdr-references";
+import type { Direction } from "@traffic-laws/country-rules/traffic-situation";
+import type { SceneDefinition } from "@traffic-laws/scene-engine";
 import type { MotionPlan } from "./motion";
-import { DRIVE_SECONDS, routeLength, routePose } from "./motion";
+import { DRIVE_SECONDS } from "./motion";
+import { OFFICIAL_TICKET_SCENES } from "./official-scenes";
 
 export interface TrainingCar extends MotionPlan {
   id: string;
+  sceneInstanceId: string;
   label: string;
   kind: "sedan" | "suv";
   color: string;
+  startDistance?: number;
 }
 export interface TrainingScenario {
   id: string;
+  number: number;
   title: string;
   summary: string;
   question: string;
-  control: "uncontrolled" | "priority-signs" | "signals";
+  answer: { options: string[]; correct: number };
+  image: { src: string; width: number; height: number; sha256: string; sourcePage: number };
+  answerSourcePage: number;
   cars: TrainingCar[];
-  answer: { kind: "order"; ids: string[] } | { kind: "choice"; options: string[]; correct: number };
-  explanation: string;
-  references: string[];
+  scene?: SceneDefinition;
   signalChange?: number;
 }
-const car = (
+
+const image = (
+  number: number,
+  width: number,
+  height: number,
+  sha256: string,
+  sourcePage: number,
+): TrainingScenario["image"] => ({
+  src: `/official-tickets/section-16-1/16-1-${String(number).padStart(2, "0")}.jpeg`,
+  width,
+  height,
+  sha256,
+  sourcePage,
+});
+const movingCar = (
   id: string,
+  label: string,
   approach: Direction,
+  maneuver: MotionPlan["maneuver"],
   release: number,
-  maneuver: MotionPlan["maneuver"] = "straight",
+  color: string,
+  kind: TrainingCar["kind"] = "sedan",
+  startDistance?: number,
+  stopDistance?: number,
 ): TrainingCar => ({
   id,
+  sceneInstanceId: `car-${id}`,
+  label,
   approach,
-  release,
   maneuver,
-  label: id === "a" ? "А · синій седан" : id === "b" ? "Б · зелений SUV" : "В · синій седан",
-  kind: id === "b" ? "suv" : "sedan",
-  color: id === "a" ? "#287bc1" : id === "b" ? "#68866a" : "#8754c7",
+  release,
+  color,
+  kind,
+  startDistance,
+  stopDistance,
 });
+
 export const TRAINING_SCENARIOS: TrainingScenario[] = [
   {
-    id: "right-hand",
-    title: "Перешкода праворуч",
-    summary: "Рівнозначні дороги · 2 авто",
-    control: "uncontrolled",
-    cars: [car("a", "south", 17), car("b", "east", 4)],
-    question: "Обидва авто їдуть прямо рівнозначними дорогами. У якому порядку вони проїдуть?",
-    answer: { kind: "order", ids: ["b", "a"] },
-    explanation:
-      "У цій моделі автомобіль Б наближається праворуч від А. Водій А дає йому дорогу. Б проїжджає, після нього — А. Світлофори вимкнені, знаків пріоритету немає.",
-    references: ["ua-pdr-16.12"],
-  },
-  {
-    id: "main-road",
-    title: "Головна та другорядна",
-    summary: "Знаки пріоритету · 2 авто",
-    control: "priority-signs",
-    cars: [car("a", "south", 17), car("b", "east", 4)],
+    id: "ua-16-1-01",
+    number: 1,
+    title: "Сигнал додаткової секції",
+    summary: "Офіційне зображення · 2D + 3D",
     question:
-      "А під’їжджає до знака «Дати дорогу», Б рухається головною дорогою. Оберіть порядок проїзду.",
-    answer: { kind: "order", ids: ["b", "a"] },
-    explanation:
-      "Автомобіль А на другорядній дорозі дає дорогу Б на головній. Головна дорога проходить зі сходу на захід і не змінює напрямку. Після Б проїжджає А.",
-    references: ["ua-pdr-16.11"],
-  },
-  {
-    id: "left-turn",
-    title: "Ліворуч назустріч потоку",
-    summary: "Основний зелений · 2 авто",
-    control: "signals",
-    cars: [car("a", "south", 17, "left"), car("b", "north", 4)],
-    question:
-      "Для обох авто горить основний зелений. А повертає ліворуч, Б їде назустріч прямо. Хто проїде першим?",
-    answer: { kind: "order", ids: ["b", "a"] },
-    explanation:
-      "Повертаючи ліворуч на основний зелений, А дає дорогу зустрічному Б, який їде прямо. Після звільнення перехрестя А завершує поворот у свою смугу.",
-    references: ["ua-pdr-16.1", "ua-pdr-16.6"],
-  },
-  {
-    id: "green-light",
-    title: "Рух за світлофором",
-    summary: "Зміна сигналів · 2 авто",
-    control: "signals",
-    cars: [car("a", "south", 4), car("b", "east", 21)],
-    signalChange: 18,
-    question: "Для А горить зелений, для Б — червоний. Хто може почати проїзд зараз?",
+      "Як повинен у даній ситуації вчинити водій білого автомобіля, який очікує ввімкнення сигналу світлофора, що дозволяє рух, щоб їхати прямо?",
     answer: {
-      kind: "choice",
-      options: ["Лише автомобіль А", "Лише автомобіль Б", "Обидва автомобілі"],
-      correct: 0,
+      options: [
+        "Продовжити рух у наміченому напрямку, тільки коли буде увімкнено зелений сигнал світлофора.",
+        "Увімкнути лівий покажчик повороту, продовжити рух у напрямку, вказаному стрілкою, увімкненою в додатковій секції.",
+        "Перестроїтися в правий ряд.",
+      ],
+      correct: 1,
     },
-    explanation:
-      "На початку А рухається на зелений, Б чекає перед стоп-лінією на червоний. У демонстрації після завершення проїзду А показано жовтий та проміжок із червоним для всіх; потім Б отримує зелений.",
-    references: ["ua-pdr-8.7.3-a", "ua-pdr-8.7.3-e", "ua-pdr-16.1"],
+    image: image(
+      1,
+      570,
+      447,
+      "e63f59deafb549b05ea897a74e36cfee6dbf2923f31a5c2819fc7a34c354838b",
+      173,
+    ),
+    answerSourcePage: 4,
+    cars: [movingCar("white", "Білий автомобіль", "south", "left", 0, "#f4f4ef", "sedan", -4.6)],
+    scene: OFFICIAL_TICKET_SCENES["ua-16-1-01"],
   },
   {
-    id: "together",
-    title: "Рух одночасно",
-    summary: "Незалежні смуги · 3 авто",
-    control: "signals",
-    cars: [car("a", "south", 4), car("b", "north", 4), car("c", "east", 21)],
-    signalChange: 18,
-    question:
-      "А та Б мають зелений і їдуть прямо назустріч у різних смугах. В чекає на червоний. Як можуть рухатися А та Б?",
+    id: "ua-16-1-02",
+    number: 2,
+    title: "Поворот праворуч перед трамваями",
+    summary: "Офіційне зображення · 2D",
+    question: "Повертаючи праворуч, водій синього автомобіля повинен:",
     answer: {
-      kind: "choice",
-      options: ["А, потім Б", "Б, потім А", "Одночасно, кожен своєю смугою"],
+      options: [
+        "Проїхати перехрестя першим.",
+        "Дати дорогу тільки зустрічному трамваю.",
+        "Дати дорогу обом трамваям.",
+        "Дати дорогу тільки попутному трамваю.",
+      ],
       correct: 2,
     },
-    explanation:
-      "Траєкторії А та Б проходять у різних смугах і не перетинаються. У заданих умовах вони можуть рухатися одночасно. Автомобіль В чекає на червоний і починає рух лише після зміни фази.",
-    references: ["ua-pdr-8.7.3-a", "ua-pdr-16.1"],
+    image: image(
+      2,
+      514,
+      362,
+      "6e01443e0e3a0939ae185de4cffbbeba7cc24ad1f40f225df45fd212b09a7595",
+      174,
+    ),
+    answerSourcePage: 4,
+    cars: [],
+  },
+  {
+    id: "ua-16-1-03",
+    number: 3,
+    title: "Перевага трамвая",
+    summary: "Офіційне зображення · 2D",
+    question: "Який транспортний засіб у даній ситуації має перевагу в русі?",
+    answer: { options: ["Трамвай.", "Автомобіль."], correct: 0 },
+    image: image(
+      3,
+      746,
+      369,
+      "15a867f150992c9811f4d48ff5332c880e2094c95a6417dececdb1fcc23d6651",
+      174,
+    ),
+    answerSourcePage: 4,
+    cars: [],
+  },
+  {
+    id: "ua-16-1-04",
+    number: 4,
+    title: "Завершення повороту ліворуч",
+    summary: "Офіційне зображення · 2D + 3D",
+    question:
+      "Як повинен вчинити водій білого автомобіля, якщо він виїхав на перехрещення проїзних частин на сигнал світлофора, що дозволяє рух?",
+    answer: {
+      options: [
+        "Зупинитися перед світлофором на шляху руху і, дочекавшись ввімкнення зеленого сигналу, продовжити рух.",
+        "Закінчити поворот ліворуч незалежно від сигналу світлофора на шляху свого руху.",
+      ],
+      correct: 1,
+    },
+    image: image(
+      4,
+      628,
+      346,
+      "5a2ad992cb7ae130caa764b8aa415a6b4c209f5b6d4458a67991395906772180",
+      174,
+    ),
+    answerSourcePage: 4,
+    cars: [movingCar("white", "Білий автомобіль", "south", "left", 0, "#f4f4ef", "sedan", 12)],
+    scene: OFFICIAL_TICKET_SCENES["ua-16-1-04"],
+  },
+  {
+    id: "ua-16-1-05",
+    number: 5,
+    title: "Стоп-лінія на шляху руху",
+    summary: "Офіційне зображення · 2D + 3D",
+    question:
+      "Як повинен вчинити водій білого автомобіля, що виїхав на перехрещення проїзних частин на зелений сигнал світлофора?",
+    answer: {
+      options: [
+        "Повинен продовжувати рух у наміченому напрямку, незважаючи на ввімкнений заборонний сигнал світлофора.",
+        "Повинен зупинитися перед дорожньою розміткою «Стоп-лінія» і продовжити рух, коли ввімкнеться зелений сигнал світлофора.",
+      ],
+      correct: 1,
+    },
+    image: image(
+      5,
+      536,
+      432,
+      "04066c23b6357e9a8ac7023cbcad24ddbae90191b793880aceb8a7b2b850b240",
+      175,
+    ),
+    answerSourcePage: 4,
+    cars: [
+      movingCar(
+        "white",
+        "Білий автомобіль",
+        "south",
+        "straight",
+        6,
+        "#f4f4ef",
+        "sedan",
+        undefined,
+        22,
+      ),
+    ],
+    scene: OFFICIAL_TICKET_SCENES["ua-16-1-05"],
+    signalChange: 6,
+  },
+  {
+    id: "ua-16-1-06",
+    number: 6,
+    title: "Лівий поворот і стоп-лінія",
+    summary: "Офіційне зображення · 2D + 3D",
+    question: "Як повинен діяти водій зеленого автомобіля, що повертає ліворуч, у даній ситуації?",
+    answer: {
+      options: [
+        "Виїхати в наміченому напрямку незалежно від сигналу світлофора на шляху свого руху.",
+        "Зупинитися перед дорожньою розміткою «Стоп-лінія» і продовжити рух, коли ввімкнеться зелений сигнал світлофора.",
+      ],
+      correct: 1,
+    },
+    image: image(
+      6,
+      533,
+      387,
+      "a4f7c21075c8a73f3df217128f605a05ec1775bc8c6bf7c854df7b648e160b3c",
+      175,
+    ),
+    answerSourcePage: 4,
+    cars: [
+      movingCar("green", "Зелений автомобіль", "south", "left", 6, "#63804f", "suv", undefined, 22),
+    ],
+    scene: OFFICIAL_TICKET_SCENES["ua-16-1-06"],
+    signalChange: 6,
+  },
+  {
+    id: "ua-16-1-07",
+    number: 7,
+    title: "Автомобіль і трамвай",
+    summary: "Офіційне зображення · 2D",
+    question: "Хто в даній ситуації повинен дати дорогу?",
+    answer: { options: ["Водій автомобіля.", "Водій трамвая."], correct: 1 },
+    image: image(
+      7,
+      820,
+      457,
+      "9dd36a1d26621fe38da6edf3c564c40da6287aeeaccc290f66fd3b5e9f4aa476",
+      175,
+    ),
+    answerSourcePage: 4,
+    cars: [],
+  },
+  {
+    id: "ua-16-1-08",
+    number: 8,
+    title: "Черговість на регульованому перехресті",
+    summary: "Офіційне зображення · 2D + 3D",
+    question: "Який транспортний засіб першим проїде дане перехрестя?",
+    answer: { options: ["Червоний автомобіль.", "Синій автомобіль."], correct: 0 },
+    image: image(
+      8,
+      791,
+      410,
+      "b5602457ef20981fadf7469bb464bd43218a301814ef18e87e5d55b39e4c970b",
+      176,
+    ),
+    answerSourcePage: 4,
+    cars: [
+      movingCar("red", "Червоний автомобіль", "west", "straight", 0, "#c8342f"),
+      movingCar("blue", "Синій автомобіль", "south", "straight", 8, "#3979b8"),
+    ],
+    scene: OFFICIAL_TICKET_SCENES["ua-16-1-08"],
+    signalChange: 7,
+  },
+  {
+    id: "ua-16-1-09",
+    number: 9,
+    title: "Велосипедист і трамвай",
+    summary: "Офіційне зображення · 2D",
+    question: "Як велосипедист проїде перехрестя в даному випадку?",
+    answer: { options: ["Дасть дорогу трамваю.", "Проїде першим, маючи перевагу."], correct: 1 },
+    image: image(
+      9,
+      817,
+      509,
+      "0c48676d2a5c1b50376c9287d6767b8610b789adcac5d2f46d991b89a8c065f0",
+      176,
+    ),
+    answerSourcePage: 4,
+    cars: [],
+  },
+  {
+    id: "ua-16-1-10",
+    number: 10,
+    title: "Поворот на зелену стрілку",
+    summary: "Офіційне зображення · 2D",
+    question:
+      "Як повинен вчинити водій червоного автомобіля, що збирається повертати праворуч, у даній ситуації?",
+    answer: {
+      options: [
+        "Продовжити рух тільки після ввімкнення зеленого сигналу світлофора.",
+        "Повернути праворуч, давши дорогу пішоходам і транспортним засобам, які рухаються з інших напрямків.",
+        "Повернути праворуч, давши дорогу лише транспортним засобам, що рухаються з інших напрямків.",
+      ],
+      correct: 1,
+    },
+    image: image(
+      10,
+      668,
+      450,
+      "1203e9bc8c6d633b610037d421b40f92cf7671e00a43bad538c3fe8cf6205d9a",
+      176,
+    ),
+    answerSourcePage: 4,
+    cars: [],
   },
 ];
-export function signalAt(
-  scenario: TrainingScenario,
-  approach: Direction,
-  time: number,
-): "off" | "red" | "yellow" | "green" {
-  if (scenario.control !== "signals") return "off";
-  const vertical = approach === "south" || approach === "north";
-  if (scenario.signalChange !== undefined) {
-    if (time >= scenario.signalChange + 2) return vertical ? "red" : "green";
-    if (time >= scenario.signalChange) return "red";
-    if (time >= scenario.signalChange - 2) return vertical ? "yellow" : "red";
-  }
-  return vertical ? "green" : "red";
-}
+
 export function durationOf(scenario: TrainingScenario): number {
-  return Math.max(...scenario.cars.map((entry) => entry.release + DRIVE_SECONDS));
+  return scenario.cars.length
+    ? Math.max(...scenario.cars.map((entry) => entry.release + DRIVE_SECONDS))
+    : 0;
 }
-export function checkAnswer(
-  scenario: TrainingScenario,
-  order: string[],
-  choice: number | null,
-): boolean {
-  return scenario.answer.kind === "order"
-    ? order.length === scenario.answer.ids.length &&
-        order.every(
-          (id, index) =>
-            id === (scenario.answer.kind === "order" ? scenario.answer.ids[index] : undefined),
-        )
-    : choice === scenario.answer.correct;
-}
-/** Reuse the existing bounded evaluator. These facts do not promote unverified legal sources. */
-export function situationOf(scenario: TrainingScenario): TrafficSituation {
-  return {
-    schemaVersion: 1,
-    id: scenario.id,
-    country: "UA",
-    intersection: {
-      layout: "cross",
-      control: scenario.control,
-      roadRelation: scenario.control === "priority-signs" ? "main-secondary" : "equal",
-      mainRoadTurns: "no",
-      regulator: "absent",
-      pedestrians: "absent",
-      otherRoadUsers: "absent",
-      specialSignalSections: "absent",
-      exitBlocked: "no",
-    },
-    lanes: scenario.cars.map((entry) => ({
-      id: entry.approach,
-      approach: entry.approach,
-      indexFromRight: 1,
-      roadPriority:
-        scenario.control === "priority-signs"
-          ? entry.approach === "east"
-            ? "main"
-            : "secondary"
-          : "equal",
-      maneuverRestriction: "none",
-      maneuverPermissions: [],
-    })),
-    vehicles: scenario.cars.map((entry) => ({
-      id: entry.id,
-      laneId: entry.approach,
-      intendedManeuver: entry.maneuver,
-      vehicleType: "non-rail",
-      sceneInstanceId: entry.id,
-    })),
-    signs:
-      scenario.control === "priority-signs"
-        ? scenario.cars.map((entry) => ({
-            id: `sign-${entry.id}`,
-            kind: entry.approach === "east" ? "priority" : "give-way",
-            officialCode: entry.approach === "east" ? "2.3" : "2.1",
-            laneIds: [entry.approach],
-            sceneInstanceId: null,
-          }))
-        : [],
-    signals:
-      scenario.control === "signals"
-        ? scenario.cars.map((entry) => ({
-            id: `light-${entry.id}`,
-            indication: signalAt(scenario, entry.approach, 0),
-            mode: "main",
-            laneIds: [entry.approach],
-            sceneInstanceId: null,
-          }))
-        : [],
-    trajectories: scenario.cars.map((entry) => ({
-      id: `path-${entry.id}`,
-      vehicleId: entry.id,
-      points: Array.from({ length: 65 }, (_, index) => {
-        const pose = routePose(entry, (routeLength(entry.maneuver) * index) / 64, {
-          x: 0,
-          z: 0,
-          yaw: 0,
-        });
-        return [pose.x, pose.z];
-      }),
-      sweptHalfWidthMeters: 1.1,
-      occupancy: { enterMs: entry.release * 1000, exitMs: (entry.release + DRIVE_SECONDS) * 1000 },
-    })),
-    conflicts: [],
-    simultaneousMovement:
-      scenario.id === "together"
-        ? [{ trajectoryIds: ["path-a", "path-b"], assessment: "candidate" }]
-        : [],
-  };
-}
-export function analysisOf(scenario: TrainingScenario) {
-  return analyzeTrafficSituation(situationOf(scenario), UA_PDR_REFERENCES);
+export function checkAnswer(scenario: TrainingScenario, choice: number | null): boolean {
+  return choice === scenario.answer.correct;
 }

@@ -5,12 +5,86 @@
 1. Установите Node.js 24 LTS. Файл `.nvmrc` рекомендует 24.22.0. Допустимый диапазон — от 24.12.0 до следующей major-версии.
 2. Установите pnpm: `npm install --global pnpm@10.34.7`.
 3. В корне выполните `pnpm install`.
-4. Запустите `pnpm dev:web` и откройте http://localhost:3000 либо `pnpm dev:studio` и откройте
-   http://localhost:3001. Существующая команда `pnpm dev` остаётся псевдонимом запуска Studio.
+4. Для первого запуска выполните `pnpm dev:ui`. Откройте школу на
+   <http://localhost:3000/school>, Studio на <http://localhost:3001/> или Admin на
+   <http://localhost:3003/>. Backend и PostgreSQL для этого режима не нужны.
 
 Версия менеджера закреплена в `packageManager`. Не нужно устанавливать Next.js, Turbo или TypeScript глобально.
 
 В workspace разрешены установочные скрипты только `esbuild` и `sharp`: они нужны для существующего тестового/сборочного окружения. Новые разрешения добавляются после проверки пакета.
+
+## Варианты запуска
+
+Все команды выполняются из корня репозитория. Не запускайте несколько вариантов одновременно,
+если они используют одинаковые порты.
+
+### Вся пользовательская часть без backend
+
+```sh
+pnpm dev:ui
+```
+
+Команда одновременно запускает Web, Studio и Admin в loopback-only UI Preview. Это основной способ
+локально посмотреть интерфейсы без аккаунтов, секретов, API и базы данных:
+
+| Приложение | URL                            |
+| ---------- | ------------------------------ |
+| Школа      | <http://localhost:3000/school> |
+| Studio     | <http://localhost:3001/>       |
+| Admin      | <http://localhost:3003/>       |
+
+Preview работает только в development при Host `localhost`, `127.0.0.1` или `::1`. Подробнее:
+[UI Preview](ui-preview.md).
+
+### Одно frontend-приложение
+
+```sh
+pnpm dev:web       # Web: http://localhost:3000
+pnpm dev:studio    # Studio: http://localhost:3001
+pnpm dev:admin     # Admin: http://localhost:3003
+```
+
+`pnpm dev` остаётся коротким псевдонимом для `pnpm dev:studio`. Web и Admin по умолчанию используют
+локальный UI Preview. Для проверки настоящей авторизации запустите нужное приложение с
+`UI_PREVIEW=false`; в этом случае должен быть доступен API:
+
+```sh
+UI_PREVIEW=false pnpm dev:web
+UI_PREVIEW=false pnpm dev:admin
+```
+
+### Полный стек с API и PostgreSQL
+
+Сначала выполните подготовку базы, миграции и создание restricted runtime role по
+[руководству API](../apps/api/README.md). Затем используйте отдельные терминалы:
+
+```sh
+# Терминал 1
+pnpm dev:api
+
+# Терминал 2
+UI_PREVIEW=false pnpm dev:web
+
+# Терминал 3, если нужен staff-интерфейс
+UI_PREVIEW=false pnpm dev:admin
+
+# Терминал 4, если нужна Studio
+pnpm dev:studio
+```
+
+Порты полного стека: Web `3000`, Studio `3001`, API `3002`, Admin `3003`, PostgreSQL `5433`.
+Swagger доступен на <http://127.0.0.1:3002/api/docs>.
+
+### Остановка
+
+Нажмите `Ctrl+C` в каждом терминале с `pnpm dev:*` или `pnpm dev:ui`. Если запускали PostgreSQL
+через compose, остановите контейнер без удаления данных:
+
+```sh
+POSTGRES_PASSWORD='<тот же локальный пароль>' docker compose -f apps/api/compose.yaml down
+```
+
+Команда не удаляет volume. Не добавляйте флаг `--volumes`, если не хотите удалить локальную базу.
 
 ## Где менять код
 

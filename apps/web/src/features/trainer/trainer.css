@@ -244,6 +244,23 @@
 .trainer-viewport canvas {
   touch-action: none;
 }
+.trainer-official-image {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 42px 20px 18px;
+  background: #f4f2ed;
+}
+.trainer-official-image img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px #26332c1a;
+}
 .trainer-scene-hint {
   position: absolute;
   top: 13px;
@@ -580,19 +597,4 @@
 .trainer-view-toggle button[aria-pressed="true"] {
   background: var(--green);
   color: white;
-}
-.trainer-diagram {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.trainer-diagram-car {
-  cursor: pointer;
-}
-.trainer-diagram-car:focus-visible {
-  outline: none;
-}
-.trainer-diagram-car:focus-visible > circle {
-  stroke: #ffda48;
-  stroke-width: 0.5;
 }

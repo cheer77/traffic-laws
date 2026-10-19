@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { VehicleKind, VehicleAnimation } from "../types/assets";
@@ -8,7 +8,22 @@ import { VEHICLE_GEOMETRY, RIDER_GEOMETRY } from "./vehicleAssets";
 import { VehicleLabels } from "./VehicleLabels";
 import { VEHICLE_ROUNDED, type GeometryPart } from "./assetBuilder";
 
-function Parts({ parts, headlights = true }: { parts: GeometryPart[]; headlights?: boolean }) {
+function Parts({
+  parts,
+  headlights = true,
+  bodyColor,
+}: {
+  parts: GeometryPart[];
+  headlights?: boolean;
+  bodyColor?: string;
+}) {
+  const customBody = useMemo(() => {
+    if (!bodyColor) return null;
+    const next = material.blue.clone();
+    next.color.set(bodyColor);
+    return next;
+  }, [bodyColor]);
+  useEffect(() => () => customBody?.dispose(), [customBody]);
   return (
     <>
       {parts.map((part) => (
@@ -17,7 +32,9 @@ function Parts({ parts, headlights = true }: { parts: GeometryPart[]; headlights
           name={`part-${part.material}`}
           geometry={part.geometry}
           material={
-            material[part.material === "headlight" && !headlights ? "chrome" : part.material]
+            customBody && (part.material === "blue" || part.material === "sage")
+              ? customBody
+              : material[part.material === "headlight" && !headlights ? "chrome" : part.material]
           }
           castShadow={!["vehicleGlass", "headlight", "tail"].includes(part.material)}
           receiveShadow
@@ -34,12 +51,14 @@ export interface VehicleModelProps {
   active?: boolean;
   headlights?: boolean;
   readAnimation?: () => VehicleAnimation;
+  bodyColor?: string;
 }
 export function VehicleModel({
   kind,
   active = false,
   headlights = true,
   readAnimation = () => IDLE,
+  bodyColor,
 }: VehicleModelProps) {
   const wheels = useRef<THREE.Group>(null),
     lamps = useRef<THREE.Group>(null),
@@ -71,7 +90,7 @@ export function VehicleModel({
   return (
     <group>
       <group name={`body-${kind}`}>
-        <Parts parts={model.parts} headlights={headlights} />
+        <Parts parts={model.parts} headlights={headlights} bodyColor={bodyColor} />
       </group>
       <VehicleLabels kind={kind} />
       {bike && (

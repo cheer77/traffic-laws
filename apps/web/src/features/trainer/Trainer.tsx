@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { Component, useRef, useState, type ReactNode } from "react";
 import {
@@ -19,11 +20,9 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import TrainerDiagram from "./TrainerDiagram";
 import type { CameraCommand, CameraMode } from "./TrainerScene";
 import type { Playback } from "./motion";
 import { TRAINING_SCENARIOS, checkAnswer, type TrainingScenario } from "./scenarios";
-import { UA_PDR_REFERENCES } from "@traffic-laws/country-rules/ua-pdr-references";
 
 const Scene = dynamic(() => import("./TrainerScene"), {
   ssr: false,
@@ -70,7 +69,10 @@ export default function Trainer() {
         <div className="trainer-progress">
           <CheckCircle2 size={20} />
           <span>
-            <strong>{completed.length} / 5</strong> опрацьовано
+            <strong>
+              {completed.length} / {TRAINING_SCENARIOS.length}
+            </strong>{" "}
+            опрацьовано
           </span>
         </div>
       </div>
@@ -78,7 +80,7 @@ export default function Trainer() {
         <aside className="trainer-sidebar" aria-label="Навчальні сценарії">
           <div className="trainer-panel-heading">
             <h2>Дорожні ситуації</h2>
-            <span>05</span>
+            <span>{String(TRAINING_SCENARIOS.length).padStart(2, "0")}</span>
           </div>
           <label className="trainer-search">
             <Search size={17} />
@@ -120,7 +122,7 @@ export default function Trainer() {
             <p>Обери авто на сцені, роздивись його напрямок та дорожні сигнали.</p>
           </div>
           <div className="trainer-draft">
-            Навчальні приклади, не офіційні білети. Зміст потребує незалежної перевірки.
+            Оригінальні 2D-матеріали з наданого офіційного PDF. Лише локальний прототип.
           </div>
         </aside>
         <Exercise
@@ -134,8 +136,9 @@ export default function Trainer() {
         />
       </div>
       <footer className="trainer-footer">
-        ПДР України · Умови моделей: без пішоходів, трамваїв і спецтранспорту; виїзд вільний.
-        Прогрес зберігається лише до оновлення сторінки.
+        Розділ 16.1 · Офіційні 2D-зображення та авторські 3D-реконструкції. Права на публічне
+        використання ілюстрацій окремо не підтверджені. Прогрес зберігається лише до оновлення
+        сторінки.
       </footer>
     </main>
   );
@@ -151,9 +154,8 @@ function Exercise({
   onComplete: () => void;
   onNext: () => void;
 }) {
-  const [view, setView] = useState<"2d" | "3d">("3d");
-  const [selected, setSelected] = useState(scenario.cars[0].id);
-  const [order, setOrder] = useState<string[]>([]);
+  const [view, setView] = useState<"2d" | "3d">("2d");
+  const [selected, setSelected] = useState(scenario.cars[0]?.id ?? "");
   const [choice, setChoice] = useState<number | null>(null);
   const [result, setResult] = useState<boolean | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -178,12 +180,7 @@ function Exercise({
   const selectCar = (id: string) => {
     setSelected(id);
   };
-  const addToOrder = (id: string) => {
-    setSelected(id);
-    setOrder((ids) => (ids.includes(id) ? ids.filter((entry) => entry !== id) : [...ids, id]));
-  };
-  const ready =
-    scenario.answer.kind === "order" ? order.length === scenario.cars.length : choice !== null;
+  const ready = choice !== null;
   return (
     <>
       <section className="trainer-stage">
@@ -192,18 +189,24 @@ function Exercise({
             <span className="trainer-eyebrow">СИТУАЦІЯ {String(index + 1).padStart(2, "0")}</span>
             <h2>{scenario.title}</h2>
           </div>
-          <div className="trainer-view-toggle" role="group" aria-label="Вигляд дорожньої ситуації">
-            <button aria-pressed={view === "2d"} onClick={() => setView("2d")}>
-              2D
-            </button>
-            <button aria-pressed={view === "3d"} onClick={() => setView("3d")}>
-              3D
-            </button>
-          </div>
+          {scenario.scene && (
+            <div
+              className="trainer-view-toggle"
+              role="group"
+              aria-label="Вигляд дорожньої ситуації"
+            >
+              <button aria-pressed={view === "2d"} onClick={() => setView("2d")}>
+                2D
+              </button>
+              <button aria-pressed={view === "3d"} onClick={() => setView("3d")}>
+                3D
+              </button>
+            </div>
+          )}
         </div>
         <div className="trainer-viewport">
           <SceneBoundary>
-            {view === "3d" ? (
+            {view === "3d" && scenario.scene ? (
               <Scene
                 key={epoch}
                 scenario={scenario}
@@ -217,24 +220,23 @@ function Exercise({
                   setEnded(true);
                 }}
               />
-            ) : (
-              <TrainerDiagram
-                key={epoch}
-                scenario={scenario}
-                playback={playback}
-                selected={selected}
-                onSelect={selectCar}
-                playing={playing}
-                onFinished={() => {
-                  setPlaying(false);
-                  setEnded(true);
-                }}
-              />
-            )}
+            ) : null}
           </SceneBoundary>
+          {view === "2d" && (
+            <div className="trainer-official-image">
+              <Image
+                src={scenario.image.src}
+                width={scenario.image.width}
+                height={scenario.image.height}
+                sizes="(max-width: 720px) 100vw, 60vw"
+                alt={`Офіційна ілюстрація до питання 16.1 №${scenario.number}`}
+                priority={index === 0}
+              />
+            </div>
+          )}
           <div className="trainer-scene-hint">
             {view === "2d"
-              ? "Навчальна схема · не офіційне екзаменаційне зображення"
+              ? `Оригінальна ілюстрація · сторінка ${scenario.image.sourcePage} PDF`
               : cameraCommand.mode === "driver"
                 ? "Камера слідує за обраним авто"
                 : "Обертай сцену · наближай · обирай авто"}
@@ -286,7 +288,7 @@ function Exercise({
             </div>
           )}
         </div>
-        {view === "3d" && (
+        {view === "3d" && scenario.scene && (
           <div className="trainer-camera" role="group" aria-label="Режим камери">
             {(
               [
@@ -306,113 +308,104 @@ function Exercise({
             ))}
           </div>
         )}
-        <div className="trainer-cars" aria-label="Автомобілі">
-          {scenario.cars.map((entry) => (
-            <button
-              key={entry.id}
-              aria-pressed={selected === entry.id}
-              onClick={() => selectCar(entry.id)}
-            >
-              <span style={{ background: entry.color }} />
-              <CarFront size={18} />
-              {entry.label}
-              <small>
-                {entry.maneuver === "left"
-                  ? "↰ ліворуч"
-                  : entry.maneuver === "right"
-                    ? "↱ праворуч"
-                    : "↑ прямо"}
-              </small>
-            </button>
-          ))}
-        </div>
-        <div className="trainer-playback">
-          <Button
-            disabled={result === null}
-            onClick={() => {
-              if (ended) reset(true);
-              else {
-                playback.current.running = !playing;
-                setPlaying(!playing);
-              }
-            }}
-          >
-            {playing ? <Pause size={17} /> : <Play size={17} />}
-            {playing ? "Пауза" : ended ? "Повторити" : "Запустити"}
-          </Button>
-          <Button
-            variant="ghost"
-            disabled={result === null}
-            onClick={() => reset(true)}
-            aria-label="Повторити від початку"
-          >
-            <RotateCcw size={18} />
-          </Button>
-          <Button variant="ghost" onClick={() => reset()}>
-            Скинути
-          </Button>
-          <div className="trainer-speed" role="group" aria-label="Швидкість">
-            {[0.5, 1, 2].map((value) => (
+        {view === "3d" && scenario.scene && (
+          <div className="trainer-cars" aria-label="Автомобілі">
+            {scenario.cars.map((entry) => (
               <button
-                key={value}
-                aria-pressed={speed === value}
-                onClick={() => {
-                  playback.current.speed = value;
-                  setSpeed(value);
-                }}
+                key={entry.id}
+                aria-pressed={selected === entry.id}
+                onClick={() => selectCar(entry.id)}
               >
-                {value}×
+                <span style={{ background: entry.color }} />
+                <CarFront size={18} />
+                {entry.label}
+                <small>
+                  {entry.maneuver === "left"
+                    ? "↰ ліворуч"
+                    : entry.maneuver === "right"
+                      ? "↱ праворуч"
+                      : "↑ прямо"}
+                </small>
               </button>
             ))}
           </div>
-        </div>
-        <p className="trainer-playback-note" role="status">
-          {result === null
-            ? "Перевір відповідь, щоб відкрити анімований розбір."
-            : ended
-              ? "Проїзд завершено. Можна повторити або перейти далі."
-              : "Авторський план руху · відтворення правильного розв’язання"}
-        </p>
+        )}
+        {view === "3d" && scenario.scene && (
+          <div className="trainer-playback">
+            <Button
+              disabled={result === null}
+              onClick={() => {
+                if (ended) reset(true);
+                else {
+                  playback.current.running = !playing;
+                  setPlaying(!playing);
+                }
+              }}
+            >
+              {playing ? <Pause size={17} /> : <Play size={17} />}
+              {playing ? "Пауза" : ended ? "Повторити" : "Запустити"}
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={result === null}
+              onClick={() => reset(true)}
+              aria-label="Повторити від початку"
+            >
+              <RotateCcw size={18} />
+            </Button>
+            <Button variant="ghost" onClick={() => reset()}>
+              Скинути
+            </Button>
+            <div className="trainer-speed" role="group" aria-label="Швидкість">
+              {[0.5, 1, 2].map((value) => (
+                <button
+                  key={value}
+                  aria-pressed={speed === value}
+                  onClick={() => {
+                    playback.current.speed = value;
+                    setSpeed(value);
+                  }}
+                >
+                  {value}×
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {view === "3d" && scenario.scene && (
+          <p className="trainer-playback-note" role="status">
+            {result === null
+              ? "Перевір відповідь, щоб відкрити анімований розбір."
+              : ended
+                ? "Проїзд завершено. Можна повторити або перейти далі."
+                : "3D-реконструкція · не є офіційною ілюстрацією"}
+          </p>
+        )}
       </section>
       <aside className="trainer-question">
         <div className="trainer-panel-heading">
           <span className="trainer-eyebrow">ТВОЄ РІШЕННЯ</span>
-          <span>{index + 1} / 5</span>
+          <span>
+            {index + 1} / {TRAINING_SCENARIOS.length}
+          </span>
         </div>
         <h2>{scenario.question}</h2>
-        <p className="trainer-question-hint">
-          {scenario.answer.kind === "order"
-            ? "Обирай автомобілі нижче в порядку проїзду. Повторне натискання прибирає авто з черги."
-            : "Обери одну відповідь."}
-        </p>
+        <p className="trainer-question-hint">Обери одну відповідь.</p>
         <fieldset disabled={result !== null}>
           <legend className="sr-only">Відповідь</legend>
           <div className="trainer-answers">
-            {scenario.answer.kind === "order"
-              ? scenario.cars.map((entry) => (
-                  <button
-                    type="button"
-                    key={entry.id}
-                    className={order.includes(entry.id) ? "is-selected" : ""}
-                    aria-pressed={order.includes(entry.id)}
-                    onClick={() => addToOrder(entry.id)}
-                  >
-                    <span>{order.includes(entry.id) ? order.indexOf(entry.id) + 1 : "—"}</span>
-                    {entry.label}
-                  </button>
-                ))
-              : scenario.answer.options.map((option, position) => (
-                  <label key={option} className={choice === position ? "is-selected" : ""}>
-                    <input
-                      type="radio"
-                      name="answer"
-                      checked={choice === position}
-                      onChange={() => setChoice(position)}
-                    />
-                    <span>{String.fromCharCode(1040 + position)}</span>
-                    {option}
-                  </label>
-                ))}
+            {scenario.answer.options.map((option, position) => (
+              <label key={option} className={choice === position ? "is-selected" : ""}>
+                <input
+                  type="radio"
+                  name="answer"
+                  checked={choice === position}
+                  onChange={() => setChoice(position)}
+                />
+                <span>{String.fromCharCode(1040 + position)}</span>
+                {option}
+              </label>
+            ))}
           </div>
         </fieldset>
         {result === null ? (
@@ -420,7 +413,7 @@ function Exercise({
             className="trainer-check"
             disabled={!ready}
             onClick={() => {
-              const correct = checkAnswer(scenario, order, choice);
+              const correct = checkAnswer(scenario, choice);
               setResult(correct);
               if (correct) onComplete();
             }}
@@ -430,26 +423,26 @@ function Exercise({
         ) : (
           <div className={`trainer-result ${result ? "is-correct" : "is-incorrect"}`} role="status">
             <strong>{result ? "Так, правильно!" : "Спробуй розібратися ще раз"}</strong>
-            <p>{scenario.explanation}</p>
-            <div className="trainer-references">
-              {scenario.references.map((id) => {
-                const rule = UA_PDR_REFERENCES.find((entry) => entry.id === id);
-                return rule?.source ? (
-                  <a key={id} href={rule.source.url} target="_blank" rel="noreferrer">
-                    ПДР {rule.source.section} ↗
-                  </a>
-                ) : null;
-              })}
-            </div>
-            <Button className="trainer-check" onClick={() => reset(true)}>
-              <Play size={16} />
-              Показати рух
-            </Button>
+            <p>
+              Правильна відповідь за офіційною таблицею: варіант {scenario.answer.correct + 1}.
+              Сторінка {scenario.answerSourcePage} PDF відповідей.
+            </p>
+            {scenario.scene && (
+              <Button
+                className="trainer-check"
+                onClick={() => {
+                  setView("3d");
+                  reset(true);
+                }}
+              >
+                <Play size={16} />
+                Показати 3D-рух
+              </Button>
+            )}
             <Button
               variant="ghost"
               onClick={() => {
                 reset();
-                setOrder([]);
                 setChoice(null);
                 setResult(null);
               }}
