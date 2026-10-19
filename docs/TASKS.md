@@ -19,11 +19,18 @@ that evidence supports.
 
 - Rotate the locally stored Gemini key if it is still valid or has been exposed elsewhere.
 - Keep environment files ignored and verify no secret is tracked or logged.
-- Do not treat the key as an implemented Gemini integration.
+- Do not treat possession of the key as evidence that the adapter or reconstruction is operational.
 
 Done when the owner confirms credential disposition and repository secret checks remain clean.
 
 ### Connect Google Gemini Vision to `VisionAdapter`
+
+**Implementation status:** local server-only adapter, structured-output validation, one-request
+limit, cache and ticket-1 CLI are implemented. The adapter uses `generateContent` with
+`gemini-3.8-flash`, matching the independently successful direct API method and model. Unsupported
+nullable `type` arrays and the zero-temperature override were removed from the structured request;
+the next single attempt passed parameter validation but received HTTP 503 `UNAVAILABLE`. No ticket
+was recognized and no Scene Definition was produced.
 
 - Read `GEMINI_API_KEY` only through a secure server-side/local tooling boundary; never expose it to
   client bundles, logs, fixtures or committed files.
@@ -35,7 +42,8 @@ Done when the owner confirms credential disposition and repository secret checks
   evidence.
 
 Done when one real ticket completes the secured adapter → validated JSON → reconstruction-pipeline
-flow with deterministic cache coverage and conservative review status. This does not make automatic
+flow with deterministic cache coverage and conservative review status. Retry only after provider
+availability is confirmed, using `--force` to bypass the cached failure. This does not make automatic
 3D creation complete or the resulting scene verified.
 
 ### Preserve production authorization

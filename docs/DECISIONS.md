@@ -35,8 +35,9 @@
 - Source PDFs remain local, ignored and unmodified.
 - PyMuPDF is local developer tooling for the supported importer, not an application runtime dependency.
 - Current answer evidence is explicit visual transcription, not automatic OCR.
-- No Gemini integration exists. Future vision assistance needs a separately approved adapter,
-  evaluation criteria, secret handling and mandatory human review.
+- Gemini vision assistance is a local server-only adapter behind the existing `VisionAdapter`.
+  Structured validation, ignored caching, explicit request limits and mandatory human review are
+  required; its presence does not make automatic reconstruction complete or verified.
 
 ## Performance and dependencies
 

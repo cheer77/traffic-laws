@@ -57,7 +57,7 @@ broader rules coverage and production hardening remain incomplete.
 ## Planned only
 
 - Accurate automatic 3D generation from 2D.
-- A Gemini Vision or other model adapter.
+- A successfully accepted Gemini Vision analysis and automatic reconstruction of a real ticket.
 - General simulation/motion engine.
 - Collaborative/protected Studio storage.
 - Mobile, monetization and international markets.
@@ -73,8 +73,9 @@ broader rules coverage and production hardening remain incomplete.
 - Scene snapshots do not prove legal facts or fidelity to an official illustration.
 - Current imported 3D candidates are displayed as 2D and remain `needs_review`; there are no verified
   automatic reconstructions.
-- No Gemini implementation was found. A local ignored API environment file contains a credential;
-  its value is not documented or tracked. The owner should rotate or retire it independently.
+- A local server-only Gemini adapter, validated cache boundary and ticket-1 CLI now exist. The live
+  pilot returned no accepted analysis, so this is infrastructure rather than a completed 2D-to-3D
+  capability. The ignored credential value is not documented or tracked.
 - Historical audit test counts are stale by nature and are no longer used as current acceptance proof.
 
 ## Documentation result
@@ -97,7 +98,8 @@ design/legal checklist, dependency security, Scene Engine and 3D asset/model doc
 ## Remaining inconsistencies or decisions
 
 1. The official question/answer edition and reuse permissions still need owner review.
-2. The local Gemini credential needs an owner decision; it is not evidence of implemented vision.
+2. The local Gemini credential still needs normal owner lifecycle management; the adapter's presence
+   is not evidence of a successful or accurate reconstruction.
 3. Production deployment and protected Studio access are not documented as completed because no such
    verification exists.
 4. Browser, GPU and mobile acceptance must be rerun for future relevant changes; historical reports

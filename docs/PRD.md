@@ -46,9 +46,10 @@ competitive advantage, but it is not delivered. The intended pipeline analyzes r
 signals, participants, poses and trajectories; searches the Studio registry for reusable assets;
 creates only supported missing objects; assembles validated Scene Definition data; and checks the 3D
 result against the original 2D ticket. The current importer extracts PDF text and images and marks
-candidates, while the existing reconstruction pipeline remains conservatively disconnected from a
-real vision provider. Gemini Vision has no connected implementation. Vision output must remain
-structured, reviewable and unable to silently publish or assert legal or visual accuracy.
+candidates. A local server-only Gemini adapter now connects to the existing reconstruction boundary,
+but its first live pilot did not return a usable analysis and no automatic reconstruction is
+delivered. Vision output must remain structured, reviewable and unable to silently publish or assert
+legal or visual accuracy.
 
 ## Content and legal quality
 

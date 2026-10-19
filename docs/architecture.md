@@ -91,9 +91,11 @@ The local importer reads owner-supplied PDFs with PyMuPDF, extracts the supporte
 writes deterministic records/images. It does not call a network model. Automatic answer-table OCR is
 not delivered; current answer evidence is explicitly marked as visual transcription.
 
-No Gemini Vision implementation exists in the codebase. A local ignored environment file may contain
-a key, but the presence of a credential is not an integration. Details and limitations are in
-[`official-ticket-pipeline.md`](official-ticket-pipeline.md).
+The Web workspace contains a local server-only Gemini adapter for the existing `VisionAdapter`
+boundary. It validates structured output, resolves registered assets through the existing
+reconstruction pipeline and caches results outside Git. It is CLI tooling, is never imported by the
+browser, and has not yet produced an accepted real-ticket reconstruction. Details and limitations are
+in [`official-ticket-pipeline.md`](official-ticket-pipeline.md).
 
 ## UI Preview security boundary
 

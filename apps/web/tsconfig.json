@@ -2,6 +2,7 @@
   "extends": "../../tooling/typescript/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
     "incremental": true,
     "plugins": [
       {

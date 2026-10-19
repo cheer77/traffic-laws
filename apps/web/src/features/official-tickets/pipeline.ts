@@ -199,7 +199,8 @@ export interface VisionAdapter {
     image: OriginalImage;
   }): Promise<unknown>;
 }
-export class VisionUnavailableError extends Error {}
+export class VisionAdapterError extends Error {}
+export class VisionUnavailableError extends VisionAdapterError {}
 export const disconnectedVision: VisionAdapter = {
   async analyze() {
     throw new VisionUnavailableError("vision_adapter_not_connected");
@@ -364,11 +365,9 @@ export async function reconstruct(
     );
     return { status: "needs_review", history, analysis, draft, missingAssets, issues };
   } catch (error) {
-    const status = error instanceof VisionUnavailableError ? "needs_review" : "failed";
+    const status = error instanceof VisionAdapterError ? "needs_review" : "failed";
     const issues = [
-      error instanceof VisionUnavailableError
-        ? error.message
-        : "invalid_analysis_or_adapter_failure",
+      error instanceof VisionAdapterError ? error.message : "invalid_analysis_or_adapter_failure",
     ];
     history[0] = { stage: "analyzing", result: status === "failed" ? "failed" : "blocked", issues };
     history.push({ stage: status, result: "blocked", issues });

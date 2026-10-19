@@ -58,7 +58,8 @@ Detailed next actions and done criteria are in [`TASKS.md`](TASKS.md).
 ## Future, not implemented
 
 - Reliable OCR for arbitrary answer tables.
-- Vision-assisted scene understanding.
+- Successful acceptance of vision-assisted scene understanding on real tickets; the local adapter
+  foundation exists, but the first pilot produced no accepted analysis.
 - Automatic accurate 2D-to-3D reconstruction and scene publication.
 - General movement/trajectory simulation.
 - Protected collaborative Studio storage.
