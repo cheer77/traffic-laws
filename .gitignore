@@ -3,6 +3,8 @@ node_modules/
 
 # Сборка Next.js и статический экспорт
 .next/
+.next-ui-preview/
+.next-production-preview-test/
 out/
 dist/
 build/
@@ -61,3 +63,6 @@ Desktop.ini
 # API generated Prisma client and disposable recovery artifacts
 apps/api/.generated/
 *.dump
+
+# Official PDR source PDFs
+/source-pdfs/*.pdf
