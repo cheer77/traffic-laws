@@ -50,6 +50,7 @@ traffic-laws/
 │   ├── scene-engine/               # Scene Definition v1 и рендерер
 │   ├── country-rules/              # UA нормативные ссылки
 │   ├── scenarios/                  # Учебный JSON v1 и демо
+│   ├── ui-preview/                 # Локальные тестовые данные и защитная граница Preview
 │   └── README.md
 ├── tooling/
 │   ├── typescript/base.json        # Общий strict

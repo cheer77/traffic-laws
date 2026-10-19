@@ -35,7 +35,7 @@ export default function HomePage() {
           <Link className="text-link" href="/login">
             Увійти
           </Link>
-          <Link className="button button-small" href="/register">
+          <Link className="button button-small" href="/school">
             Почати навчання
           </Link>
         </div>
@@ -55,10 +55,10 @@ export default function HomePage() {
             у 3D та бачте власний прогрес.
           </p>
           <div className="hero-actions">
-            <Link className="button" href="/register">
+            <Link className="button" href="/school">
               Навчатися безкоштовно <span>→</span>
             </Link>
-            <Link className="button button-ghost" href="/school/tickets">
+            <Link className="button button-ghost" href="/school">
               Переглянути завдання
             </Link>
           </div>
@@ -194,7 +194,7 @@ export default function HomePage() {
             <li>Текстові та 3D-ситуації</li>
             <li>Історія відповідей і прогрес</li>
           </ul>
-          <Link className="button" href="/register">
+          <Link className="button" href="/school">
             Створити акаунт
           </Link>
         </div>
@@ -243,7 +243,7 @@ export default function HomePage() {
             <strong>Платформа</strong>
             <Link href="/register">Реєстрація</Link>
             <Link href="/login">Вхід</Link>
-            <Link href="/school/tickets">Завдання</Link>
+            <Link href="/school">Завдання</Link>
           </div>
           <div>
             <strong>Важливо</strong>

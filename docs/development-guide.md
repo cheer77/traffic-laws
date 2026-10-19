@@ -146,6 +146,13 @@ workspace to address test-tool advisories; Vite remains 7.3.7.
 
 ## Admin (Phase 7)
 
+For frontend-only review without accounts, PostgreSQL or API, use the guarded
+[UI Preview mode](ui-preview.md):
+
+```sh
+pnpm dev:ui
+```
+
 Start PostgreSQL and the API with the [API guide](../apps/api/README.md), including the restricted
 runtime role, administrator bootstrap and optional development seed. In a second terminal run:
 

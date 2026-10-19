@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import "./globals.css";
+import { PreviewModeBanner } from "@/components/PreviewModeBanner";
 
 export const metadata: Metadata = {
   title: "ПДР України",
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="uk">
-      <body>{children}</body>
+      <body>
+        <PreviewModeBanner />
+        {children}
+      </body>
     </html>
   );
 }

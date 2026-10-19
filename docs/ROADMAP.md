@@ -19,6 +19,27 @@ Status labels in this document have strict meanings:
 
 ## Current Project Status
 
+- **Official school pilot — authorized, source acquisition blocked.** The owner requested ten real
+  Ukrainian exam questions with question-specific 2D or Studio-authored 3D presentation. Official
+  source links and import acceptance criteria are recorded in [`official-school-pilot.md`](official-school-pilot.md).
+  No official question records have been imported yet; the five current examples remain authored demos.
+
+- **Local interactive trainer — explicitly authorized frontend prototype.** The owner’s restoration
+  brief authorizes five development-only Ukrainian examples with deterministic vehicle animation in
+  Web, without backend or production publication. The owner additionally approved `/school` as its
+  sole entry, with synchronized 2D/3D modes and removal of duplicate school UIs. Production
+  authentication and the unverified-content boundary remain enforced. Implementation and acceptance limits are recorded
+  in [`local-trainer.md`](local-trainer.md). This does not advance the broader production simulation
+  roadmap or legal-source verification.
+
+- **MVP Phase 1 — Online school UI foundation (completed).** This product-facing phase is separate
+  from the historical technical Phase 1 below. The shared Web tokens, minimal shadcn-style component
+  layer and responsive three-column ticket workspace are implemented and browser-verified; evidence
+  and remaining product limitations are tracked in [`mvp-phase-1-ui-audit.md`](mvp-phase-1-ui-audit.md).
+- **Local UI Preview — Completed.** Web, Admin and Studio can be reviewed together without accounts,
+  PostgreSQL or API through an explicit loopback-only development mode. It never changes production
+  authentication or publication; see [`ui-preview.md`](ui-preview.md).
+
 - **Phase 1 — Completed.** The audit and monorepo foundation are finished.
 - The existing 3D Studio was moved intact to `apps/studio`.
 - All 54 automated tests passed according to the Phase 1 audit.

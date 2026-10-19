@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Profile } from "./contracts";
+import { isUiPreview, uiPreviewApiResponse } from "./ui-preview";
 export const COOKIE_NAME = "traffic_laws_session";
 const API_BASE = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3002";
 export class ApiError extends Error {
@@ -17,6 +18,7 @@ export async function apiFetch<T>(
   token?: string,
 ): Promise<T> {
   if (!path.startsWith("/") || path.startsWith("//")) throw new Error("Invalid API path");
+  if (await isUiPreview()) return (await uiPreviewApiResponse(path)) as T;
   const bearer = token ?? (await cookies()).get(COOKIE_NAME)?.value;
   const response = await fetch(`${API_BASE}/api/v1${path}`, {
     ...init,
@@ -31,6 +33,7 @@ export async function apiFetch<T>(
   return response.json() as Promise<T>;
 }
 export async function currentProfile(): Promise<Profile | null> {
+  if (await isUiPreview()) return (await uiPreviewApiResponse("/users/me")) as Profile;
   if (!(await cookies()).has(COOKIE_NAME)) return null;
   try {
     return await apiFetch<Profile>("/users/me");

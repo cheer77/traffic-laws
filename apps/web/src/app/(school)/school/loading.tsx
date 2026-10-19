@@ -1,8 +1,10 @@
+import { Skeleton } from "@/components/ui/skeleton";
 export default function Loading() {
   return (
-    <div className="empty-state" role="status">
-      <span className="spinner" />
-      <h2>Завантажуємо школу…</h2>
+    <div className="workspace-loading" role="status" aria-label="Завантажуємо школу">
+      <Skeleton className="skeleton-nav" />
+      <Skeleton className="skeleton-scene" />
+      <Skeleton className="skeleton-question" />
     </div>
   );
 }
