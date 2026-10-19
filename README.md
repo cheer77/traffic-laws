@@ -1,71 +1,82 @@
 # РУХ / Traffic Laws
 
-Образовательная платформа ПДД Украины: онлайн-школа, 3D Studio, staff Admin и отдельный API.
-Репозиторий организован как pnpm Workspaces + Turborepo.
+Платформа для изучения ПДД Украины: Landing и Online School, отдельная 3D Studio,
+staff Admin и NestJS API. Репозиторий организован как pnpm Workspaces + Turborepo.
 
-## Запуск
+## Требования
 
-Нужен Node.js 24 LTS. Рекомендуемая версия указана в `.nvmrc`; проверено также на установленном Node.js 24.12.0.
+- Node.js 24 LTS (`.nvmrc`)
+- pnpm 10.34.7
+- PostgreSQL 17 — только для полного стека с API
+- WebGL 2 и аппаратное ускорение — для 3D
 
 ```sh
 nvm install
 nvm use
 npm install --global pnpm@10.34.7
 pnpm install
+```
+
+## Быстрый запуск
+
+Без аккаунтов, API и PostgreSQL:
+
+```sh
 pnpm dev:ui
 ```
 
-Если Node.js уже установлен без nvm, первые две команды не нужны. `pnpm dev:ui` запускает безопасный
-локальный UI Preview без аккаунтов, API и PostgreSQL:
+- Landing: <http://localhost:3000/>
+- Online School: <http://localhost:3000/school>
+- Studio: <http://localhost:3001/>
+- Admin: <http://localhost:3003/>
 
-- онлайн-школа: <http://localhost:3000/school>;
-- Studio: <http://localhost:3001/>;
-- Admin: <http://localhost:3003/>.
+UI Preview разрешён только в development на loopback-host. Он не меняет production-пути
+авторизации и не записывает preview-данные в PostgreSQL. Для проверки настоящей авторизации
+запускайте Web или Admin с `UI_PREVIEW=false` и работающим API.
 
-Остановите процессы сочетанием `Ctrl+C` в терминале, где запущена команда. Studio требует WebGL 2
-и аппаратного ускорения. Полный запуск с API, базой данных и настоящей авторизацией описан в
-[руководстве разработчика](docs/development-guide.md#варианты-запуска).
+Полный backend setup, роли PostgreSQL, миграции и bootstrap администратора описаны в
+[`apps/api/README.md`](apps/api/README.md).
 
-## Команды из корня
+## Основные команды
 
-| Команда              | Назначение                                                       |
-| -------------------- | ---------------------------------------------------------------- |
-| `pnpm dev:ui`        | Web, Studio и Admin в локальном UI Preview                       |
-| `pnpm dev:web`       | Только Web на порту 3000                                         |
-| `pnpm dev:studio`    | Только Studio на порту 3001                                      |
-| `pnpm dev:api`       | Только NestJS API на порту 3002; требуется PostgreSQL            |
-| `pnpm dev:admin`     | Только Admin на порту 3003                                       |
-| `pnpm dev`           | Псевдоним `pnpm dev:studio`                                      |
-| `pnpm build`         | Production-сборка всех приложений                                |
-| `pnpm typecheck`     | Генерация типов маршрутов и строгая проверка TypeScript          |
-| `pnpm lint`          | ESLint для всего monorepo                                        |
-| `pnpm test`          | Автоматические тесты без disposable PostgreSQL integration suite |
-| `pnpm format:check`  | Проверка форматирования                                          |
-| `pnpm audit:imports` | Проверка архитектурных границ и импортов                         |
-| `pnpm check`         | Импорты, lint, тесты, типы, сборки и форматирование              |
+| Команда                       | Назначение                                                  |
+| ----------------------------- | ----------------------------------------------------------- |
+| `pnpm dev:ui`                 | Web, Studio и Admin в локальном UI Preview                  |
+| `pnpm dev:web`                | Web на порту 3000                                           |
+| `pnpm dev:studio`             | Studio на порту 3001                                        |
+| `pnpm dev:api`                | API на порту 3002; требуется PostgreSQL                     |
+| `pnpm dev:admin`              | Admin на порту 3003                                         |
+| `pnpm check`                  | Импорты, lint, тесты, typecheck, build и форматирование     |
+| `pnpm test:api:integration`   | API/PostgreSQL integration suite                            |
+| `pnpm test:admin:integration` | API/Admin integration и browser suite; только с разрешением |
+| `pnpm import:official`        | Локальный импорт вопросов из исходных PDF                   |
+| `pnpm test:official-pdf`      | Проверка PDF importer                                       |
 
-Studio экспортируется в `apps/studio/out/`; Web и Admin используют собственные Next.js production-сборки,
-а API собирается как отдельное NestJS-приложение.
+Полная матрица проверок: [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Структура
 
-- `apps/web/` — пользовательская онлайн-школа.
-- `apps/studio/` — 3D Asset Library и Scene Studio.
-- `apps/admin/` — staff-интерфейс управления контентом.
-- `apps/api/` — NestJS API и PostgreSQL persistence.
-- `packages/assets-3d/` — общие модели, ресурсы и реестр.
-- `packages/scene-engine/` — формат и renderer сцен.
-- `tooling/` — общие конфигурации TypeScript и ESLint.
-- `scripts/` — проверки репозитория.
-- `docs/` — архитектура, руководство разработчика и отчёты.
-
-Зависимости управляются pnpm, фиксируются в `pnpm-lock.yaml`. В CI используйте `pnpm install --frozen-lockfile`. Не создавайте второй lockfile через npm install.
+- `apps/web` — украинские Landing и Online School.
+- `apps/studio` — 3D Asset Library и Scene Studio/Composer.
+- `apps/admin` — staff workflows для контента и импорта.
+- `apps/api` — NestJS API и PostgreSQL persistence.
+- `packages/assets-3d` — переиспользуемые 3D-ассеты и registry.
+- `packages/scene-engine` — Scene Definition, validation и renderer.
+- `packages/country-rules` — UA-only нормативные ссылки и bounded evaluator.
+- `packages/scenarios` — вопросы, ответы, объяснения и scene bindings.
+- `packages/ui-preview` — безопасные локальные preview fixtures и gate.
 
 ## Документация
 
-- [Архитектура](docs/architecture.md)
-- [Руководство разработчика](docs/development-guide.md)
-- [Структура папок](docs/folder-structure.md)
-- [Аудит и отчёт Фазы 1](docs/phase-1-audit.md)
+- [Продукт и требования](docs/PRD.md)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Ближайшие задачи](docs/TASKS.md)
+- [UI/UX](docs/DESIGN.md)
+- [Технические решения](docs/DECISIONS.md)
+- [Проверки](docs/TESTING.md)
+- [Актуальный аудит](docs/AUDIT.md)
+- [Импорт официальных вопросов](docs/official-ticket-pipeline.md)
 
-Первый рынок — Украина. Другие страны предусмотрены как будущая граница контента, но их правила и приложения сейчас не создаются.
+Украина и украинский язык — единственный текущий рынок. Иностранные rulesets, Mobile,
+монетизация и автоматическая реконструкция точных 3D-сцен из 2D не реализованы.

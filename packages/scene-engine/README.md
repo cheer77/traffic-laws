@@ -38,4 +38,5 @@ Models, geometry, materials, labels and batched scenery remain owned by `assets-
 controls, local persistence and editing operations belong to Studio. Rendering callbacks allow
 Studio to add selection and diagnostic behavior without making the engine import editor code.
 
-Full architecture, authoring instructions and verification: [Phase 4 audit](../../docs/phase-4-audit.md).
+Architecture and verification requirements: [architecture](../../docs/ARCHITECTURE.md) and
+[testing guide](../../docs/TESTING.md).

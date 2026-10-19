@@ -84,7 +84,7 @@ untrusted glob expressions are safe.
 Both full `pnpm audit` and `pnpm audit --prod` report **zero advisories**, with empty muted lists.
 `pnpm why braces` returns no dependency path. A frozen offline install succeeds with the same lockfile
 SHA-256 before and after installation. Full application acceptance evidence is in the
-[Phase 6 audit](phase-6-audit.md).
+[current audit](AUDIT.md) and [testing guide](TESTING.md).
 
 On dependency updates, rerun both audits and the security regression suite. Review this decision
 when upgrading the Next lint plugin or tinyglobby, changing `settings.next.rootDir`, adding another

@@ -3,7 +3,7 @@
 Independent NestJS modular monolith on port **3002**. Web (3000) and Studio (3001) are unchanged.
 No educational scenario is approved for production. The three UA demonstrations remain `in_review`.
 The Phase 7 Admin UI and first Web learning dashboard are in progress. Payments, mobile and
-simulation are not implemented. See `docs/mvp-audit.md` for the current product slice.
+simulation are not implemented. See [`docs/AUDIT.md`](../../docs/AUDIT.md) for the current product slice.
 
 ## Start locally
 
@@ -305,5 +305,6 @@ The final runtime dependency audit has no known advisories. Stable Prisma 7.10.1
 Swagger `js-yaml` 5.4.1 override fix the initial findings. Vitest is 4.1.11 throughout the workspace,
 with the existing stable Vite 7.3.7 retained for transforms. PostgreSQL is pinned to 17.11-alpine.
 The full development audit still reports `braces` 3.0.3 through the existing ESLint/Next tooling,
-with no published fixed release. See [the Phase 6 audit](../../docs/phase-6-audit.md) for the
+with no published fixed release. See [the current audit](../../docs/AUDIT.md) and
+[testing guide](../../docs/TESTING.md) for the
 unresolved security gate; it has not been suppressed or represented as a passing full audit.
