@@ -12,7 +12,10 @@
         "HOST",
         "CORS_ORIGINS",
         "SESSION_TTL_SECONDS",
-        "SWAGGER_ENABLED"
+        "SWAGGER_ENABLED",
+        "UI_PREVIEW",
+        "NEXT_PUBLIC_UI_PREVIEW",
+        "NEXT_DIST_DIR"
       ]
     },
     "build": {

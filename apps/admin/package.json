@@ -14,6 +14,7 @@
     "@traffic-laws/country-rules": "workspace:*",
     "@traffic-laws/scenarios": "workspace:*",
     "@traffic-laws/scene-engine": "workspace:*",
+    "@traffic-laws/ui-preview": "workspace:*",
     "next": "16.4.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",

@@ -27,6 +27,7 @@
     "test:api:integration": "pnpm --filter @traffic-laws/api test:integration",
     "test:admin:integration": "pnpm --filter @traffic-laws/api test:integration --admin",
     "dev:admin": "turbo run dev --filter=@traffic-laws/admin",
+    "dev:ui": "NEXT_DIST_DIR=.next-ui-preview turbo run dev --filter=@traffic-laws/web --filter=@traffic-laws/admin --filter=@traffic-laws/studio",
     "build:admin": "turbo run build --filter=@traffic-laws/admin"
   },
   "devDependencies": {

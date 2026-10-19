@@ -7,6 +7,7 @@ import { UA_PDR_REFERENCES } from "@traffic-laws/country-rules/ua-pdr-references
 import { apiFetch, ApiError, COOKIE_NAME, requireStaff } from "@/lib/api";
 import { assertSameOrigin } from "@/lib/security";
 import type { Profile } from "@/lib/contracts";
+import { isUiPreview } from "@/lib/ui-preview";
 
 export interface FormState {
   error: string | null;
@@ -91,6 +92,8 @@ export async function logoutAction(): Promise<void> {
   redirect(revocationFailed ? "/login?logout=partial" : "/login");
 }
 export async function saveScenarioAction(_state: FormState, data: FormData): Promise<FormState> {
+  if (await isUiPreview())
+    return { error: null, success: "Тестова дія виконана. Дані не збережено." };
   let target = "";
   try {
     await assertSameOrigin();
@@ -130,6 +133,8 @@ export async function reviewAction(
   _state: FormState,
   data: FormData,
 ): Promise<FormState> {
+  if (await isUiPreview())
+    return { error: null, success: "Тестову рекомендацію показано без збереження." };
   try {
     await assertSameOrigin();
     const profile = await requireStaff();
@@ -162,6 +167,8 @@ export async function publicationAction(
   _state: FormState,
   data: FormData,
 ): Promise<FormState> {
+  if (await isUiPreview())
+    return { error: null, success: "Тестову зміну публікації показано без збереження." };
   try {
     await assertSameOrigin();
     const profile = await requireStaff();
@@ -192,6 +199,8 @@ export async function publicationAction(
 export async function syncQuestionsAction(_state: FormState, _data: FormData): Promise<FormState> {
   void _state;
   void _data;
+  if (await isUiPreview())
+    return { error: null, success: "Тестову перевірку показано без запуску імпорту." };
   try {
     await assertSameOrigin();
     const profile = await requireStaff();

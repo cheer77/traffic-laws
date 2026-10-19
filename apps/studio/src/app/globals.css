@@ -4,6 +4,7 @@
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;margin:0}
 body{color:var(--ink);background:var(--canvas);font-family:"Avenir Next",Avenir,"Segoe UI",sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.ui-preview-badge{position:fixed;z-index:100;left:50%;bottom:36px;transform:translateX(-50%);padding:8px 13px;border:1px solid #d4b76d;border-radius:999px;background:#fff7d8ed;color:#694d0d;box-shadow:0 8px 24px #30240c24;font-size:10px;font-weight:800;white-space:nowrap;backdrop-filter:blur(8px)}
 button,input,select{font:inherit}
 button,a,input,select{-webkit-tap-highlight-color:transparent}
 button{cursor:pointer;border:0;color:inherit}

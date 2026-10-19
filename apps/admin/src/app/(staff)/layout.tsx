@@ -2,8 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { requireStaff } from "@/lib/api";
 import { logoutAction } from "@/app/actions";
+import { isUiPreview } from "@/lib/ui-preview";
 export default async function StaffLayout({ children }: { children: ReactNode }) {
-  const profile = await requireStaff();
+  const [profile, preview] = await Promise.all([requireStaff(), isUiPreview()]);
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -23,9 +24,13 @@ export default async function StaffLayout({ children }: { children: ReactNode })
       <div className="main">
         <header className="topbar">
           <span>Керування навчальними матеріалами</span>
-          <form action={logoutAction}>
-            <button className="button secondary">Вийти</button>
-          </form>
+          {preview ? (
+            <span className="preview-inline-label">Тестовий адміністратор</span>
+          ) : (
+            <form action={logoutAction}>
+              <button className="button secondary">Вийти</button>
+            </form>
+          )}
         </header>
         <main className="content">{children}</main>
       </div>

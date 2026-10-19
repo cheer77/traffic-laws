@@ -11,6 +11,36 @@
 body {
   margin: 0;
 }
+.preview-mode-banner {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  padding: 8px 13px;
+  border: 1px solid #d4b76d;
+  border-radius: 999px;
+  background: #fff7d8ed;
+  color: #694d0d;
+  box-shadow: 0 8px 24px #30240c24;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.preview-inline-label {
+  color: #916b16;
+  font-size: 12px;
+  font-weight: 800;
+}
+.preview-notice {
+  padding: 12px 14px;
+  border: 1px solid #ead089;
+  border-radius: 10px;
+  background: #fff8dc;
+  color: #6d5215;
+  font-weight: 700;
+}
 a {
   color: inherit;
 }

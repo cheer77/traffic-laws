@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@traffic-laws/ui-preview": "workspace:*",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
     "lucide-react": "^0.548.0",
