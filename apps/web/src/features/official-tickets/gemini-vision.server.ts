@@ -89,6 +89,8 @@ interface GenerateInput {
   prompt: string;
   imageBase64: string;
   mimeType: string;
+  plain?: boolean;
+  json?: boolean;
 }
 
 interface GeminiVisionOptions {
@@ -96,6 +98,8 @@ interface GeminiVisionOptions {
   cacheDirectory: string;
   force?: boolean;
   model?: string;
+  plain?: boolean;
+  json?: boolean;
   generate?: (input: GenerateInput) => Promise<string>;
 }
 
@@ -108,6 +112,8 @@ interface CacheRecordBase {
 
 type CacheRecord =
   | (CacheRecordBase & { result: "analysis"; analysis: unknown })
+  | (CacheRecordBase & { result: "plain"; description: string })
+  | (CacheRecordBase & { result: "invalid_json"; response: string; errorCode: string })
   | (CacheRecordBase & {
       result: "error";
       errorCode: string;
@@ -124,7 +130,7 @@ export interface GeminiVisionDiagnostic {
 export interface GeminiVisionRequestDiagnostic {
   imageBytes: number;
   mimeType: string;
-  structuredOutput: true;
+  structuredOutput: boolean;
   maxHttpAttempts: 1;
 }
 
@@ -135,6 +141,10 @@ export interface GeminiVisionStats {
   model: string;
   diagnostic?: GeminiVisionDiagnostic;
   request?: GeminiVisionRequestDiagnostic;
+  plainDescriptionReceived?: boolean;
+  plainDescriptionCharacters?: number;
+  invalidJsonSaved?: boolean;
+  invalidJsonCharacters?: number;
 }
 
 export class GeminiVisionError extends VisionAdapterError {
@@ -212,6 +222,32 @@ requiredAssets must contain only genuinely necessary objects not represented by 
 Use a short descriptive stable ID for a missing object; do not substitute a different known asset.`;
 }
 
+function plainPrompt(ticket: ImportedTicket): string {
+  return `Опиши українською мовою лише те, що видно на ілюстрації до офіційного питання ПДР.
+Не визначай правильну відповідь і не повертай JSON.
+
+Питання: ${ticket.question}
+Варіанти:
+${ticket.options.map((option, index) => `${index + 1}. ${option}`).join("\n")}`;
+}
+
+function jsonPrompt(ticket: ImportedTicket): string {
+  return `Поверни тільки компактний JSON без Markdown. Аналізуй лише видимі об'єкти на зображенні.
+
+Питання: ${ticket.question}
+
+Формат:
+{"facts":[{"subject":"id","kind":"road_geometry|lanes|direction|vehicle|position|orientation|color|sign|stop_line|crosswalk|island|signal|extra_signal|maneuver","value":"коротке значення або null","confidence":0.0,"bounds":[left,top,right,bottom]}],"unknowns":[],"requiredAssets":[],"camera":null}
+
+Зафіксуй тип перехрестя, кількість/напрямок смуг, кожний автомобіль (тип, колір, смуга/порядок,
+напрямок), видимі знаки, сигнали світлофорів та розмітку. Bounds — рамка об'єкта від 0 до 1 з
+додатною площею. Один subject+kind — один факт; максимум 40 фактів. Невідоме не вгадуй: value=null
+і запиши назву поля в unknowns. Не оцінюй 3D-геометрію чи камеру, camera завжди null. Не визначай
+правильну відповідь. Відомі базові ассети: intersection.city.standard, vehicle.sedan.standard,
+traffic-light.standard, sign.priority.yield.ua, sign.priority.main.ua, sign.priority.stop.ua.
+requiredAssets містить лише явно потрібні відсутні можливості, наприклад traffic-light.extra-section.ua.`;
+}
+
 function classifySdkError(error: unknown): GeminiVisionError {
   const value = error && typeof error === "object" ? (error as Record<string, unknown>) : {};
   const status = value.status;
@@ -283,10 +319,32 @@ export function buildGenerateContentRequest(input: GenerateInput): GenerateConte
   };
 }
 
+export function buildPlainGenerateContentRequest(input: GenerateInput): GenerateContentParameters {
+  return {
+    model: input.model,
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { inlineData: { mimeType: input.mimeType, data: input.imageBase64 } },
+          { text: input.prompt },
+        ],
+      },
+    ],
+    config: {
+      httpOptions: { timeout: 120_000, retryOptions: { attempts: 1 } },
+    },
+  };
+}
+
 async function defaultGenerate(apiKey: string, input: GenerateInput): Promise<string> {
   const client = new GoogleGenAI({ apiKey });
   try {
-    const response = await client.models.generateContent(buildGenerateContentRequest(input));
+    const request =
+      input.plain || input.json
+        ? buildPlainGenerateContentRequest(input)
+        : buildGenerateContentRequest(input);
+    const response = await client.models.generateContent(request);
     if (!response.text) throw new GeminiVisionError("gemini_empty_response");
     return response.text;
   } catch (error) {
@@ -312,6 +370,19 @@ function parseCache(input: unknown): CacheRecord {
   };
   if (value.result === "analysis" && "analysis" in value)
     return { ...base, result: "analysis", analysis: value.analysis };
+  if (value.result === "plain" && typeof value.description === "string")
+    return { ...base, result: "plain", description: value.description };
+  if (
+    value.result === "invalid_json" &&
+    typeof value.response === "string" &&
+    typeof value.errorCode === "string"
+  )
+    return {
+      ...base,
+      result: "invalid_json",
+      response: value.response,
+      errorCode: value.errorCode,
+    };
   if (value.result === "error" && typeof value.errorCode === "string") {
     const diagnosticValue = value.diagnostic;
     const diagnostic =
@@ -336,8 +407,14 @@ export function createGeminiVisionAdapter(
 ): { adapter: VisionAdapter; stats: GeminiVisionStats } {
   if (!options.apiKey.trim()) throw new GeminiVisionError("missing_gemini_api_key");
   if (ticket.images.length !== 1) throw new GeminiVisionError("unique_reference_image_required");
+  if (options.plain && options.json) throw new GeminiVisionError("conflicting_diagnostic_modes");
   const model = options.model ?? GEMINI_VISION_MODEL;
-  const key = cacheKey(ticket, model);
+  const structuredKey = cacheKey(ticket, model);
+  const key = options.plain
+    ? createHash("sha256").update(`${structuredKey}:plain-v1`).digest("hex")
+    : options.json
+      ? createHash("sha256").update(`${structuredKey}:json-compact-v1`).digest("hex")
+      : structuredKey;
   const cachePath = path.join(options.cacheDirectory, `${key}.json`);
   const stats: GeminiVisionStats = {
     cacheHit: false,
@@ -359,6 +436,16 @@ export function createGeminiVisionAdapter(
           if (cached.cacheKey !== key || cached.model !== model)
             throw new GeminiVisionError("cache_binding_mismatch");
           stats.cacheHit = true;
+          if (cached.result === "plain") {
+            stats.plainDescriptionReceived = true;
+            stats.plainDescriptionCharacters = cached.description.length;
+            throw new GeminiVisionError("gemini_plain_description_received");
+          }
+          if (cached.result === "invalid_json") {
+            stats.invalidJsonSaved = true;
+            stats.invalidJsonCharacters = cached.response.length;
+            throw new GeminiVisionError(cached.errorCode);
+          }
           if (cached.result === "error") {
             stats.diagnostic = cached.diagnostic;
             throw new GeminiVisionError(cached.errorCode, cached.diagnostic);
@@ -381,7 +468,7 @@ export function createGeminiVisionAdapter(
       stats.request = {
         imageBytes: bytes.byteLength,
         mimeType: mimeType(ticket.images[0].src),
-        structuredOutput: true,
+        structuredOutput: !options.plain && !options.json,
         maxHttpAttempts: 1,
       };
       stats.requestCount = 1;
@@ -390,9 +477,15 @@ export function createGeminiVisionAdapter(
       try {
         responseText = await generated({
           model,
-          prompt: prompt(ticket),
+          prompt: options.plain
+            ? plainPrompt(ticket)
+            : options.json
+              ? jsonPrompt(ticket)
+              : prompt(ticket),
           imageBase64: bytes.toString("base64"),
           mimeType: stats.request.mimeType,
+          plain: options.plain,
+          json: options.json,
         });
       } catch (error) {
         const failure =
@@ -410,6 +503,19 @@ export function createGeminiVisionAdapter(
           diagnostic: failure.diagnostic,
         });
         throw failure;
+      }
+      if (options.plain) {
+        stats.plainDescriptionReceived = true;
+        stats.plainDescriptionCharacters = responseText.length;
+        await writeCache(cachePath, {
+          version: 1,
+          cacheKey: key,
+          model,
+          promptVersion: PROMPT_VERSION,
+          result: "plain",
+          description: responseText,
+        });
+        throw new GeminiVisionError("gemini_plain_description_received");
       }
       let analysis;
       try {
@@ -436,14 +542,29 @@ export function createGeminiVisionAdapter(
             : new GeminiVisionError(
                 `gemini_analysis_rejected:${error instanceof Error ? error.message.replaceAll(" ", "_") : "unknown"}`,
               );
-        await writeCache(cachePath, {
-          version: 1,
-          cacheKey: key,
-          model,
-          promptVersion: PROMPT_VERSION,
-          result: "error",
-          errorCode: failure.code,
-        });
+        if (options.json) {
+          const diagnosticResponse = responseText.slice(0, 200_000);
+          stats.invalidJsonSaved = true;
+          stats.invalidJsonCharacters = diagnosticResponse.length;
+          await writeCache(cachePath, {
+            version: 1,
+            cacheKey: key,
+            model,
+            promptVersion: PROMPT_VERSION,
+            result: "invalid_json",
+            response: diagnosticResponse,
+            errorCode: failure.code,
+          });
+        } else {
+          await writeCache(cachePath, {
+            version: 1,
+            cacheKey: key,
+            model,
+            promptVersion: PROMPT_VERSION,
+            result: "error",
+            errorCode: failure.code,
+          });
+        }
         throw failure;
       }
       const cache: CacheRecord = {

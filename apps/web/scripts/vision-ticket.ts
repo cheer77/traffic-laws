@@ -11,12 +11,21 @@ import {
 const WEB_ROOT = fileURLToPath(new URL("../", import.meta.url));
 const REPOSITORY_ROOT = path.resolve(WEB_ROOT, "../..");
 
-function parseArguments(args: string[]): { ticket: number; force: boolean } {
+function parseArguments(args: string[]): {
+  ticket: number;
+  force: boolean;
+  plain: boolean;
+  json: boolean;
+} {
   let ticket: number | null = null;
   let force = false;
+  let plain = false;
+  let json = false;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === "--force") force = true;
+    else if (argument === "--plain") plain = true;
+    else if (argument === "--json") json = true;
     else if (argument === "--ticket") {
       const value = Number(args[index + 1]);
       if (!Number.isInteger(value) || value < 1) throw new Error("invalid_ticket_number");
@@ -25,7 +34,8 @@ function parseArguments(args: string[]): { ticket: number; force: boolean } {
     } else throw new Error(`unknown_argument:${argument}`);
   }
   if (ticket === null) throw new Error("missing_required_argument:--ticket");
-  return { ticket, force };
+  if (plain && json) throw new Error("conflicting_diagnostic_modes");
+  return { ticket, force, plain, json };
 }
 
 async function main() {
@@ -44,6 +54,8 @@ async function main() {
     cacheDirectory: path.resolve(REPOSITORY_ROOT, ".cache/gemini-vision"),
     force: args.force,
     model: GEMINI_VISION_MODEL,
+    plain: args.plain,
+    json: args.json,
   });
   const result = await reconstruct(ticket, adapter);
   const factsByKind = result.analysis?.facts.reduce<Record<string, number>>((counts, fact) => {
@@ -59,6 +71,10 @@ async function main() {
         apiRequests: stats.requestCount,
         request: stats.request,
         diagnostic: stats.diagnostic,
+        plainDescriptionReceived: stats.plainDescriptionReceived,
+        plainDescriptionCharacters: stats.plainDescriptionCharacters,
+        invalidJsonSaved: stats.invalidJsonSaved,
+        invalidJsonCharacters: stats.invalidJsonCharacters,
         status: result.status,
         factCounts: factsByKind ?? {},
         requiredAssets: result.analysis?.requiredAssets ?? [],
@@ -71,7 +87,7 @@ async function main() {
       2,
     ),
   );
-  if (!result.analysis) process.exitCode = 1;
+  if (!result.analysis && !stats.plainDescriptionReceived) process.exitCode = 1;
 }
 
 main().catch((error: unknown) => {

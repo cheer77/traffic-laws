@@ -6,6 +6,7 @@ import imported from "./imported.json";
 import { parseImportedTickets, reconstruct } from "./pipeline";
 import {
   buildGenerateContentRequest,
+  buildPlainGenerateContentRequest,
   createGeminiVisionAdapter,
   GeminiVisionError,
 } from "./gemini-vision.server";
@@ -50,6 +51,68 @@ function response() {
   });
 }
 
+const savedPlainDescription =
+  "Чотиристороннє перехрестя, дві смуги, стоп-лінія, чотири автомобілі, червоний сигнал і зелена стрілка ліворуч.";
+
+function compactResponseGroundedInSavedPlainDescription() {
+  return JSON.stringify({
+    facts: [
+      {
+        subject: "road",
+        kind: "road_geometry",
+        value: "four-way intersection",
+        confidence: 0.95,
+        bounds: [0, 0, 1, 1],
+      },
+      {
+        subject: "road",
+        kind: "lanes",
+        value: "two inbound lanes",
+        confidence: 0.95,
+        bounds: [0.15, 0.4, 0.85, 1],
+      },
+      {
+        subject: "road",
+        kind: "direction",
+        value: "toward intersection",
+        confidence: 0.9,
+        bounds: [0.15, 0.4, 0.85, 1],
+      },
+      ...["white", "green", "dark-gray", "orange"].map((color, index) => ({
+        subject: `vehicle-${index + 1}`,
+        kind: "vehicle",
+        value: `passenger car; color=${color}`,
+        confidence: 0.9,
+        bounds: [0.1 + index * 0.2, 0.5, 0.25 + index * 0.2, 0.8],
+      })),
+      {
+        subject: "stop-line-1",
+        kind: "stop_line",
+        value: "visible before intersection",
+        confidence: 0.95,
+        bounds: [0.15, 0.45, 0.85, 0.5],
+      },
+      {
+        subject: "traffic-light-1",
+        kind: "signal",
+        value: "red",
+        confidence: 0.95,
+        bounds: [0.82, 0.12, 0.92, 0.38],
+      },
+      {
+        subject: "traffic-light-1",
+        kind: "extra_signal",
+        value: "green left arrow",
+        confidence: 0.95,
+        bounds: [0.9, 0.2, 0.97, 0.3],
+      },
+    ],
+    unknowns: ["exact vehicle directions"],
+    requiredAssets: ["traffic-light.extra-section.ua"],
+    camera: null,
+  });
+}
+
 afterEach(async () => {
   await Promise.all(
     temporaryDirectories.splice(0).map((directory) => rm(directory, { recursive: true })),
@@ -57,6 +120,163 @@ afterEach(async () => {
 });
 
 describe("Gemini Vision adapter", () => {
+  it("builds a plain image request without structured-output parameters", () => {
+    const request = buildPlainGenerateContentRequest({
+      model: "gemini-3.8-flash",
+      prompt: "Опиши зображення",
+      imageBase64: "jpeg-base64",
+      mimeType: "image/jpeg",
+      plain: true,
+    });
+
+    expect(request).toEqual({
+      model: "gemini-3.8-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: "image/jpeg", data: "jpeg-base64" } },
+            { text: "Опиши зображення" },
+          ],
+        },
+      ],
+      config: {
+        httpOptions: { timeout: 120_000, retryOptions: { attempts: 1 } },
+      },
+    });
+    expect(request.config).not.toHaveProperty("responseJsonSchema");
+    expect(request.config).not.toHaveProperty("responseMimeType");
+    expect(request.config).not.toHaveProperty("thinkingConfig");
+    expect(request.config).not.toHaveProperty("maxOutputTokens");
+  });
+
+  it("builds the JSON diagnostic request without structured-output parameters", () => {
+    const request = buildPlainGenerateContentRequest({
+      model: "gemini-3.8-flash",
+      prompt: "Поверни тільки JSON",
+      imageBase64: "jpeg-base64",
+      mimeType: "image/jpeg",
+      json: true,
+    });
+
+    expect(request.config).toEqual({
+      httpOptions: { timeout: 120_000, retryOptions: { attempts: 1 } },
+    });
+    expect(request.config).not.toHaveProperty("responseJsonSchema");
+    expect(request.config).not.toHaveProperty("responseMimeType");
+    expect(request.config).not.toHaveProperty("thinkingConfig");
+    expect(request.config).not.toHaveProperty("maxOutputTokens");
+  });
+
+  it("keeps a plain description separate from validated analysis and reuses its cache", async () => {
+    const cacheDirectory = await temporaryDirectory();
+    let calls = 0;
+    const first = createGeminiVisionAdapter(ticket, {
+      apiKey: "test-secret",
+      cacheDirectory,
+      plain: true,
+      generate: async (input) => {
+        calls += 1;
+        expect(input.plain).toBe(true);
+        return "На зображенні видно перехрестя та автомобілі.";
+      },
+    });
+    const firstResult = await reconstruct(ticket, first.adapter);
+    expect(firstResult.analysis).toBeNull();
+    expect(first.stats.plainDescriptionReceived).toBe(true);
+    expect(first.stats.requestCount).toBe(1);
+
+    const cached = createGeminiVisionAdapter(ticket, {
+      apiKey: "test-secret",
+      cacheDirectory,
+      plain: true,
+      generate: async () => {
+        calls += 1;
+        return "must not run";
+      },
+    });
+    await reconstruct(ticket, cached.adapter);
+    expect(cached.stats.cacheHit).toBe(true);
+    expect(cached.stats.plainDescriptionReceived).toBe(true);
+    expect(cached.stats.requestCount).toBe(0);
+    expect(calls).toBe(1);
+  });
+
+  it("validates JSON-mode output through the existing ImageAnalysis parser", async () => {
+    const cacheDirectory = await temporaryDirectory();
+    const json = createGeminiVisionAdapter(ticket, {
+      apiKey: "test-secret",
+      cacheDirectory,
+      json: true,
+      generate: async (input) => {
+        expect(input.json).toBe(true);
+        expect(input.prompt).toContain('"facts"');
+        return response();
+      },
+    });
+    const result = await reconstruct(ticket, json.adapter);
+    expect(json.stats.request?.structuredOutput).toBe(false);
+    expect(result.analysis?.facts).toHaveLength(3);
+    expect(result.missingAssets).toEqual(["traffic-light.extra-section.ua"]);
+    expect(result.status).toBe("needs_review");
+  });
+
+  it("accepts compact JSON grounded in the saved plain description without an API call", async () => {
+    expect(savedPlainDescription).toContain("чотири автомобілі");
+    const cacheDirectory = await temporaryDirectory();
+    const json = createGeminiVisionAdapter(ticket, {
+      apiKey: "local-test-only",
+      cacheDirectory,
+      json: true,
+      generate: async (input) => {
+        expect(input.prompt).toContain("максимум 40 фактів");
+        expect(input.prompt).toContain("camera завжди null");
+        expect(input.prompt).not.toContain("Варіанти:");
+        return compactResponseGroundedInSavedPlainDescription();
+      },
+    });
+
+    const result = await reconstruct(ticket, json.adapter);
+    expect(json.stats.requestCount).toBe(1);
+    expect(result.analysis?.facts.filter((fact) => fact.kind === "vehicle")).toHaveLength(4);
+    expect(result.analysis?.camera).toBeNull();
+    expect(result.missingAssets).toEqual(["traffic-light.extra-section.ua"]);
+    expect(result.draft).toBeNull();
+    expect(result.status).toBe("needs_review");
+  });
+
+  it("stores invalid JSON-mode output as a separate diagnostic cache result", async () => {
+    const cacheDirectory = await temporaryDirectory();
+    let calls = 0;
+    const invalid = createGeminiVisionAdapter(ticket, {
+      apiKey: "test-secret",
+      cacheDirectory,
+      json: true,
+      generate: async () => {
+        calls += 1;
+        return "```json\n{invalid}\n```";
+      },
+    });
+    const result = await reconstruct(ticket, invalid.adapter);
+    expect(result.analysis).toBeNull();
+    expect(invalid.stats.invalidJsonSaved).toBe(true);
+    expect(await readFile(invalid.stats.cachePath, "utf8")).toContain("{invalid}");
+
+    const cached = createGeminiVisionAdapter(ticket, {
+      apiKey: "test-secret",
+      cacheDirectory,
+      json: true,
+      generate: async () => {
+        calls += 1;
+        return response();
+      },
+    });
+    await reconstruct(ticket, cached.adapter);
+    expect(cached.stats.cacheHit).toBe(true);
+    expect(cached.stats.requestCount).toBe(0);
+    expect(calls).toBe(1);
+  });
+
   it("builds the supported generateContent structured-output request", () => {
     const request = buildGenerateContentRequest({
       model: "gemini-3.8-flash",

@@ -30,7 +30,14 @@ limit, cache and ticket-1 CLI are implemented. The adapter uses `generateContent
 `gemini-3.8-flash`, matching the independently successful direct API method and model. Unsupported
 nullable `type` arrays and the zero-temperature override were removed from the structured request;
 the next single attempt passed parameter validation but received HTTP 503 `UNAVAILABLE`. No ticket
-was recognized and no Scene Definition was produced.
+was recognized through structured output and no Scene Definition was produced. A separate plain-mode
+probe on 2026-10-20 successfully described the ticket image, proving basic image understanding while
+remaining outside validated reconstruction input. A schema-less JSON mode now requests the existing
+`ImageAnalysis` fields and validates them locally. Its original live pilot ended with HTTP 504
+`DEADLINE_EXCEEDED`. A smaller second-stage prompt was then proven locally against the saved plain
+description, but its one authorized live attempt returned HTTP 503 `UNAVAILABLE` before any response
+body. No real JSON, asset comparison or Scene Definition was produced; retry remains an explicit
+owner decision.
 
 - Read `GEMINI_API_KEY` only through a secure server-side/local tooling boundary; never expose it to
   client bundles, logs, fixtures or committed files.

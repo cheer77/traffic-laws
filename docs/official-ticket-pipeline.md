@@ -37,6 +37,30 @@ Analyze only the authorized pilot ticket:
 pnpm vision:ticket --ticket 1
 ```
 
+For a diagnostic image-understanding check without structured output:
+
+```sh
+pnpm vision:ticket --ticket 1 --plain
+```
+
+Plain mode sends no response MIME type, JSON Schema, thinking configuration or generation limits.
+Its text response uses a separate ignored cache entry and never becomes validated analysis or a Scene
+Definition.
+
+Request JSON in the existing `ImageAnalysis` shape without provider-side structured output:
+
+```sh
+pnpm vision:ticket --ticket 1 --json
+```
+
+JSON mode uses the same schema-less `generateContent` request as plain mode, but asks for one compact
+raw JSON object. It requests at most 40 image-bound facts and explicitly excludes camera estimation,
+3D geometry and a model-authored Scene Definition. It parses with `JSON.parse`, binds trusted
+ticket/image identifiers locally and passes the result through the existing `parseImageAnalysis`
+validator. Valid analysis continues through `reconstruct`; invalid model text is retained only in a
+separate ignored diagnostic cache entry and is never sent to Scene Engine. Its cache is distinct from
+both plain and structured-output modes and from earlier JSON prompt revisions.
+
 The CLI reads `GEMINI_API_KEY` from the server-only local environment, sends one request at most and
 uses `.cache/gemini-vision/` on subsequent runs. Use `--force` only for an intentional new request.
 The SDK retry policy is explicitly limited to one physical HTTP attempt. Safe diagnostics report the
@@ -156,6 +180,24 @@ The corrected request no longer returned HTTP 400 and instead reached provider p
 returned HTTP 503 `UNAVAILABLE`. No validated analysis, objects, asset comparison or Scene Definition
 was produced; the ticket remains `needs_review`. Repeating without `--force` uses the cached safe
 failure and performs zero API requests.
+
+On 2026-10-20, one plain-mode request successfully described the same image: a regulated four-way
+intersection, red main signal with a green left arrow in the additional section, two inbound lanes,
+a stop line and four vehicles. This proves image understanding for the pilot but is not structured,
+validated reconstruction input; the scene remains `needs_review`.
+
+On 2026-10-20, the single authorized schema-less JSON-mode request sent the same JPEG and question
+with no response MIME type, JSON Schema, thinking configuration or generation limits. It exhausted
+the 120-second HTTP deadline and returned HTTP 504 `DEADLINE_EXCEEDED`. No response body, valid JSON,
+asset comparison or Scene Definition was produced. The safe failure is cached under the JSON-mode
+key; rerunning the command without `--force` consumes no API quota. No automatic retry occurred.
+
+The compact prompt was then tested locally using only facts already present in the saved plain
+description. The resulting synthetic analysis passed the existing parser and reconstruction boundary,
+reported `traffic-light.extra-section.ua` as unavailable and correctly remained `needs_review` with no
+scene draft. The one subsequent live request returned HTTP 503 `UNAVAILABLE` before a response body;
+it made one physical HTTP attempt and its safe failure is cached under the compact-prompt key. No real
+compact JSON or image-derived asset comparison was obtained.
 
 Browser, Chrome, Playwright, Puppeteer, GPU, mobile and visual scene checks are intentionally not run
 under the owner's restrictions. PDF page/image inspection is independent of browser verification.
